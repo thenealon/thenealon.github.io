@@ -1,0 +1,144 @@
+<!DOCTYPE HTML>
+<!--
+	TXT 2.5 by HTML5 UP
+	html5up.net | @n33co
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+
+<html>
+	<head>
+<script type="text/javascript">
+  //<![CDATA[
+  function getQuote(){
+    quotes = new Array(
+       "To Thales the primary question was not what do we know, but how do we know it.",
+      " Neglect of mathematics works injury to all knowledge, since he who is ignorant of it cannot know the other sciences or the things of the world.",
+      "No matter how correct a mathematical theorem may appear to be, one ought never to be satisfied that there was not something imperfect about it until it also gives the impression of being beautiful.",
+      "In mathematics the art of proposing a question must be held of higher value than solving it. ",
+      "I have had my results for a long time: but I do not yet know how I am to arrive at them.",
+	"What we know is not much. What we do not know is immense.",
+	"We must regard classical mathematics as a combinatorial game played with symbols.",
+	"Wherever there is number, there is beauty.",
+	"If only I had the theorems! Then I should find the proofs easily enough. ",
+	"Let us grant that the pursuit of mathematics is a divine madness of the human spirit.",
+	"Logic is the hygiene the mathematician practices to keep his ideas healthy and strong."
+    );
+    authors = new Array(
+	"-- Aristotle (384-322 BCE)",
+	"-- Roger Bacon (1214-1294)",
+	"-- George Boole (1815-1869)",
+	"-- George Cantor (1845-1918)",
+ 	"-- Carl Friedrich Gauss (1777-1855)",
+	"-- Pierre-Simon Laplace (1749-1827)",
+	"-- John Von Neumann (1903-1957)",
+	"-- Diadochus Proclus (410-485)",
+	"-- Bernard Riemann (1826-1866)",
+	"-- Alfred North Whitehead (1861-1947)",
+	"-- Hermann Klaus Hugo Weyl (1885-1955)"
+	);
+    //generate a random number between zero and the number of quotes
+    numQuotes = quotes.length;
+
+    quoteID = parseInt(Math.random() * numQuotes);
+
+    //get the outputQuote div
+    var outputQuote = document.getElementById("outputQuote");
+    var outputAuthor = document.getElementById("outputAuthor");
+    //copy the appropriate quote to the output element
+    outputQuote.innerHTML = quotes[quoteID];
+    outputAuthor.innerHTML = authors[quoteID];
+
+  } // end getQuote
+
+  //]]>
+  </script>
+
+		<title>N. Bushaw</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,700|Open+Sans+Condensed:700" rel="stylesheet" />
+		<script src="js/jquery.min.js"></script>
+		<script src="js/config.js"></script>
+		<script src="js/skel.min.js"></script>
+		<script src="js/skel-panels.min.js"></script>
+		<noscript>
+			<link rel="stylesheet" href="css/skel-noscript.css" />
+			<link rel="stylesheet" href="css/style.css" />
+			<link rel="stylesheet" href="css/style-desktop.css" />
+		</noscript>
+		<!--[if lte IE 9]><link rel="stylesheet" href="css/ie9.css" /><![endif]-->
+		<!--[if lte IE 8]><script src="js/html5shiv.js"></script><link rel="stylesheet" href="css/ie8.css" /><![endif]-->
+		<!--[if lte IE 7]><link rel="stylesheet" href="css/ie7.css" /><![endif]-->
+	</head>
+	<body class="homepage"><body onload = "getQuote()">
+
+		<!-- Header -->
+			<header id="header">
+				<div class="logo">
+					<div>
+						<h2><a href="#" id="logo">Neal Bushaw</a>
+						</h2>
+						<h1><span class="byline"><a href="http://math.vcu.edu/">Assistant Professor<br>Department of Mathematics and Applied Mathematics</a><br><a href="http://www.vcu.edu/">Virginia Commonwealth University</a></span></h0>
+					</div>
+				</div>
+			</header>
+		<!-- /Header -->
+
+		<!-- Nav -->
+			<nav id="nav" class="skel-panels-fixed">
+				<ul>
+					<li class="current_page_item"><a href="index.html">Home</a></li>
+					<li><a href="research.html">Research</a></li>
+					<li><a href="teaching.html">Teaching</a></li>
+					<li><a href="whois.html">Who?</a></li>
+					<li><a href="links.html">Links</a></li>
+				</ul>
+			</nav>
+		<!-- /Nav -->
+
+		<!-- Banner -->
+			<div id="banner-wrapper">
+				<section id="banner">
+					<h2 id="outputQuote">
+</h2>
+					<span class="byline" id="outputAuthor"></span>
+                    <span class="byline"><br><hr><br><br></span><h2>
+<a href="http://sysm.vcu.edu">SYSM Affiliated Faculty, Systems Modeling and Analysis Program</a><br><br>
+<a href="http://www.people.vcu.edu/~dcranston/DM-seminar/">Biggest Fan, Frequent Speaker, VCU Discrete Math Seminar</a><br><br><hr></h2>
+
+                    <h2><br><br><br> Spring 2020 Courses:<br><br>
+                    MATH200 -- Calculus with Analytic Geometry<br>
+                    MATH356 -- Graphs and Algorithms<br><br></h2>
+                    <h2><br><br><br> Fall 2020 Courses:<br><br>
+                    MATH300 -- Intro to Mathematical Reasoning (2 Sections)<br>
+                    MATH756 -- Topics in Graph Theory (Extremal Graph Theory and the Probabilistic Method)<br><br></h2>
+						</section>
+			</div>
+		<!-- /Banner -->
+
+		<!-- Main -->
+			<div id="main-wrapper">
+				<div id="main" class="container">
+					<div class="row">
+						<div class="12u">
+
+							<!-- Highlight -->
+								<section class="is-highlight">
+									<ul class="special">
+										<li><a href="research.html" class="fa fa-coffee solo"><span>Research</span></a></li>
+										<li><a href="teaching.html" class="fa fa-book solo"><span>Teaching</span></a></li>
+
+										<li><a href="whois.html" class="fa fa-user solo"><span>Who?</span></a></li>
+										<li><a href="links.html" class="fa fa-chain solo"><span>Links</span></a></li>
+									</ul>
+									<header>
+										<h2><a href="research.html">Research</a>, <a href="teaching.html">Teaching</a>, <a href="whois.html">About Me</a>, <a href="links.html">Links</a></h2>
+										<span class="byline">Space for this page is provided by Virginia Commonwealth University. Although it is intended to further the educational mission of the university, the opinions expressed here are the author's, and are not endorsed by VCU.</span>
+									</header>
+									<p>
+
+
+
+	</body>
+</html>

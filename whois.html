@@ -1,0 +1,134 @@
+﻿<!DOCTYPE HTML>
+<!--
+	TXT 2.5 by HTML5 UP
+	html5up.net | @n33co
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+<script type="text/javascript">
+  //<![CDATA[
+  function getQuote(){
+    quotes = new Array(
+	"I may not have gone where I intended to go, but I think I have ended up where I needed to be.",
+	"I've always believed that if you put in the work, the results will come. I don't do things half-heartedly. Because I know if I do, then I can expect half-hearted results.",
+	"There's nothing wrong with me, this is how I'm supposed to be.",
+	"But enough about me... Let's talk about me. What do you think of me?",
+	"Half the lies they tell about me aren't true.",
+	"I'm kind of a big deal."
+    );
+    authors = new Array(
+	"Douglas Adams (1952-2001)",
+	"Michael Jordan (1963+)",
+	"Green Day (1987+)",
+	"Johnny Bravo (1997-2004)",
+	"Yogi Berra (1925+)",
+	"Ron Burgundy"
+	);
+    //generate a random number between zero and the number of quotes
+    numQuotes = quotes.length;
+
+    quoteID = parseInt(Math.random() * numQuotes);
+
+    //get the outputQuote div
+    var outputQuote = document.getElementById("outputQuote");
+    var outputAuthor = document.getElementById("outputAuthor");
+    //copy the appropriate quote to the output element
+    outputQuote.innerHTML = quotes[quoteID];
+    outputAuthor.innerHTML = authors[quoteID];
+
+  } // end getQuote
+
+  //]]>
+  </script>
+		<title>N. Bushaw</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,700|Open+Sans+Condensed:700" rel="stylesheet" />
+		<script src="js/jquery.min.js"></script>
+		<script src="js/config.js"></script>
+		<script src="js/skel.min.js"></script>
+		<script src="js/skel-panels.min.js"></script>
+		<noscript>
+			<link rel="stylesheet" href="css/skel-noscript.css" />
+			<link rel="stylesheet" href="css/style.css" />
+			<link rel="stylesheet" href="css/style-desktop.css" />
+		</noscript>
+		<!--[if lte IE 9]><link rel="stylesheet" href="css/ie9.css" /><![endif]-->
+		<!--[if lte IE 8]><script src="js/html5shiv.js"></script><link rel="stylesheet" href="css/ie8.css" /><![endif]-->
+		<!--[if lte IE 7]><link rel="stylesheet" href="css/ie7.css" /><![endif]-->
+	</head>
+	<body class="homepage"><body onload = "getQuote()">
+
+		<!-- Header -->
+			<header id="header">
+				<div class="logo">
+					<div>
+						<h2><a href="#" id="logo">Who is Neal Bushaw?</a>
+						</h2>
+
+				</div>
+			</header>
+		<!-- /Header -->
+
+		<!-- Nav -->
+			<nav id="nav" class="skel-panels-fixed">
+				<ul>
+					<li><a href="index.html">Home</a></li>
+					<li><a href="research.html">Research</a></li>
+					<li><a href="teaching.html">Teaching</a></li>
+					<li class="current_page_item"><a href="whois.html">Who?</a></li>
+					<li><a href="links.html">Links</a></li>
+				</ul>
+			</nav>
+		<!-- /Nav -->
+
+		<!-- Banner -->
+			<div id="banner-wrapper">
+				<section id="banner"><h2 id="outputQuote"></h2>
+					<span class="byline" id="outputAuthor"></span>
+
+				</section>
+			</div>
+		<!-- /Banner -->
+
+		<!-- Main -->
+			<div id="main-wrapper">
+				<div id="main" class="container">
+					<div class="row">
+						<div class="12u">
+
+									<header>
+
+<blockquote>
+
+I'm an Assistant Professor in the <a href="http://math.vcu.edu">Department of Mathematics and Applied Mathematics</a> at <a href="http://www.vcu.edu">Virginia Commonwealth University</a>. Before that, I was a Visiting Assistant Professor at <a href="http://www.asu.edu">Arizona State University</a>, and a research postdoc at <a href="http://www.impa.br">Instituto Nacional de Matematica Pura e Aplicada</a> in Rio de Janeiro. I completed my doctorate under the of supervision Prof. Bela Bollobas at
+the <a href="http://www.memphis.edu">University of Memphis</a>, in
+the <a href="http://www.msci.memphis.edu/">Department of
+Mathematical Sciences</a>, in May 2012; this followed an M.S. at <a href="http://math.wwu.edu/">Western Washington University</a> under the supervision of Dr. Amites Sarkar, and a B.A. at <a href="http://www.colorado.edu">The University of Colorado</a>. I am greatly indebted to those around me
+who have helped me throughout my academic career, although I make no list here. My academic
+interests lie primarily in the mysteries and details of mathematics,
+particularly extremal and probabilistic combinatorics. Outside my
+academia, I enjoy <a
+href="http://en.wikipedia.org/wiki/Avant-garde_jazz">weird</a> <a href="http://en.wikipedia.org/wiki/Eric_Dolphy">jazz</a>,
+<a href="http://en.wikipedia.org/wiki/Hardcore_punk">loud</a> <a href="http://en.wikipedia.org/wiki/Skate_punk">punk</a>
+<a href="http://en.wikipedia.org/wiki/Refused">rock</a>, <a href="http://www.fender.com">gui</a><a
+href="http://www.mguitar.com">tars</a>, <a
+href="http://www.freeskier.com">skiing</a>, <a
+href="http://www.stevenspass.com">snowboarding</a>, as well as life, the universe, and everything. You can find out about my mathematical family and collaborators <a href="gen.html">here</a>, or peek at my cv <a href="">here</a>.
+
+</blockquote>
+
+<a href="https://tcs4f.org" 
+   style="display: inline-block;
+	background-color: #004b1e; border: 2px solid #CCCCCC;
+	padding: 5px; margin: 10px; border-radius: 5px;">
+	<img width="250" src="https://tcs4f.org/themes/tcs4f/img/logo_white_support_long.svg" 
+	     alt="Theoretical Computer Scientists for Future">
+</a>
+
+
+
+	</body>
+</html>

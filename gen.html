@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<!--
+	TXT 2.5 by HTML5 UP
+	html5up.net | @n33co
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+<script type="text/javascript">
+  //<![CDATA[
+  function getQuote(){
+    quotes = new Array(
+       "Everyone has ancestors and it is only a question of going back far enough to find a good one."
+    );
+    authors = new Array(
+	"-- Howard Kenneth Nixon (1927-2009)"
+	);
+    //generate a random number between zero and the number of quotes
+    numQuotes = quotes.length;
+
+    quoteID = parseInt(Math.random() * numQuotes);
+
+    //get the outputQuote div
+    var outputQuote = document.getElementById("outputQuote");
+    var outputAuthor = document.getElementById("outputAuthor");
+    //copy the appropriate quote to the output element
+    outputQuote.innerHTML = quotes[quoteID];
+    outputAuthor.innerHTML = authors[quoteID];
+
+  } // end getQuote
+
+  //]]>
+  </script>
+		<title>N. Bushaw</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,700|Open+Sans+Condensed:700" rel="stylesheet" />
+		<script src="js/jquery.min.js"></script>
+		<script src="js/config.js"></script>
+		<script src="js/skel.min.js"></script>
+		<script src="js/skel-panels.min.js"></script>
+		<noscript>
+			<link rel="stylesheet" href="css/skel-noscript.css" />
+			<link rel="stylesheet" href="css/style.css" />
+			<link rel="stylesheet" href="css/style-desktop.css" />
+		</noscript>
+		<!--[if lte IE 9]><link rel="stylesheet" href="css/ie9.css" /><![endif]-->
+		<!--[if lte IE 8]><script src="js/html5shiv.js"></script><link rel="stylesheet" href="css/ie8.css" /><![endif]-->
+		<!--[if lte IE 7]><link rel="stylesheet" href="css/ie7.css" /><![endif]-->
+	</head>
+	<body class="homepage"><body onload = "getQuote()">
+
+		<!-- Header -->
+			<header id="header">
+				<div class="logo">
+					<div>
+						<h2><a href="#" id="logo">Mathematics Genealogy</a>
+						</h2>
+
+				</div>
+			</header>
+		<!-- /Header -->
+
+		<!-- Nav -->
+			<nav id="nav" class="skel-panels-fixed">
+				<ul>
+					<li><a href="index.html">Home</a></li>
+					<li><a href="research.html">Research</a></li>
+					<li><a href="teaching.html">Teaching</a></li>
+					<li><a href="whois.html">Who?</a></li>
+					<li><a href="links.html">Links</a></li>
+				</ul>
+			</nav>
+		<!-- /Nav -->
+
+		<!-- Banner -->
+			<div id="banner-wrapper">
+				<section id="banner">
+					<h2 id="outputQuote"></h2>
+					<span class="byline" id="outputAuthor"></span>
+				</section>
+			</div>
+		<!-- /Banner -->
+
+		<!-- Main -->
+			<div id="main-wrapper">
+				<div id="main" class="container">
+					<div class="row">
+						<div class="12u">
+
+									<header>
+
+
+
+<blockquote>
+This page collects some information about and pictures of my academic ancestry, as well as the non-trivial overlap between my genetic and mathematical ancestries.
+<hr>
+
+<h3>This information was made/collected/visualized primarily using:</h3>
+<ol>
+ <li><a href="http://genealogy.math.ndsu.nodak.edu/">The Mathematics Genealogy Project</a>, the primary source for data on who did their Ph.D. where, and with whom.</li>
+ <li><a href="http://www.davidalber.net/geneagrapher/">Geneagrapher</a>. Created by David Alber, Geneagrapher is an outstanding command line tool for automatically grabbing ancestry data from the MGP and saving it in the GraphViz format (.dot).</li>
+ <li><a href="http://www.graphviz.org/">GraphViz</a>. Open source, easy to use (but hard to customize) software to create visualizations of the data downloaded with Geneagrapher.</li>
+ <li><a href="http://gephi.org/">Gephi</a>. A remarkable open source graph visualization program. Takes some playing with, but makes gorgeous pictures.</li>
+</ol>
+
+<h3>Data specific to me:</h3>
+<ol>
+ <li><a href="http://genealogy.math.ndsu.nodak.edu/id.php?id=22719">Academic Brothers and Sisters</a> via Bela Bollobas, my PhD supervisor.</li>
+ <li><a href="//http://genealogy.math.ndsu.nodak.edu/id.php?id=9383">Students</a> of my grandfather, Donald "Beh" Bushaw.</li>
+</ol><h3>Graphical Views ({Ancestors}+{Bollobas decendents}):</h3>
+<ol>
+ <li><a href="http://umdrive.memphis.edu/nobushaw/www/Research/Viz/pretty.pdf">Academic Family Tree</a>, viewed as a family tree [pdf].</li>
+ <li><a href="http://umdrive.memphis.edu/nobushaw/www/Research/Viz/ballgraph.png">Academic Family Tree</a>, circular visualization [png].</li>
+ <li><a href="http://umdrive.memphis.edu/nobushaw/www/Research/Viz/circular.pdf">Academic Family Tree</a>, different circular visualization [pdf].</li>
+ <li><a href="http://umdrive.memphis.edu/nobushaw/www/Research/Viz/circular.png">Academic Family Tree</a>, different circular visualization [png].</li>
+ <li><a href="http://umdrive.memphis.edu/nobushaw/www/Research/Viz/force2.pdf">Academic Family Tree</a>, force repulsion visualization [pdf].</li>
+ <li><a href="http://umdrive.memphis.edu/nobushaw/www/Research/Viz/fruchtermanrheingold.png">Academic Family Tree</a>, Fruchterman-Rheingold visualization [png].</li>
+ <li><a href="http://umdrive.memphis.edu/nobushaw/www/Research/Viz/radialaxis.png">Academic Family Tree</a>, radial axis visualization [png].</li>
+ <li><a href="http://umdrive.memphis.edu/nobushaw/www/Research/Viz/random.png">Academic Family Tree</a>, random node placement visualization [png].</li>
+ <li><a href="http://umdrive.memphis.edu/nobushaw/www/Research/Viz/wholenamesround.png">Academic Family Tree</a>, more different circular visualization [png].</li>
+ <li><a href="http://umdrive.memphis.edu/nobushaw/www/Research/Viz/YifanHu.png">Academic Family Tree</a>, Yifan-Hu proportional multilevel visualization [png].</li>
+</ol>
+
+</blockquote>
+
+
+
+
+
+	</body>
+</html>
