@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <title>VCU/Pitt Bootstrap Percolation</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body { font-family: Arial, sans-serif; text-align:center; margin:0; padding:0; background:#f7f7f7; }
 h1 { margin:10px; }
 #controls { margin:10px auto; display:flex; flex-wrap:wrap; justify-content:center; gap:15px; }
 .slider-container { display:flex; flex-direction:column; align-items:center; }
 canvas { border:2px solid #333; margin:15px auto; display:block; touch-action: none; }
-button, select { margin:5px; padding:6px 12px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; background:#ccc; }
-button:hover, select:hover { opacity:0.85; }
+button, select, input[type=file] { margin:5px; padding:6px 12px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; background:#ccc; }
+button:hover, select:hover, input[type=file]:hover { opacity:0.85; }
 label.toggle-label { display:flex; align-items:center; gap:5px; font-weight:bold; }
 #roundsLabelDisplay { font-weight:bold; margin-left:5px; }
 </style>
@@ -27,7 +27,6 @@ label.toggle-label { display:flex; align-items:center; gap:5px; font-weight:bold
   <div class="slider-container"><label>Speed(ms/step): <span id="speedLabel">300</span></label><input type="range" id="speedSlider" min="50" max="1000" step="50" value="300"></div>
   <div class="slider-container"><label class="toggle-label"><input type="checkbox" id="torusVert"> Vertical Wrap</label></div>
   <div class="slider-container"><label class="toggle-label"><input type="checkbox" id="torusHoriz"> Horizontal Wrap</label></div>
-  <div class="slider-container"><label class="toggle-label"><input type="checkbox" id="squareToggle"> Square Grid</label></div>
 </div>
 
 <div>
@@ -42,6 +41,7 @@ label.toggle-label { display:flex; align-items:center; gap:5px; font-weight:bold
   <option value="diagonals">Diagonals</option>
   <option value="primes">Primes</option>
 </select>
+<input type="file" id="imageUpload" accept="image/*">
 <span>Rounds: <span id="roundsLabelDisplay">0</span></span>
 </div>
 
@@ -57,21 +57,34 @@ let infectionInterval;
 let team="VCU";
 let colors = {bg:"#ffb300", infected:"#000"};
 
-function initGrid(){ grid = Array(rows).fill().map(()=>Array(cols).fill(false)); rounds=0; document.getElementById("roundsLabelDisplay").textContent=rounds; drawGrid(); }
+function initGrid(){ 
+  grid = Array(rows).fill().map(()=>Array(cols).fill(false)); 
+  rounds=0; 
+  document.getElementById("roundsLabelDisplay").textContent=rounds; 
+  drawGrid(); 
+}
+
 function cellSize(){ return Math.floor(Math.min(window.innerWidth*0.9/cols, (window.innerHeight-300)/rows)); }
 
 function drawGrid(){
-  const size = cellSize(); canvas.width=cols*size; canvas.height=rows*size;
+  const size = cellSize(); 
+  canvas.width=cols*size; canvas.height=rows*size;
   ctx.fillStyle = colors.bg; ctx.fillRect(0,0,canvas.width,canvas.height);
-  const vertWrap = document.getElementById("torusVert").checked; const horizWrap = document.getElementById("torusHoriz").checked;
+  const vertWrap = document.getElementById("torusVert").checked; 
+  const horizWrap = document.getElementById("torusHoriz").checked;
   const hintAlpha = 0.15;
-  if(vertWrap || horizWrap){ ctx.globalAlpha=hintAlpha; for(let dr=-1;dr<=1;dr++){for(let dc=-1;dc<=1;dc++){if(dr===0 && dc===0) continue; for(let r=0;r<rows;r++){for(let c=0;c<cols;c++){if(grid[r][c]){const rr=r+dr*rows; const cc=c+dc*cols; if(rr>=0 && rr<rows && cc>=0 && cc<cols){ctx.fillStyle=colors.infected;ctx.fillRect(cc*size,rr*size,size,size);}}}}}} ctx.globalAlpha=1.0;}
+  if(vertWrap || horizWrap){
+    ctx.globalAlpha=hintAlpha; 
+    for(let dr=-1;dr<=1;dr++){for(let dc=-1;dc<=1;dc++){if(dr===0 && dc===0) continue; for(let r=0;r<rows;r++){for(let c=0;c<cols;c++){if(grid[r][c]){const rr=r+dr*rows; const cc=c+dc*cols; if(rr>=0 && rr<rows && cc>=0 && cc<cols){ctx.fillStyle=colors.infected;ctx.fillRect(cc*size,rr*size,size,size);}}}}}} 
+    ctx.globalAlpha=1.0;
+  }
   ctx.strokeStyle="#444"; ctx.lineWidth=0.5;
   for(let r=0;r<rows;r++){for(let c=0;c<cols;c++){ctx.strokeRect(c*size,r*size,size,size); if(grid[r][c]){ctx.fillStyle=colors.infected;ctx.fillRect(c*size,r*size,size,size);}}}
 }
 
 function countNeighbors(r,c){
-  const vertWrap = document.getElementById("torusVert").checked; const horizWrap = document.getElementById("torusHoriz").checked;
+  const vertWrap = document.getElementById("torusVert").checked; 
+  const horizWrap = document.getElementById("torusHoriz").checked;
   let count=0;
   let nr=r-1; if(nr<0 && vertWrap) nr=rows-1; if(nr>=0 && nr<rows && grid[nr][c]) count++;
   nr=r+1; if(nr>=rows && vertWrap) nr=0; if(nr>=0 && nr<rows && grid[nr][c]) count++;
@@ -90,6 +103,7 @@ function stepInfection(){
 function toggleInfection(){ if(running){clearInterval(infectionInterval);running=false;} else{infectionInterval=setInterval(stepInfection,speed);running=true;} }
 
 function randomInfect(){for(let r=0;r<rows;r++){for(let c=0;c<cols;c++){grid[r][c]=Math.random()<prob;}} rounds=0; document.getElementById("roundsLabelDisplay").textContent=rounds; drawGrid();}
+
 function switchTeams(){
   if(team==="VCU"){team="Pitt"; colors={bg:"#003594",infected:"#ffb81c"}; document.getElementById("title").textContent="Pitt Infection Simulation"; document.getElementById("logoButton").textContent="PITT";}
   else{team="VCU"; colors={bg:"#ffb300",infected:"#000"}; document.getElementById("title").textContent="VCU Infection Simulation"; document.getElementById("logoButton").textContent="VCU";}
@@ -134,13 +148,34 @@ function toggleCell(x,y){ const size=cellSize(); const c=Math.floor(x/size), r=M
 canvas.addEventListener("click",e=>{ const rect=canvas.getBoundingClientRect(); toggleCell(e.clientX-rect.left,e.clientY-rect.top); });
 canvas.addEventListener("touchstart",e=>{ e.preventDefault(); const rect=canvas.getBoundingClientRect(); const touch=e.touches[0]; toggleCell(touch.clientX-rect.left,touch.clientY-rect.top); }, {passive:false});
 
+// Image upload infection
+document.getElementById("imageUpload").addEventListener("change", e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const img = new Image();
+  img.onload = ()=>{
+    initGrid();
+    const temp = document.createElement("canvas");
+    temp.width = cols; temp.height = rows;
+    const tctx = temp.getContext("2d");
+    tctx.drawImage(img,0,0,cols,rows);
+    const data = tctx.getImageData(0,0,cols,rows).data;
+    for(let r=0;r<rows;r++){for(let c=0;c<cols;c++){
+      const idx = (r*cols+c)*4;
+      const brightness = 0.299*data[idx]+0.587*data[idx+1]+0.114*data[idx+2];
+      if(brightness<128) grid[r][c]=true;
+    }}
+    rounds=0; document.getElementById("roundsLabelDisplay").textContent=rounds; drawGrid();
+  };
+  img.src = URL.createObjectURL(file);
+});
+
 // Sliders
-document.getElementById("rowsSlider").addEventListener("input",e=>{ rows=+e.target.value; if(document.getElementById("squareToggle").checked) cols=rows; document.getElementById("rowsLabel").textContent=rows; document.getElementById("colsLabel").textContent=cols; initGrid(); });
-document.getElementById("colsSlider").addEventListener("input",e=>{ cols=+e.target.value; if(document.getElementById("squareToggle").checked) rows=cols; document.getElementById("colsLabel").textContent=cols; document.getElementById("rowsLabel").textContent=rows; initGrid(); });
+document.getElementById("rowsSlider").addEventListener("input",e=>{ rows=+e.target.value; document.getElementById("rowsLabel").textContent=rows; initGrid(); });
+document.getElementById("colsSlider").addEventListener("input",e=>{ cols=+e.target.value; document.getElementById("colsLabel").textContent=cols; initGrid(); });
 document.getElementById("probSlider").addEventListener("input",e=>{ prob=+e.target.value; document.getElementById("probLabel").textContent=prob.toFixed(2); });
 document.getElementById("thresholdSlider").addEventListener("input",e=>{ threshold=+e.target.value; document.getElementById("thresholdLabel").textContent=threshold; });
 document.getElementById("speedSlider").addEventListener("input",e=>{ speed=+e.target.value; document.getElementById("speedLabel").textContent=speed; if(running){ clearInterval(infectionInterval); infectionInterval=setInterval(stepInfection,speed); } });
-document.getElementById("squareToggle").addEventListener("change",e=>{ if(e.target.checked){ cols=rows; document.getElementById("colsSlider").value=cols; document.getElementById("colsLabel").textContent=cols; initGrid(); } });
 
 window.addEventListener("resize", drawGrid); 
 initGrid();
