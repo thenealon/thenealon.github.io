@@ -24,6 +24,9 @@
     margin-bottom: 25px;
     text-align: center;
     box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+    width: 100%;
+    max-width: 600px;
+    box-sizing: border-box;
   }
   .control-row {
     margin-top: 12px;
@@ -31,20 +34,41 @@
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
+    gap: 15px;
+  }
+  .control-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
   }
   #canvas-container {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 40px;
+    gap: 20px;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    max-width: 900px;
+  }
+  .canvas-wrapper {
+    flex: 1 1 300px; /* Allow shrinking and growing */
+    max-width: 400px;
+    display: flex;
+    justify-content: center;
   }
   canvas {
     background: transparent;
     cursor: pointer;
     outline: none; 
     filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1; /* Keeps it perfectly square when resizing */
   }
   #graph {
     cursor: default; 
@@ -54,6 +78,11 @@
     font-size: 0.85em;
     color: #666;
     font-style: italic;
+  }
+  .sustain-active {
+    background-color: #ffe6eb !important;
+    border-radius: 6px;
+    padding: 2px 6px;
   }
 </style>
 </head>
@@ -68,14 +97,15 @@
       <label>Black Keys (K): <strong id="k-val">5</strong></label>
       <input type="range" id="k-slider" min="1" max="11" value="5">
     </div>
-    <div class="control-row" style="margin-top: 15px; gap: 15px;">
+    
+    <div class="control-group">
       <div>
         <input type="checkbox" id="qwerty-toggle">
         <label for="qwerty-toggle" style="cursor:pointer; font-size: 0.9em;">QWERTY</label>
       </div>
       <div>
         <input type="checkbox" id="integer-toggle">
-        <label for="integer-toggle" style="cursor:pointer; font-size: 0.9em;">Notes/Integers</label>
+        <label for="integer-toggle" style="cursor:pointer; font-size: 0.9em;">Numbers</label>
       </div>
       <div>
         <input type="checkbox" id="distances-toggle" checked>
@@ -85,13 +115,21 @@
         <input type="checkbox" id="polygons-toggle" checked>
         <label for="polygons-toggle" style="cursor:pointer; font-size: 0.9em;">Polygons</label>
       </div>
+      <div id="sustain-container">
+        <input type="checkbox" id="sustain-toggle">
+        <label for="sustain-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Sustain Pedal</label>
+      </div>
     </div>
-    <div class="hint">Hold <strong>Spacebar</strong> to sustain notes.</div>
+    <div class="hint">Or hold <strong>Spacebar</strong> to sustain notes on desktop.</div>
   </div>
 
   <div id="canvas-container">
-    <canvas id="keyboard" width="400" height="400" tabindex="0"></canvas>
-    <canvas id="graph" width="400" height="400"></canvas>
+    <div class="canvas-wrapper">
+      <canvas id="keyboard" width="400" height="400" tabindex="0"></canvas>
+    </div>
+    <div class="canvas-wrapper">
+      <canvas id="graph" width="400" height="400"></canvas>
+    </div>
   </div>
 
   <script>
@@ -107,6 +145,8 @@
     const integerToggle = document.getElementById('integer-toggle');
     const distancesToggle = document.getElementById('distances-toggle');
     const polygonsToggle = document.getElementById('polygons-toggle');
+    const sustainToggle = document.getElementById('sustain-toggle');
+    const sustainContainer = document.getElementById('sustain-container');
 
     let N = 12;
     let K = 5;
@@ -119,13 +159,14 @@
 
     // --- Audio & Synthesis State ---
     let audioCtx = null;
+    let audioUnlocked = false;
     let nextVoiceId = 0;
     
-    const activeVoices = new Map();     // voiceId -> { osc, gain, index }
-    const sustainedVoices = new Set();  // voiceIds currently held by the sustain pedal
+    const activeVoices = new Map();     
+    const sustainedVoices = new Set();  
     
-    const pointerToVoice = new Map();   // pointerId -> voiceId
-    const keyToVoice = new Map();       // keyChar -> voiceId
+    const pointerToVoice = new Map();   
+    const keyToVoice = new Map();       
     
     const activePointers = new Set(); 
     const pressedKeys = new Set(); 
@@ -143,6 +184,30 @@
     const rGraph = 160;
 
     const noteNames12 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+    // --- iOS Audio Unlocker ---
+    function unlockAudio() {
+      if (audioUnlocked) return;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      
+      // Play a silent buffer to wake up the iOS audio engine
+      const buffer = audioCtx.createBuffer(1, 1, 22050);
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioCtx.destination);
+      source.start(0);
+      
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      audioUnlocked = true;
+      document.removeEventListener('pointerdown', unlockAudio);
+      document.removeEventListener('keydown', unlockAudio);
+    }
+    
+    document.addEventListener('pointerdown', unlockAudio);
+    document.addEventListener('keydown', unlockAudio);
+
 
     function updateKeyboard() {
       N = parseInt(nSlider.value);
@@ -289,7 +354,6 @@
     function drawGraph(activeIndices) {
       gCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
       
-      // 1. Draw edges of the base cycle graph
       gCtx.beginPath();
       for (let i = 0; i <= N; i++) {
         const angle = Math.PI / 2 - (i % N) * (Math.PI * 2) / N;
@@ -309,7 +373,6 @@
         let cxSum = 0;
         let cySum = 0;
 
-        // 2. Draw Polygon Base (if enabled)
         if (showPolygons) {
           gCtx.beginPath();
           for (let i = 0; i < activeArr.length; i++) {
@@ -340,7 +403,6 @@
           gCtx.stroke();
         }
 
-        // 3. Draw Distance Arcs (if enabled)
         if (showDistances) {
           for (let i = 0; i < activeArr.length; i++) {
             for (let j = i + 1; j < activeArr.length; j++) {
@@ -365,7 +427,6 @@
           }
         }
 
-        // 4. Draw Labels on Top (Distances then Area)
         if (showDistances) {
           gCtx.textAlign = 'center';
           gCtx.textBaseline = 'middle';
@@ -430,7 +491,6 @@
         }
       }
 
-      // 5. Draw vertices last
       const vRadius = Math.max(6, Math.min(18, (rGraph * Math.PI / N) * 0.7));
       
       for (let i = 0; i < N; i++) {
@@ -487,13 +547,11 @@
         drawLabels();
       }
 
-      // Cut out the center hole
       ctx.globalCompositeOperation = 'destination-out';
       ctx.beginPath();
       ctx.arc(cx, cy, rHole, 0, Math.PI * 2);
       ctx.fill();
       
-      // Draw the inner ring
       ctx.globalCompositeOperation = 'source-over';
       ctx.beginPath();
       ctx.arc(cx, cy, rHole, 0, Math.PI * 2);
@@ -507,9 +565,7 @@
     // --- Audio Voice Control ---
 
     function startVoice(index) {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
+      if (!audioUnlocked) unlockAudio();
       if (audioCtx.state === 'suspended') audioCtx.resume();
 
       const freq = 261.63 * Math.pow(2, index / N);
@@ -562,10 +618,36 @@
       requestAnimationFrame(draw);
     }
 
+    function handleSustainChange(active) {
+      isSustainDown = active;
+      sustainToggle.checked = active;
+      
+      if (active) {
+        sustainContainer.classList.add('sustain-active');
+      } else {
+        sustainContainer.classList.remove('sustain-active');
+        // Release all voices that are currently sustained, unless they are actively being held by a pointer or key
+        const currentlyHeld = new Set();
+        pointerToVoice.forEach(id => currentlyHeld.add(id));
+        keyToVoice.forEach(id => currentlyHeld.add(id));
+        
+        sustainedVoices.forEach(voiceId => {
+          if (!currentlyHeld.has(voiceId)) {
+            stopVoice(voiceId);
+          }
+        });
+      }
+    }
+
     function getIndexFromClick(e) {
+      // Adjusted to use canvas scaling
       const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left - cx;
-      const y = e.clientY - rect.top - cy;
+      // scaleX and scaleY map the physical DOM size to the internal 400x400 canvas resolution
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      
+      const x = (e.clientX - rect.left) * scaleX - cx;
+      const y = (e.clientY - rect.top) * scaleY - cy;
       const distance = Math.sqrt(x*x + y*y);
       
       if (distance < rHole) return -1; 
@@ -664,7 +746,7 @@
       if (e.repeat || e.metaKey || e.ctrlKey) return; 
 
       if (e.key === ' ') {
-        isSustainDown = true;
+        handleSustainChange(true);
         e.preventDefault(); 
         return;
       }
@@ -681,8 +763,7 @@
 
     window.addEventListener('keyup', (e) => {
       if (e.key === ' ') {
-        isSustainDown = false;
-        sustainedVoices.forEach(voiceId => stopVoice(voiceId));
+        handleSustainChange(false);
         return;
       }
 
@@ -695,6 +776,10 @@
           keyToVoice.delete(keyChar);
         }
       }
+    });
+
+    sustainToggle.addEventListener('change', (e) => {
+      handleSustainChange(e.target.checked);
     });
 
     nSlider.addEventListener('input', updateKeyboard);
