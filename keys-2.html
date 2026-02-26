@@ -12,16 +12,16 @@
     align-items: center;
     background: #4a4a4a; 
     margin: 0;
-    padding: 20px;
+    padding: 10px; /* Reduced for mobile */
     touch-action: none; 
     user-select: none;
     -webkit-tap-highlight-color: transparent; 
   }
   #controls {
     background: #fdfdfd;
-    padding: 15px 25px;
+    padding: 10px 15px; /* Compacted */
     border-radius: 12px;
-    margin-bottom: 25px;
+    margin-bottom: 15px; /* Compacted */
     text-align: center;
     box-shadow: 0 6px 15px rgba(0,0,0,0.25);
     width: 100%;
@@ -29,37 +29,37 @@
     box-sizing: border-box;
   }
   .control-row {
-    margin-top: 12px;
+    margin-top: 8px; /* Compacted */
     display: flex;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 10px; /* Compacted */
   }
   .control-group {
     display: flex;
-    gap: 15px;
+    gap: 10px; /* Compacted */
     flex-wrap: wrap;
     justify-content: center;
-    margin-top: 15px;
-    padding-top: 15px;
+    margin-top: 10px;
+    padding-top: 10px;
     border-top: 1px solid #eee;
   }
   #canvas-container {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
-    gap: 20px;
+    flex-wrap: nowrap; /* FORCED SIDE-BY-SIDE */
+    gap: 10px; /* Tighter gap for small screens */
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
     max-width: 900px;
   }
   .canvas-wrapper {
-    flex: 1 1 300px; /* Allow shrinking and growing */
-    max-width: 400px;
+    flex: 1 1 50%; /* Each gets half the available width */
     display: flex;
     justify-content: center;
+    max-width: 400px; /* Cap size on desktop */
   }
   canvas {
     background: transparent;
@@ -68,14 +68,14 @@
     filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
     width: 100%;
     height: auto;
-    aspect-ratio: 1 / 1; /* Keeps it perfectly square when resizing */
+    aspect-ratio: 1 / 1; /* Keeps it square when shrinking */
   }
   #graph {
     cursor: default; 
   }
   .hint {
-    margin-top: 10px;
-    font-size: 0.85em;
+    margin-top: 8px;
+    font-size: 0.8em;
     color: #666;
     font-style: italic;
   }
@@ -89,7 +89,7 @@
 <body>
 
   <div id="controls">
-    <div>
+    <div class="control-row">
       <label>Notes (N): <strong id="n-val">12</strong></label>
       <input type="range" id="n-slider" min="5" max="31" value="12">
     </div>
@@ -117,10 +117,10 @@
       </div>
       <div id="sustain-container">
         <input type="checkbox" id="sustain-toggle">
-        <label for="sustain-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Sustain Pedal</label>
+        <label for="sustain-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Sustain</label>
       </div>
     </div>
-    <div class="hint">Or hold <strong>Spacebar</strong> to sustain notes on desktop.</div>
+    <div class="hint">Hold <strong>Spacebar</strong> or use the toggle above to sustain notes.</div>
   </div>
 
   <div id="canvas-container">
@@ -190,7 +190,6 @@
       if (audioUnlocked) return;
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       
-      // Play a silent buffer to wake up the iOS audio engine
       const buffer = audioCtx.createBuffer(1, 1, 22050);
       const source = audioCtx.createBufferSource();
       source.buffer = buffer;
@@ -626,7 +625,6 @@
         sustainContainer.classList.add('sustain-active');
       } else {
         sustainContainer.classList.remove('sustain-active');
-        // Release all voices that are currently sustained, unless they are actively being held by a pointer or key
         const currentlyHeld = new Set();
         pointerToVoice.forEach(id => currentlyHeld.add(id));
         keyToVoice.forEach(id => currentlyHeld.add(id));
@@ -640,9 +638,7 @@
     }
 
     function getIndexFromClick(e) {
-      // Adjusted to use canvas scaling
       const rect = canvas.getBoundingClientRect();
-      // scaleX and scaleY map the physical DOM size to the internal 400x400 canvas resolution
       const scaleX = canvas.width / rect.width;
       const scaleY = canvas.height / rect.height;
       
