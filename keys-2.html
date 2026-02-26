@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-<title>BRIDGES 2026 -- Cyclic Keyboards</title>
+<title>Cyclic Pianos</title>
 <style>
   body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -12,16 +12,25 @@
     align-items: center;
     background: #4a4a4a; 
     margin: 0;
-    padding: 10px; /* Reduced for mobile */
+    padding: 10px;
     touch-action: none; 
     user-select: none;
     -webkit-tap-highlight-color: transparent; 
   }
+  header {
+    text-align: center;
+    color: white;
+    margin-bottom: 15px;
+  }
+  header h1 { margin: 0; font-size: 1.6rem; }
+  header p { margin: 4px 0; font-size: 0.95rem; opacity: 0.9; }
+  header a { color: #aadaff; text-decoration: none; }
+  
   #controls {
     background: #fdfdfd;
-    padding: 10px 15px; /* Compacted */
+    padding: 10px 15px;
     border-radius: 12px;
-    margin-bottom: 15px; /* Compacted */
+    margin-bottom: 15px;
     text-align: center;
     box-shadow: 0 6px 15px rgba(0,0,0,0.25);
     width: 100%;
@@ -29,16 +38,16 @@
     box-sizing: border-box;
   }
   .control-row {
-    margin-top: 8px; /* Compacted */
+    margin-top: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 10px; /* Compacted */
+    gap: 10px;
   }
   .control-group {
     display: flex;
-    gap: 10px; /* Compacted */
+    gap: 10px;
     flex-wrap: wrap;
     justify-content: center;
     margin-top: 10px;
@@ -48,18 +57,18 @@
   #canvas-container {
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap; /* FORCED SIDE-BY-SIDE */
-    gap: 10px; /* Tighter gap for small screens */
+    flex-wrap: nowrap;
+    gap: 10px;
     justify-content: center;
     align-items: flex-start;
     width: 100%;
     max-width: 900px;
   }
   .canvas-wrapper {
-    flex: 1 1 50%; /* Each gets half the available width */
+    flex: 1 1 50%;
     display: flex;
     justify-content: center;
-    max-width: 400px; /* Cap size on desktop */
+    max-width: 400px;
   }
   canvas {
     background: transparent;
@@ -68,7 +77,7 @@
     filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
     width: 100%;
     height: auto;
-    aspect-ratio: 1 / 1; /* Keeps it square when shrinking */
+    aspect-ratio: 1 / 1;
   }
   #graph {
     cursor: default; 
@@ -76,7 +85,7 @@
   .hint {
     margin-top: 8px;
     font-size: 0.8em;
-    color: #666;
+    color: #ccc;
     font-style: italic;
   }
   .sustain-active {
@@ -87,6 +96,11 @@
 </style>
 </head>
 <body>
+
+  <header>
+    <h1>Cyclic Pianos</h1>
+    <p>N. Bushaw &mdash; Bridges2026 &mdash; <span id="contact"></span></p>
+  </header>
 
   <div id="controls">
     <div class="control-row">
@@ -119,8 +133,12 @@
         <input type="checkbox" id="sustain-toggle">
         <label for="sustain-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Sustain</label>
       </div>
+      <div>
+        <input type="checkbox" id="shepard-toggle">
+        <label for="shepard-toggle" style="cursor:pointer; font-size: 0.9em; color: #d00; font-weight: bold;">Shepard</label>
+      </div>
     </div>
-    <div class="hint">Hold <strong>Spacebar</strong> or use the toggle above to sustain notes.</div>
+    <div class="hint">Hold <strong>Spacebar</strong> to sustain. Toggle <strong>Shepard</strong> for the illusion.</div>
   </div>
 
   <div id="canvas-container">
@@ -133,9 +151,15 @@
   </div>
 
   <script>
+    // Obfuscate Email
+    (function() {
+      const u = "nobushaw";
+      const d = "vcu.edu";
+      document.getElementById('contact').innerHTML = `<a href="mailto:${u}@${d}">${u}@${d}</a>`;
+    })();
+
     const canvas = document.getElementById('keyboard');
     const ctx = canvas.getContext('2d');
-    
     const graphCanvas = document.getElementById('graph');
     const gCtx = graphCanvas.getContext('2d');
 
@@ -147,73 +171,42 @@
     const polygonsToggle = document.getElementById('polygons-toggle');
     const sustainToggle = document.getElementById('sustain-toggle');
     const sustainContainer = document.getElementById('sustain-container');
+    const shepardToggle = document.getElementById('shepard-toggle');
 
-    let N = 12;
-    let K = 5;
-    let showQwerty = false;
-    let showInteger = false;
-    let showDistances = true;
-    let showPolygons = true;
-    let keys = []; 
-    let isBlackArr = []; 
+    let N = 12, K = 5;
+    let showQwerty = false, showInteger = false, showDistances = true, showPolygons = true;
+    let keys = [], isBlackArr = []; 
 
-    // --- Audio & Synthesis State ---
-    let audioCtx = null;
-    let audioUnlocked = false;
-    let nextVoiceId = 0;
-    
-    const activeVoices = new Map();     
-    const sustainedVoices = new Set();  
-    
-    const pointerToVoice = new Map();   
-    const keyToVoice = new Map();       
-    
-    const activePointers = new Set(); 
-    const pressedKeys = new Set(); 
+    let audioCtx = null, audioUnlocked = false, nextVoiceId = 0;
+    const activeVoices = new Map(), sustainedVoices = new Set();
+    const pointerToVoice = new Map(), keyToVoice = new Map();
+    const activePointers = new Set(), pressedKeys = new Set();
     let isSustainDown = false;
 
-    // --- Geometry ---
-    const cx = canvas.width / 2;
-    const cy = canvas.height / 2;
-    const rWhite = 190;
-    const rBlack = 110;
-    const rHole = 35; 
-
-    const gx = graphCanvas.width / 2;
-    const gy = graphCanvas.height / 2;
-    const rGraph = 160;
-
+    const cx = 200, cy = 200, rWhite = 190, rBlack = 110, rHole = 35; 
+    const gx = 200, gy = 200, rGraph = 160;
     const noteNames12 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
-    // --- iOS Audio Unlocker ---
     function unlockAudio() {
       if (audioUnlocked) return;
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      
+      // Latency Optimization: Set latencyHint to interactive
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
       const buffer = audioCtx.createBuffer(1, 1, 22050);
       const source = audioCtx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(audioCtx.destination);
-      source.start(0);
-      
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+      source.buffer = buffer; source.connect(audioCtx.destination); source.start(0);
+      if (audioCtx.state === 'suspended') audioCtx.resume();
       audioUnlocked = true;
       document.removeEventListener('pointerdown', unlockAudio);
       document.removeEventListener('keydown', unlockAudio);
     }
-    
     document.addEventListener('pointerdown', unlockAudio);
     document.addEventListener('keydown', unlockAudio);
-
 
     function updateKeyboard() {
       N = parseInt(nSlider.value);
       kSlider.max = N - 1;
       if (parseInt(kSlider.value) >= N) kSlider.value = N - 1;
       K = parseInt(kSlider.value);
-      
       showQwerty = qwertyToggle.checked;
       showInteger = integerToggle.checked;
       showDistances = distancesToggle.checked;
@@ -224,569 +217,256 @@
 
       isBlackArr = Array(N).fill(false);
       let standardPianoMap = null;
-      
       if (N === 12 && K === 5) {
-        const standardBlacks = [1, 3, 6, 8, 10];
-        standardBlacks.forEach(i => isBlackArr[i] = true);
-        
-        standardPianoMap = {
-          0: 'a', 1: 'w', 2: 's', 3: 'e', 4: 'd', 5: 'f', 
-          6: 't', 7: 'g', 8: 'y', 9: 'h', 10: 'u', 11: 'j'
-        };
+        [1, 3, 6, 8, 10].forEach(i => isBlackArr[i] = true);
+        standardPianoMap = {0:'a', 1:'w', 2:'s', 3:'e', 4:'d', 5:'f', 6:'t', 7:'g', 8:'y', 9:'h', 10:'u', 11:'j'};
       } else {
-        for (let i = 0; i < K; i++) {
-          isBlackArr[(Math.floor((i * N) / K) + 1) % N] = true;
-        }
+        for (let i = 0; i < K; i++) isBlackArr[(Math.floor((i * N) / K) + 1) % N] = true;
       }
 
-      const W = N - K;
-      const angleW = (Math.PI * 2) / W;
-      const blackWidth = angleW * 0.55; 
-      const rotationOffset = -angleW / 2; 
-
-      const fallbackWhiteLabels = ['a','s','d','f','g','h','j','k','l',';',"'"];
-      const fallbackBlackLabels = ['w','e','r','t','y','u','i','o','p','[',']'];
-
+      const W = N - K, angleW = (Math.PI * 2) / W, blackWidth = angleW * 0.55, rotationOffset = -angleW / 2;
+      const fW = ['a','s','d','f','g','h','j','k','l',';',"'"], fB = ['w','e','r','t','y','u','i','o','p','[',']'];
       keys = [];
-      let currentWhite = 0;
-      let wLabelIdx = 0;
-      let bLabelIdx = 0;
+      let currentWhite = 0, wIdx = 0, bIdx = 0;
 
       for (let i = 0; i < N; i++) {
-        let qwertyLabel = '';
-        if (standardPianoMap) {
-          qwertyLabel = standardPianoMap[i];
-        } else {
-          if (isBlackArr[i]) {
-            qwertyLabel = fallbackBlackLabels[bLabelIdx % fallbackBlackLabels.length];
-            bLabelIdx++;
-          } else {
-            qwertyLabel = fallbackWhiteLabels[wLabelIdx % fallbackWhiteLabels.length];
-            wLabelIdx++;
-          }
-        }
-
+        let ql = standardPianoMap ? standardPianoMap[i] : (isBlackArr[i] ? fB[bIdx++ % 11] : fW[wIdx++ % 11]);
         if (isBlackArr[i]) {
-          const centerAngle = currentWhite * angleW + rotationOffset;
-          keys.push({
-            index: i,
-            isBlack: true,
-            center: centerAngle,
-            width: blackWidth,
-            radius: rBlack,
-            qwertyLabel: qwertyLabel
-          });
+          keys.push({ index: i, isBlack: true, center: currentWhite * angleW + rotationOffset, width: blackWidth, radius: rBlack, qwertyLabel: ql });
         } else {
-          const startAngle = currentWhite * angleW + rotationOffset;
-          const endAngle = (currentWhite + 1) * angleW + rotationOffset;
-          keys.push({
-            index: i,
-            isBlack: false,
-            start: startAngle,
-            end: endAngle,
-            whiteIndex: currentWhite,
-            radius: rWhite,
-            qwertyLabel: qwertyLabel
-          });
+          keys.push({ index: i, isBlack: false, start: currentWhite * angleW + rotationOffset, end: (currentWhite + 1) * angleW + rotationOffset, whiteIndex: currentWhite, radius: rWhite, qwertyLabel: ql });
           currentWhite++;
         }
       }
-
       draw();
     }
 
     function drawWedge(radius, logicalStart, logicalEnd, color) {
-      const canvasStart = Math.PI / 2 - logicalEnd;
-      const canvasEnd = Math.PI / 2 - logicalStart;
-      
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.arc(cx, cy, radius, canvasStart, canvasEnd);
-      ctx.closePath();
-      
-      ctx.fillStyle = color;
-      ctx.fill();
-      ctx.strokeStyle = '#222';
-      ctx.lineWidth = 2.5;
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, radius, Math.PI / 2 - logicalEnd, Math.PI / 2 - logicalStart);
+      ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+      ctx.strokeStyle = '#222'; ctx.lineWidth = 2.5; ctx.stroke();
     }
 
     function drawLabels() {
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.font = 'bold 15px Georgia, "Palatino Linotype", serif'; 
-
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = 'bold 15px Georgia, serif'; 
       for (let key of keys) {
         const angle = key.isBlack ? key.center : (key.start + key.end) / 2;
-        const canvasAngle = Math.PI / 2 - angle;
-        
-        const rText = key.isBlack ? key.radius - 22 : key.radius - 32;
-        
-        const tx = cx + Math.cos(canvasAngle) * rText;
-        const ty = cy + Math.sin(canvasAngle) * rText;
-        
+        const tx = cx + Math.cos(Math.PI/2 - angle) * (key.isBlack ? key.radius - 22 : key.radius - 32);
+        const ty = cy + Math.sin(Math.PI/2 - angle) * (key.isBlack ? key.radius - 22 : key.radius - 32);
         ctx.fillStyle = key.isBlack ? '#f0f0f0' : '#333';
-
         let lines = [];
-        
-        if (showInteger) {
-          if (N === 12) {
-            lines.push(`${noteNames12[key.index]}`);
-          } else {
-            lines.push(`${key.index}`);
-          }
-        }
-        
-        if (showQwerty) {
-          lines.push(key.qwertyLabel.toUpperCase());
-        }
-
-        if (lines.length === 1) {
-          ctx.fillText(lines[0], tx, ty);
-        } else if (lines.length === 2) {
-          ctx.fillText(lines[0], tx, ty - 8);
-          ctx.fillText(lines[1], tx, ty + 8);
-        }
+        if (showInteger) lines.push(N === 12 ? noteNames12[key.index] : key.index);
+        if (showQwerty) lines.push(key.qwertyLabel.toUpperCase());
+        if (lines.length === 1) ctx.fillText(lines[0], tx, ty);
+        else if (lines.length === 2) { ctx.fillText(lines[0], tx, ty - 8); ctx.fillText(lines[1], tx, ty + 8); }
       }
     }
 
     function drawGraph(activeIndices) {
-      gCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
-      
+      gCtx.clearRect(0, 0, 400, 400);
       gCtx.beginPath();
       for (let i = 0; i <= N; i++) {
-        const angle = Math.PI / 2 - (i % N) * (Math.PI * 2) / N;
-        const px = gx + Math.cos(angle) * rGraph;
-        const py = gy + Math.sin(angle) * rGraph;
-        if (i === 0) gCtx.moveTo(px, py);
-        else gCtx.lineTo(px, py);
+        const a = Math.PI / 2 - (i % N) * (Math.PI * 2) / N;
+        const px = gx + Math.cos(a) * rGraph, py = gy + Math.sin(a) * rGraph;
+        i === 0 ? gCtx.moveTo(px, py) : gCtx.lineTo(px, py);
       }
-      gCtx.strokeStyle = '#222';
-      gCtx.lineWidth = 2.5;
-      gCtx.stroke();
+      gCtx.strokeStyle = '#222'; gCtx.lineWidth = 2.5; gCtx.stroke();
 
       const activeArr = Array.from(activeIndices).sort((a, b) => a - b);
-      
       if (activeArr.length > 1) {
-        let polyArea = 0;
-        let cxSum = 0;
-        let cySum = 0;
-
         if (showPolygons) {
           gCtx.beginPath();
           for (let i = 0; i < activeArr.length; i++) {
-            const u = activeArr[i];
-            const angle = Math.PI / 2 - u * (Math.PI * 2) / N;
-            const px = gx + Math.cos(angle) * rGraph;
-            const py = gy + Math.sin(angle) * rGraph;
-            
-            cxSum += px;
-            cySum += py;
-            
-            if (i === 0) gCtx.moveTo(px, py);
-            else gCtx.lineTo(px, py);
-
-            const nextU = activeArr[(i + 1) % activeArr.length];
-            const nextAngle = Math.PI / 2 - nextU * (Math.PI * 2) / N;
-            polyArea += Math.sin(angle - nextAngle);
+            const u = activeArr[i], a = Math.PI / 2 - u * (Math.PI * 2) / N;
+            const px = gx + Math.cos(a) * rGraph, py = gy + Math.sin(a) * rGraph;
+            i === 0 ? gCtx.moveTo(px, py) : gCtx.lineTo(px, py);
           }
-          
-          if (activeArr.length >= 3) {
-            gCtx.closePath();
-            gCtx.fillStyle = 'rgba(255, 51, 102, 0.3)';
-            gCtx.fill();
-          }
-          
-          gCtx.strokeStyle = '#ff3366';
-          gCtx.lineWidth = 2.5;
-          gCtx.stroke();
+          if (activeArr.length >= 3) { gCtx.closePath(); gCtx.fillStyle = 'rgba(255, 51, 102, 0.3)'; gCtx.fill(); }
+          gCtx.strokeStyle = '#ff3366'; gCtx.lineWidth = 2.5; gCtx.stroke();
         }
-
         if (showDistances) {
-          for (let i = 0; i < activeArr.length; i++) {
-            for (let j = i + 1; j < activeArr.length; j++) {
-              const u = activeArr[i];
-              const v = activeArr[j];
-              
-              const a1 = Math.PI / 2 - u * (Math.PI * 2) / N;
-              const a2 = Math.PI / 2 - v * (Math.PI * 2) / N;
-              
-              const px1 = gx + Math.cos(a1) * rGraph;
-              const py1 = gy + Math.sin(a1) * rGraph;
-              const px2 = gx + Math.cos(a2) * rGraph;
-              const py2 = gy + Math.sin(a2) * rGraph;
-              
-              gCtx.beginPath();
-              gCtx.moveTo(px1, py1);
-              gCtx.lineTo(px2, py2);
-              gCtx.strokeStyle = '#ff3366';
-              gCtx.lineWidth = 2.5;
-              gCtx.stroke();
-            }
-          }
-        }
-
-        if (showDistances) {
-          gCtx.textAlign = 'center';
-          gCtx.textBaseline = 'middle';
-          gCtx.font = 'bold 12px sans-serif';
-
-          for (let i = 0; i < activeArr.length; i++) {
-            for (let j = i + 1; j < activeArr.length; j++) {
-              const u = activeArr[i];
-              const v = activeArr[j];
-              const dist = Math.min(Math.abs(u - v), N - Math.abs(u - v));
-              
-              const a1 = Math.PI / 2 - u * (Math.PI * 2) / N;
-              const a2 = Math.PI / 2 - v * (Math.PI * 2) / N;
-              
-              const px1 = gx + Math.cos(a1) * rGraph;
-              const py1 = gy + Math.sin(a1) * rGraph;
-              const px2 = gx + Math.cos(a2) * rGraph;
-              const py2 = gy + Math.sin(a2) * rGraph;
-              
-              const mx = (px1 + px2) / 2;
-              const my = (py1 + py2) / 2;
-              
-              gCtx.beginPath();
-              gCtx.arc(mx, my, 8, 0, Math.PI * 2);
-              gCtx.fillStyle = '#fff';
-              gCtx.fill();
-              gCtx.strokeStyle = '#ff3366';
-              gCtx.lineWidth = 1.5;
-              gCtx.stroke();
-              
-              gCtx.fillStyle = '#ff3366';
-              gCtx.fillText(dist, mx, my);
-            }
-          }
-        }
-
-        if (showPolygons && activeArr.length >= 3) {
-          const finalArea = Math.abs(polyArea * 0.5);
-          const text = `A=${finalArea.toFixed(2)}`;
-          
-          const polyCX = cxSum / activeArr.length;
-          const polyCY = cySum / activeArr.length;
-          
-          gCtx.font = 'bold 12px sans-serif';
-          const textWidth = gCtx.measureText(text).width;
-          
-          gCtx.beginPath();
-          gCtx.arc(polyCX - textWidth / 2, polyCY, 10, Math.PI / 2, Math.PI * 1.5);
-          gCtx.arc(polyCX + textWidth / 2, polyCY, 10, Math.PI * 1.5, Math.PI / 2);
-          gCtx.closePath();
-          
-          gCtx.fillStyle = '#fff';
-          gCtx.fill();
-          gCtx.strokeStyle = '#ff3366';
-          gCtx.lineWidth = 1.5;
-          gCtx.stroke();
-          
-          gCtx.fillStyle = '#ff3366';
-          gCtx.textAlign = 'center';
-          gCtx.textBaseline = 'middle';
-          gCtx.fillText(text, polyCX, polyCY);
+          activeArr.forEach((u, i) => {
+            activeArr.slice(i+1).forEach(v => {
+              const a1 = Math.PI/2 - u*(Math.PI*2)/N, a2 = Math.PI/2 - v*(Math.PI*2)/N;
+              const x1 = gx+Math.cos(a1)*rGraph, y1 = gy+Math.sin(a1)*rGraph, x2 = gx+Math.cos(a2)*rGraph, y2 = gy+Math.sin(a2)*rGraph;
+              gCtx.beginPath(); gCtx.moveTo(x1, y1); gCtx.lineTo(x2, y2);
+              gCtx.strokeStyle = '#ff3366'; gCtx.stroke();
+              const dist = Math.min(Math.abs(u-v), N-Math.abs(u-v));
+              gCtx.beginPath(); gCtx.arc((x1+x2)/2, (y1+y2)/2, 8, 0, Math.PI*2); gCtx.fillStyle='#fff'; gCtx.fill();
+              gCtx.strokeStyle='#ff3366'; gCtx.lineWidth=1.5; gCtx.stroke();
+              gCtx.fillStyle='#ff3366'; gCtx.font='bold 10px sans-serif'; gCtx.textAlign='center'; gCtx.fillText(dist, (x1+x2)/2, (y1+y2)/2+3);
+            });
+          });
         }
       }
 
-      const vRadius = Math.max(6, Math.min(18, (rGraph * Math.PI / N) * 0.7));
-      
+      const vRad = Math.max(6, Math.min(18, (rGraph * Math.PI / N) * 0.7));
       for (let i = 0; i < N; i++) {
-        const angle = Math.PI / 2 - i * (Math.PI * 2) / N;
-        const px = gx + Math.cos(angle) * rGraph;
-        const py = gy + Math.sin(angle) * rGraph;
-
-        gCtx.beginPath();
-        gCtx.arc(px, py, vRadius, 0, Math.PI * 2);
-        
-        const isBlack = isBlackArr[i];
-        const isActive = activeIndices.has(i);
-
-        if (isBlack) {
-          gCtx.fillStyle = isActive ? '#777' : '#222';
-        } else {
-          gCtx.fillStyle = isActive ? '#aadaff' : '#fff';
-        }
-        gCtx.fill();
-        
-        gCtx.strokeStyle = isActive ? (isBlack ? '#fff' : '#0055ff') : '#222';
-        gCtx.lineWidth = isActive ? 3 : 2;
-        gCtx.stroke();
-
-        if (vRadius >= 10) {
-          gCtx.fillStyle = isBlack ? (isActive ? '#fff' : '#ddd') : (isActive ? '#000' : '#444');
-          gCtx.font = `bold ${Math.max(9, vRadius - 4)}px sans-serif`;
-          gCtx.textAlign = 'center';
-          gCtx.textBaseline = 'middle';
-          gCtx.fillText(i, px, py);
+        const a = Math.PI / 2 - i * (Math.PI * 2) / N, px = gx + Math.cos(a) * rGraph, py = gy + Math.sin(a) * rGraph;
+        gCtx.beginPath(); gCtx.arc(px, py, vRad, 0, Math.PI * 2);
+        const active = activeIndices.has(i);
+        gCtx.fillStyle = isBlackArr[i] ? (active ? '#777' : '#222') : (active ? '#aadaff' : '#fff');
+        gCtx.fill(); gCtx.strokeStyle = active ? (isBlackArr[i] ? '#fff' : '#0055ff') : '#222';
+        gCtx.lineWidth = active ? 3 : 2; gCtx.stroke();
+        if (vRad >= 10) {
+          gCtx.fillStyle = isBlackArr[i] ? (active ? '#fff' : '#ddd') : (active ? '#000' : '#444');
+          gCtx.font = `bold ${Math.max(9, vRad - 4)}px sans-serif`; gCtx.textAlign = 'center'; gCtx.fillText(i, px, py + 4);
         }
       }
     }
 
     function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, 400, 400);
       const activeIndices = new Set(Array.from(activeVoices.values()).map(v => v.index));
-
-      for (let key of keys) {
-        if (!key.isBlack) {
-          const color = activeIndices.has(key.index) ? '#d9eaff' : '#fff';
-          drawWedge(key.radius, key.start, key.end, color);
-        }
-      }
-
-      for (let key of keys) {
-        if (key.isBlack) {
-          const color = activeIndices.has(key.index) ? '#555' : '#222';
-          drawWedge(key.radius, key.center - key.width / 2, key.center + key.width / 2, color);
-        }
-      }
-
-      if (showQwerty || showInteger) {
-        drawLabels();
-      }
-
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.beginPath();
-      ctx.arc(cx, cy, rHole, 0, Math.PI * 2);
-      ctx.fill();
-      
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.beginPath();
-      ctx.arc(cx, cy, rHole, 0, Math.PI * 2);
-      ctx.strokeStyle = '#222';
-      ctx.lineWidth = 3;
-      ctx.stroke();
-
+      keys.filter(k => !k.isBlack).forEach(k => drawWedge(k.radius, k.start, k.end, activeIndices.has(k.index) ? '#d9eaff' : '#fff'));
+      keys.filter(k => k.isBlack).forEach(k => drawWedge(k.radius, k.center-k.width/2, k.center+k.width/2, activeIndices.has(k.index) ? '#555' : '#222'));
+      if (showQwerty || showInteger) drawLabels();
+      ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(cx, cy, rHole, 0, Math.PI*2); ctx.fill();
+      ctx.globalCompositeOperation = 'source-over'; ctx.beginPath(); ctx.arc(cx, cy, rHole, 0, Math.PI*2); ctx.strokeStyle = '#222'; ctx.lineWidth = 3; ctx.stroke();
       drawGraph(activeIndices);
     }
 
-    // --- Audio Voice Control ---
+    // --- Audio Logic ---
 
     function startVoice(index) {
       if (!audioUnlocked) unlockAudio();
       if (audioCtx.state === 'suspended') audioCtx.resume();
 
-      const freq = 261.63 * Math.pow(2, index / N);
-
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.value = freq;
-      
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
+      const masterGain = audioCtx.createGain();
+      masterGain.connect(audioCtx.destination);
       const now = audioCtx.currentTime;
+      masterGain.gain.setValueAtTime(0, now);
       
-      gain.gain.setValueAtTime(0, now);
-      gain.gain.linearRampToValueAtTime(0.1, now + 0.01);
-      
-      osc.start(now);
+      // Balancing & Buffer Optimization: 0.02s ramp helps sync threads
+      const targetVolume = shepardToggle.checked ? 0.05 : 0.15;
+      masterGain.gain.linearRampToValueAtTime(targetVolume, now + 0.02);
+
+      const oscillators = [];
+      const baseFreq = 261.63 * Math.pow(2, index / N);
+
+      if (shepardToggle.checked) {
+        for (let i = -3; i <= 3; i++) {
+          const freq = baseFreq * Math.pow(2, i);
+          const osc = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          const lfreq = Math.log2(freq / 261.63);
+          const volume = Math.exp(-0.5 * Math.pow(lfreq / 1.5, 2)); 
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          g.gain.value = volume;
+          osc.connect(g);
+          g.connect(masterGain);
+          osc.start(now);
+          oscillators.push(osc);
+        }
+      } else {
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = baseFreq;
+        osc.connect(masterGain);
+        osc.start(now);
+        oscillators.push(osc);
+      }
 
       const voiceId = nextVoiceId++;
-      activeVoices.set(voiceId, { osc, gain, index });
+      activeVoices.set(voiceId, { oscillators, gain: masterGain, index });
       requestAnimationFrame(draw); 
       return voiceId;
     }
 
-    function releaseVoice(voiceId) {
-      if (!activeVoices.has(voiceId)) return;
-      
-      if (isSustainDown) {
-        sustainedVoices.add(voiceId);
-      } else {
-        stopVoice(voiceId);
-      }
-    }
-
     function stopVoice(voiceId) {
       if (!activeVoices.has(voiceId)) return;
-      const { osc, gain } = activeVoices.get(voiceId);
+      const { oscillators, gain } = activeVoices.get(voiceId);
       const now = audioCtx.currentTime;
-      
       gain.gain.cancelScheduledValues(now);
       gain.gain.setValueAtTime(gain.gain.value, now);
-      
       gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
-      osc.stop(now + 0.4);
-      
+      oscillators.forEach(o => o.stop(now + 0.4));
       activeVoices.delete(voiceId);
       sustainedVoices.delete(voiceId);
       requestAnimationFrame(draw);
     }
 
+    function releaseVoice(voiceId) {
+      if (isSustainDown) sustainedVoices.add(voiceId);
+      else stopVoice(voiceId);
+    }
+
     function handleSustainChange(active) {
-      isSustainDown = active;
-      sustainToggle.checked = active;
-      
-      if (active) {
-        sustainContainer.classList.add('sustain-active');
-      } else {
+      isSustainDown = active; sustainToggle.checked = active;
+      if (active) sustainContainer.classList.add('sustain-active');
+      else {
         sustainContainer.classList.remove('sustain-active');
-        const currentlyHeld = new Set();
-        pointerToVoice.forEach(id => currentlyHeld.add(id));
-        keyToVoice.forEach(id => currentlyHeld.add(id));
-        
-        sustainedVoices.forEach(voiceId => {
-          if (!currentlyHeld.has(voiceId)) {
-            stopVoice(voiceId);
-          }
-        });
+        const held = new Set([...pointerToVoice.values(), ...keyToVoice.values()]);
+        sustainedVoices.forEach(id => { if (!held.has(id)) stopVoice(id); });
       }
     }
 
     function getIndexFromClick(e) {
       const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      
-      const x = (e.clientX - rect.left) * scaleX - cx;
-      const y = (e.clientY - rect.top) * scaleY - cy;
-      const distance = Math.sqrt(x*x + y*y);
-      
-      if (distance < rHole) return -1; 
-      
-      let rawAngle = Math.atan2(y, x);
-      let logicalAngle = Math.PI / 2 - rawAngle;
-      if (logicalAngle < 0) logicalAngle += Math.PI * 2;
-      if (logicalAngle >= Math.PI * 2) logicalAngle -= Math.PI * 2;
-
-      if (distance <= rBlack) {
-        for (let key of keys) {
-          if (key.isBlack) {
-            let diff = Math.abs(logicalAngle - key.center);
-            if (diff > Math.PI) diff = 2 * Math.PI - diff;
-            
-            if (diff <= key.width / 2) {
-              return key.index;
-            }
-          }
+      const x = (e.clientX - rect.left) * (400/rect.width) - cx, y = (e.clientY - rect.top) * (400/rect.height) - cy;
+      const dist = Math.sqrt(x*x + y*y);
+      if (dist < rHole) return -1;
+      let ang = Math.PI/2 - Math.atan2(y, x);
+      if (ang < 0) ang += Math.PI*2; if (ang >= Math.PI*2) ang -= Math.PI*2;
+      if (dist <= rBlack) {
+        for (let k of keys) if (k.isBlack) {
+          let d = Math.abs(ang - k.center); if (d > Math.PI) d = 2*Math.PI - d;
+          if (d <= k.width/2) return k.index;
         }
       }
-
-      if (distance <= rWhite) {
-        const W = N - K;
-        const angleW = (Math.PI * 2) / W;
-        const rotationOffset = -angleW / 2;
-
-        let gridAngle = logicalAngle - rotationOffset;
-        if (gridAngle < 0) gridAngle += Math.PI * 2;
-        if (gridAngle >= Math.PI * 2) gridAngle -= Math.PI * 2;
-        
-        const targetWhiteIndex = Math.floor(gridAngle / angleW);
-        
-        for (let key of keys) {
-          if (!key.isBlack && key.whiteIndex === targetWhiteIndex) {
-            return key.index;
-          }
-        }
+      if (dist <= rWhite) {
+        const W = N-K, aW = (Math.PI*2)/W, off = -aW/2;
+        let gA = ang - off; if (gA < 0) gA += Math.PI*2; if (gA >= Math.PI*2) gA -= Math.PI*2;
+        const target = Math.floor(gA / aW);
+        for (let k of keys) if (!k.isBlack && k.whiteIndex === target) return k.index;
       }
-
       return -1;
     }
 
-    // --- Event Listeners ---
-
     canvas.addEventListener('pointerdown', (e) => {
-      activePointers.add(e.pointerId);
-      canvas.setPointerCapture(e.pointerId);
-      
-      const index = getIndexFromClick(e);
-      if (index !== -1) {
-        const voiceId = startVoice(index);
-        pointerToVoice.set(e.pointerId, voiceId);
-      }
+      activePointers.add(e.pointerId); canvas.setPointerCapture(e.pointerId);
+      const idx = getIndexFromClick(e); if (idx !== -1) pointerToVoice.set(e.pointerId, startVoice(idx));
     });
-
     canvas.addEventListener('pointermove', (e) => {
       if (!activePointers.has(e.pointerId)) return;
-
-      const newIndex = getIndexFromClick(e);
-      const oldVoiceId = pointerToVoice.get(e.pointerId);
-      const activeVoice = oldVoiceId !== undefined ? activeVoices.get(oldVoiceId) : null;
-      const currentIndex = activeVoice ? activeVoice.index : -1;
-
-      if (newIndex !== currentIndex) {
-        if (oldVoiceId !== undefined) {
-          releaseVoice(oldVoiceId);
-          pointerToVoice.delete(e.pointerId);
-        }
-        if (newIndex !== -1) {
-          const newVoiceId = startVoice(newIndex);
-          pointerToVoice.set(e.pointerId, newVoiceId);
-        }
+      const nIdx = getIndexFromClick(e), oVid = pointerToVoice.get(e.pointerId);
+      const cIdx = oVid !== undefined ? activeVoices.get(oVid).index : -1;
+      if (nIdx !== cIdx) {
+        if (oVid !== undefined) { releaseVoice(oVid); pointerToVoice.delete(e.pointerId); }
+        if (nIdx !== -1) pointerToVoice.set(e.pointerId, startVoice(nIdx));
       }
     });
-
     canvas.addEventListener('pointerup', (e) => {
-      activePointers.delete(e.pointerId);
-      const voiceId = pointerToVoice.get(e.pointerId);
-      if (voiceId !== undefined) {
-        releaseVoice(voiceId);
-        pointerToVoice.delete(e.pointerId);
-      }
-    });
-    
-    canvas.addEventListener('pointercancel', (e) => {
-      activePointers.delete(e.pointerId);
-      const voiceId = pointerToVoice.get(e.pointerId);
-      if (voiceId !== undefined) {
-        releaseVoice(voiceId);
-        pointerToVoice.delete(e.pointerId);
-      }
+      activePointers.delete(e.pointerId); const vid = pointerToVoice.get(e.pointerId);
+      if (vid !== undefined) { releaseVoice(vid); pointerToVoice.delete(e.pointerId); }
     });
 
     window.addEventListener('keydown', (e) => {
-      if (e.repeat || e.metaKey || e.ctrlKey) return; 
-
-      if (e.key === ' ') {
-        handleSustainChange(true);
-        e.preventDefault(); 
-        return;
-      }
-
-      const keyChar = e.key.toLowerCase();
-      const matchedKey = keys.find(k => k.qwertyLabel === keyChar);
-      
-      if (matchedKey && !pressedKeys.has(keyChar)) {
-        pressedKeys.add(keyChar);
-        const voiceId = startVoice(matchedKey.index);
-        keyToVoice.set(keyChar, voiceId);
+      if (e.repeat || e.metaKey || e.ctrlKey) return;
+      if (e.key === ' ') { handleSustainChange(true); e.preventDefault(); return; }
+      const matched = keys.find(k => k.qwertyLabel === e.key.toLowerCase());
+      if (matched && !pressedKeys.has(e.key.toLowerCase())) {
+        pressedKeys.add(e.key.toLowerCase());
+        keyToVoice.set(e.key.toLowerCase(), startVoice(matched.index));
       }
     });
-
     window.addEventListener('keyup', (e) => {
-      if (e.key === ' ') {
-        handleSustainChange(false);
-        return;
-      }
-
-      const keyChar = e.key.toLowerCase();
-      if (pressedKeys.has(keyChar)) {
-        pressedKeys.delete(keyChar);
-        const voiceId = keyToVoice.get(keyChar);
-        if (voiceId !== undefined) {
-          releaseVoice(voiceId);
-          keyToVoice.delete(keyChar);
-        }
+      if (e.key === ' ') { handleSustainChange(false); return; }
+      const char = e.key.toLowerCase();
+      if (pressedKeys.has(char)) {
+        pressedKeys.delete(char); const vid = keyToVoice.get(char);
+        if (vid !== undefined) { releaseVoice(vid); keyToVoice.delete(char); }
       }
     });
 
-    sustainToggle.addEventListener('change', (e) => {
-      handleSustainChange(e.target.checked);
-    });
-
-    nSlider.addEventListener('input', updateKeyboard);
-    kSlider.addEventListener('input', updateKeyboard);
-    qwertyToggle.addEventListener('change', updateKeyboard);
-    integerToggle.addEventListener('change', updateKeyboard);
-    distancesToggle.addEventListener('change', updateKeyboard);
-    polygonsToggle.addEventListener('change', updateKeyboard);
-
+    nSlider.oninput = updateKeyboard; kSlider.oninput = updateKeyboard;
+    qwertyToggle.onchange = updateKeyboard; integerToggle.onchange = updateKeyboard;
+    distancesToggle.onchange = updateKeyboard; polygonsToggle.onchange = updateKeyboard;
+    sustainToggle.onchange = (e) => handleSustainChange(e.target.checked);
     updateKeyboard();
-
   </script>
 </body>
 </html>
