@@ -3,39 +3,82 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-<title>Cyclic Pianos</title>
+<title>Cyclic Pianos - VCU Theme</title>
 <style>
   body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #4a4a4a; 
+    background: #e4e4e4; 
     margin: 0;
     padding: 10px;
     touch-action: none; 
     user-select: none;
     -webkit-tap-highlight-color: transparent; 
   }
+
+  /* --- Splash Screen Styles --- */
+  #splash {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: #111111; 
+    color: #FFB81C; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.4s ease;
+  }
+  #splash h1 {
+    font-size: 3rem;
+    margin: 0 0 10px 0;
+    text-align: center;
+  }
+  #splash p {
+    font-size: 1.2rem;
+    color: #fdfdfd;
+    margin-bottom: 30px;
+  }
+  #start-btn {
+    background: #FFB81C;
+    color: #111;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 184, 28, 0.3);
+    transition: transform 0.1s;
+  }
+  #start-btn:active {
+    transform: scale(0.95);
+  }
+
+  /* --- Main App Styles --- */
   header {
     text-align: center;
-    color: white;
+    color: #111;
     margin-bottom: 15px;
   }
-  header h1 { margin: 0; font-size: 1.6rem; }
-  header p { margin: 4px 0; font-size: 0.95rem; opacity: 0.9; }
-  header a { color: #aadaff; text-decoration: none; }
+  header h1 { margin: 0; font-size: 1.8rem; color: #111; }
+  header p { margin: 4px 0; font-size: 0.95rem; opacity: 0.9; color: #444; }
+  header a { color: #D49A18; text-decoration: none; font-weight: bold; }
   
   #controls {
     background: #fdfdfd;
+    color: #111;
     padding: 10px 15px;
     border-radius: 12px;
     margin-bottom: 15px;
     text-align: center;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
     width: 100%;
-    max-width: 600px;
+    max-width: 650px;
     box-sizing: border-box;
+    border-top: 4px solid #FFB81C; 
   }
   .control-row {
     margin-top: 8px;
@@ -74,7 +117,7 @@
     background: transparent;
     cursor: pointer;
     outline: none; 
-    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
     width: 100%;
     height: auto;
     aspect-ratio: 1 / 1;
@@ -85,17 +128,27 @@
   .hint {
     margin-top: 8px;
     font-size: 0.8em;
-    color: #ccc;
+    color: #555;
     font-style: italic;
   }
   .sustain-active {
-    background-color: #ffe6eb !important;
+    background-color: #FFB81C !important;
+    color: #000;
     border-radius: 6px;
     padding: 2px 6px;
   }
+  label[for="autoplay-toggle"] { color: #008000; }
+  label[for="shepard-toggle"] { color: #d00; }
+  label[for="mobius-toggle"] { color: #800080; }
 </style>
 </head>
 <body>
+
+  <div id="splash">
+    <h1>Cyclic Pianos</h1>
+    <p>Bridges 2026 &mdash; N. Bushaw</p>
+    <button id="start-btn">Start Exploring</button>
+  </div>
 
   <header>
     <h1>Cyclic Pianos</h1>
@@ -134,11 +187,19 @@
         <label for="sustain-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Sustain</label>
       </div>
       <div>
+        <input type="checkbox" id="autoplay-toggle">
+        <label for="autoplay-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Auto-Play</label>
+      </div>
+      <div>
         <input type="checkbox" id="shepard-toggle">
-        <label for="shepard-toggle" style="cursor:pointer; font-size: 0.9em; color: #d00; font-weight: bold;">Shepard</label>
+        <label for="shepard-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Shepard</label>
+      </div>
+      <div>
+        <input type="checkbox" id="mobius-toggle">
+        <label for="mobius-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Möbius</label>
       </div>
     </div>
-    <div class="hint">Hold <strong>Spacebar</strong> to sustain. Toggle <strong>Shepard</strong> for the illusion.</div>
+    <div class="hint">Toggle <strong>Möbius + Shepard + Auto-Play</strong> to traverse the non-orientable topology.</div>
   </div>
 
   <div id="canvas-container">
@@ -171,10 +232,12 @@
     const polygonsToggle = document.getElementById('polygons-toggle');
     const sustainToggle = document.getElementById('sustain-toggle');
     const sustainContainer = document.getElementById('sustain-container');
+    const autoplayToggle = document.getElementById('autoplay-toggle');
     const shepardToggle = document.getElementById('shepard-toggle');
+    const mobiusToggle = document.getElementById('mobius-toggle');
 
     let N = 12, K = 5;
-    let showQwerty = false, showInteger = false, showDistances = true, showPolygons = true;
+    let showQwerty = false, showInteger = false, showDistances = true, showPolygons = true, showMobius = false;
     let keys = [], isBlackArr = []; 
 
     let audioCtx = null, audioUnlocked = false, nextVoiceId = 0;
@@ -182,25 +245,31 @@
     const pointerToVoice = new Map(), keyToVoice = new Map();
     const activePointers = new Set(), pressedKeys = new Set();
     let isSustainDown = false;
+    
+    let autoplayInterval = null, arpIndex = 0, arpVoiceId = null;
 
-    const cx = 200, cy = 200, rWhite = 190, rBlack = 110, rHole = 35; 
-    const gx = 200, gy = 200, rGraph = 160;
+    const cx = 200, cy = 200, gx = 200, gy = 200, rGraph = 160;
     const noteNames12 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+    // --- Splash Screen & Audio Unlock ---
+    const splash = document.getElementById('splash');
+    const startBtn = document.getElementById('start-btn');
 
     function unlockAudio() {
       if (audioUnlocked) return;
-      // Latency Optimization: Set latencyHint to interactive
       audioCtx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
       const buffer = audioCtx.createBuffer(1, 1, 22050);
       const source = audioCtx.createBufferSource();
       source.buffer = buffer; source.connect(audioCtx.destination); source.start(0);
       if (audioCtx.state === 'suspended') audioCtx.resume();
       audioUnlocked = true;
-      document.removeEventListener('pointerdown', unlockAudio);
-      document.removeEventListener('keydown', unlockAudio);
     }
-    document.addEventListener('pointerdown', unlockAudio);
-    document.addEventListener('keydown', unlockAudio);
+
+    startBtn.addEventListener('click', () => {
+      unlockAudio();
+      splash.style.opacity = '0';
+      setTimeout(() => { splash.style.display = 'none'; }, 400); 
+    });
 
     function updateKeyboard() {
       N = parseInt(nSlider.value);
@@ -211,6 +280,7 @@
       showInteger = integerToggle.checked;
       showDistances = distancesToggle.checked;
       showPolygons = polygonsToggle.checked;
+      showMobius = mobiusToggle.checked;
 
       document.getElementById('n-val').innerText = N;
       document.getElementById('k-val').innerText = K;
@@ -225,27 +295,136 @@
       }
 
       const W = N - K, angleW = (Math.PI * 2) / W, blackWidth = angleW * 0.55, rotationOffset = -angleW / 2;
-      const fW = ['a','s','d','f','g','h','j','k','l',';',"'"], fB = ['w','e','r','t','y','u','i','o','p','[',']'];
-      keys = [];
-      let currentWhite = 0, wIdx = 0, bIdx = 0;
+      
+      const fW_out = ['a','s','d','f','g','h','j','k','l',';',"'"];
+      const fB_out = ['w','e','r','t','y','u','i','o','p','[',']'];
+      const fW_in = ['z','x','c','v','b','n','m',',','.','/'];
+      const fB_in = ['1','2','3','4','5','6','7','8','9','0','-','='];
 
-      for (let i = 0; i < N; i++) {
-        let ql = standardPianoMap ? standardPianoMap[i] : (isBlackArr[i] ? fB[bIdx++ % 11] : fW[wIdx++ % 11]);
-        if (isBlackArr[i]) {
-          keys.push({ index: i, isBlack: true, center: currentWhite * angleW + rotationOffset, width: blackWidth, radius: rBlack, qwertyLabel: ql });
-        } else {
-          keys.push({ index: i, isBlack: false, start: currentWhite * angleW + rotationOffset, end: (currentWhite + 1) * angleW + rotationOffset, whiteIndex: currentWhite, radius: rWhite, qwertyLabel: ql });
-          currentWhite++;
+      keys = [];
+      let numRings = showMobius ? 2 : 1;
+      let ringProps = showMobius 
+        ? [ { rw: 190, rb: 154, ri: 114 }, { rw: 110, rb: 74, ri: 35 } ]
+        : [ { rw: 190, rb: 110, ri: 35 } ];
+
+      for (let ring = 0; ring < numRings; ring++) {
+        let currentWhite = 0, wIdx = 0, bIdx = 0;
+        let props = ringProps[ring];
+        
+        for (let i = 0; i < N; i++) {
+          let logicalIndex = i + ring * N;
+          let ql = "";
+          if (ring === 0) {
+            ql = standardPianoMap ? standardPianoMap[i] : (isBlackArr[i] ? fB_out[bIdx++ % 11] : fW_out[wIdx++ % 11]);
+          } else {
+            ql = isBlackArr[i] ? fB_in[bIdx++ % 12] : fW_in[wIdx++ % 10];
+          }
+
+          if (isBlackArr[i]) {
+            keys.push({ index: logicalIndex, isBlack: true, center: currentWhite * angleW + rotationOffset, width: blackWidth, rOuter: props.rb, rInner: props.ri, qwertyLabel: ql });
+          } else {
+            keys.push({ index: logicalIndex, isBlack: false, start: currentWhite * angleW + rotationOffset, end: (currentWhite + 1) * angleW + rotationOffset, whiteIndex: currentWhite, rOuter: props.rw, rInner: props.ri, qwertyLabel: ql });
+            currentWhite++;
+          }
         }
       }
       draw();
     }
 
-    function drawWedge(radius, logicalStart, logicalEnd, color) {
-      ctx.beginPath(); ctx.moveTo(cx, cy);
-      ctx.arc(cx, cy, radius, Math.PI / 2 - logicalEnd, Math.PI / 2 - logicalStart);
-      ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+    function drawWedge(rInner, rOuter, logicalStart, logicalEnd, color) {
+      ctx.beginPath(); 
+      ctx.arc(cx, cy, rOuter, Math.PI / 2 - logicalEnd, Math.PI / 2 - logicalStart);
+      ctx.arc(cx, cy, rInner, Math.PI / 2 - logicalStart, Math.PI / 2 - logicalEnd, true);
+      ctx.closePath(); 
+      ctx.fillStyle = color; ctx.fill();
       ctx.strokeStyle = '#222'; ctx.lineWidth = 2.5; ctx.stroke();
+    }
+
+    function drawMobiusArrows() {
+      if (!showMobius) return;
+
+      // Extract the precise keys bounding the topological seam
+      const keyOutC = keys.find(k => k.index === 0);         // Start of outer loop
+      const keyOutB = keys.find(k => k.index === N - 1);     // End of outer loop
+      const keyInC  = keys.find(k => k.index === N);         // Start of inner loop
+      const keyInB  = keys.find(k => k.index === 2 * N - 1); // End of inner loop
+
+      if (!keyOutC || !keyOutB || !keyInC || !keyInB) return;
+
+      // Dynamically calculate their exact geometric centers
+      const getCenterAngle = (k) => k.isBlack ? k.center : (k.start + k.end) / 2;
+      const getRadius = (k) => (k.rOuter + k.rInner) / 2;
+
+      const getPoint = (k) => {
+        const ang = Math.PI / 2 - getCenterAngle(k);
+        const r = getRadius(k);
+        return { x: cx + Math.cos(ang) * r, y: cy + Math.sin(ang) * r };
+      };
+
+      const pOutC = getPoint(keyOutC);
+      const pOutB = getPoint(keyOutB);
+      const pInC  = getPoint(keyInC);
+      const pInB  = getPoint(keyInB);
+
+      const drawArrowHead = (x, y, angle) => {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        
+        // Background shadow exactly terminating at center point
+        ctx.beginPath();
+        ctx.moveTo(1, 0); 
+        ctx.lineTo(-8, -6);
+        ctx.lineTo(-8, 6);
+        ctx.closePath();
+        ctx.fillStyle = '#111';
+        ctx.fill();
+
+        // Foreground gold
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(-7, -4);
+        ctx.lineTo(-7, 4);
+        ctx.closePath();
+        ctx.fillStyle = '#FFB81C';
+        ctx.fill();
+        
+        ctx.restore();
+      };
+
+      const drawHorizontalCurve = (p1, p2) => {
+        // Enforce pure Left-to-Right orientation to avoid crossovers
+        const pLeft = p1.x < p2.x ? p1 : p2;
+        const pRight = p1.x < p2.x ? p2 : p1;
+        
+        // Pure horizontal X-axis offset for smooth, horizontal entry/exits
+        const cpOffset = Math.max(30, Math.abs(pRight.x - pLeft.x) * 0.5);
+
+        // Shadow Line
+        ctx.beginPath();
+        ctx.moveTo(pLeft.x, pLeft.y);
+        ctx.bezierCurveTo(pLeft.x + cpOffset, pLeft.y, pRight.x - cpOffset, pRight.y, pRight.x, pRight.y);
+        ctx.strokeStyle = '#111';
+        ctx.lineWidth = 6;
+        ctx.stroke();
+
+        // Gold Line
+        ctx.beginPath();
+        ctx.moveTo(pLeft.x, pLeft.y);
+        ctx.bezierCurveTo(pLeft.x + cpOffset, pLeft.y, pRight.x - cpOffset, pRight.y, pRight.x, pRight.y);
+        ctx.strokeStyle = '#FFB81C';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Double Horizontal Arrowheads
+        drawArrowHead(pLeft.x, pLeft.y, Math.PI); // Lock pointing strictly Left
+        drawArrowHead(pRight.x, pRight.y, 0);     // Lock pointing strictly Right
+      };
+
+      // Path 1: Connect Outer loop end to Inner loop start
+      drawHorizontalCurve(pOutB, pInC);
+      // Path 2: Connect Inner loop end to Outer loop start
+      drawHorizontalCurve(pInB, pOutC);
     }
 
     function drawLabels() {
@@ -253,66 +432,143 @@
       ctx.font = 'bold 15px Georgia, serif'; 
       for (let key of keys) {
         const angle = key.isBlack ? key.center : (key.start + key.end) / 2;
-        const tx = cx + Math.cos(Math.PI/2 - angle) * (key.isBlack ? key.radius - 22 : key.radius - 32);
-        const ty = cy + Math.sin(Math.PI/2 - angle) * (key.isBlack ? key.radius - 22 : key.radius - 32);
+        const radiusPos = key.isBlack ? key.rOuter - 15 : key.rOuter - 22;
+        const tx = cx + Math.cos(Math.PI/2 - angle) * radiusPos;
+        const ty = cy + Math.sin(Math.PI/2 - angle) * radiusPos;
         ctx.fillStyle = key.isBlack ? '#f0f0f0' : '#333';
+        
         let lines = [];
-        if (showInteger) lines.push(N === 12 ? noteNames12[key.index] : key.index);
+        if (showInteger) lines.push(N === 12 && !showMobius ? noteNames12[key.index % N] : key.index);
         if (showQwerty) lines.push(key.qwertyLabel.toUpperCase());
+        
         if (lines.length === 1) ctx.fillText(lines[0], tx, ty);
         else if (lines.length === 2) { ctx.fillText(lines[0], tx, ty - 8); ctx.fillText(lines[1], tx, ty + 8); }
       }
     }
 
+    function getNodePos(i) {
+      if (!showMobius) {
+        const a = Math.PI / 2 - i * (Math.PI * 2) / N;
+        return { x: gx + Math.cos(a) * rGraph, y: gy + Math.sin(a) * rGraph };
+      } else {
+        const R = rGraph - 25; 
+        const w = 35;          
+        
+        const u = Math.PI / 2 - i * (Math.PI * 2) / N; 
+        const v = i * Math.PI / N; 
+        
+        const lx = (R + w * Math.cos(v)) * Math.cos(u);
+        const ly = (R + w * Math.cos(v)) * Math.sin(u);
+        const lz = w * Math.sin(v);
+        
+        const tilt = 0.7; 
+        return { 
+          x: gx + lx, 
+          y: gy + ly * Math.cos(tilt) - lz * Math.sin(tilt)
+        };
+      }
+    }
+
     function drawGraph(activeIndices) {
       gCtx.clearRect(0, 0, 400, 400);
+      const limit = showMobius ? N * 2 : N;
+
+      if (showMobius) {
+        gCtx.beginPath();
+        for (let i = 0; i < N; i++) {
+          const p1 = getNodePos(i);
+          const p2 = getNodePos(i + N);
+          gCtx.moveTo(p1.x, p1.y);
+          gCtx.lineTo(p2.x, p2.y);
+        }
+        gCtx.strokeStyle = 'rgba(34, 34, 34, 0.4)'; 
+        gCtx.lineWidth = 1.5; 
+        gCtx.stroke();
+      }
+
       gCtx.beginPath();
-      for (let i = 0; i <= N; i++) {
-        const a = Math.PI / 2 - (i % N) * (Math.PI * 2) / N;
-        const px = gx + Math.cos(a) * rGraph, py = gy + Math.sin(a) * rGraph;
-        i === 0 ? gCtx.moveTo(px, py) : gCtx.lineTo(px, py);
+      for (let i = 0; i <= limit; i++) {
+        const p = getNodePos(i % limit);
+        i === 0 ? gCtx.moveTo(p.x, p.y) : gCtx.lineTo(p.x, p.y);
       }
       gCtx.strokeStyle = '#222'; gCtx.lineWidth = 2.5; gCtx.stroke();
 
       const activeArr = Array.from(activeIndices).sort((a, b) => a - b);
       if (activeArr.length > 1) {
+        let polyArea = 0, cxSum = 0, cySum = 0;
+        
         if (showPolygons) {
           gCtx.beginPath();
           for (let i = 0; i < activeArr.length; i++) {
-            const u = activeArr[i], a = Math.PI / 2 - u * (Math.PI * 2) / N;
-            const px = gx + Math.cos(a) * rGraph, py = gy + Math.sin(a) * rGraph;
-            i === 0 ? gCtx.moveTo(px, py) : gCtx.lineTo(px, py);
+            const uIdx = activeArr[i];
+            const p = getNodePos(uIdx);
+            cxSum += p.x; cySum += p.y;
+            i === 0 ? gCtx.moveTo(p.x, p.y) : gCtx.lineTo(p.x, p.y);
+            
+            const a1 = Math.PI / 2 - uIdx * (Math.PI * 2) / limit;
+            const a2 = Math.PI / 2 - activeArr[(i + 1) % activeArr.length] * (Math.PI * 2) / limit;
+            polyArea += Math.sin(a1 - a2);
           }
-          if (activeArr.length >= 3) { gCtx.closePath(); gCtx.fillStyle = 'rgba(255, 51, 102, 0.3)'; gCtx.fill(); }
-          gCtx.strokeStyle = '#ff3366'; gCtx.lineWidth = 2.5; gCtx.stroke();
+          if (activeArr.length >= 3) { gCtx.closePath(); gCtx.fillStyle = 'rgba(255, 184, 28, 0.3)'; gCtx.fill(); }
+          gCtx.strokeStyle = '#FFB81C'; gCtx.lineWidth = 2.5; gCtx.stroke();
         }
+        
         if (showDistances) {
           activeArr.forEach((u, i) => {
             activeArr.slice(i+1).forEach(v => {
-              const a1 = Math.PI/2 - u*(Math.PI*2)/N, a2 = Math.PI/2 - v*(Math.PI*2)/N;
-              const x1 = gx+Math.cos(a1)*rGraph, y1 = gy+Math.sin(a1)*rGraph, x2 = gx+Math.cos(a2)*rGraph, y2 = gy+Math.sin(a2)*rGraph;
-              gCtx.beginPath(); gCtx.moveTo(x1, y1); gCtx.lineTo(x2, y2);
-              gCtx.strokeStyle = '#ff3366'; gCtx.stroke();
-              const dist = Math.min(Math.abs(u-v), N-Math.abs(u-v));
-              gCtx.beginPath(); gCtx.arc((x1+x2)/2, (y1+y2)/2, 8, 0, Math.PI*2); gCtx.fillStyle='#fff'; gCtx.fill();
-              gCtx.strokeStyle='#ff3366'; gCtx.lineWidth=1.5; gCtx.stroke();
-              gCtx.fillStyle='#ff3366'; gCtx.font='bold 10px sans-serif'; gCtx.textAlign='center'; gCtx.fillText(dist, (x1+x2)/2, (y1+y2)/2+3);
+              const p1 = getNodePos(u);
+              const p2 = getNodePos(v);
+              gCtx.beginPath(); gCtx.moveTo(p1.x, p1.y); gCtx.lineTo(p2.x, p2.y);
+              gCtx.strokeStyle = '#FFB81C'; gCtx.stroke();
+              
+              const dist = Math.min(Math.abs(u-v), limit - Math.abs(u-v));
+              const mx = (p1.x + p2.x) / 2;
+              const my = (p1.y + p2.y) / 2;
+              
+              gCtx.beginPath(); gCtx.arc(mx, my, 8, 0, Math.PI*2); gCtx.fillStyle='#fff'; gCtx.fill();
+              gCtx.strokeStyle='#FFB81C'; gCtx.lineWidth=1.5; gCtx.stroke();
+              gCtx.fillStyle='#FFB81C'; gCtx.font='bold 10px sans-serif'; gCtx.textAlign='center'; gCtx.fillText(dist, mx, my+3);
             });
           });
         }
+        
+        if (showPolygons && activeArr.length >= 3) {
+          const finalArea = Math.abs(polyArea * 0.5);
+          const text = `A=${finalArea.toFixed(2)}`;
+          const polyCX = cxSum / activeArr.length;
+          const polyCY = cySum / activeArr.length;
+          
+          gCtx.font = 'bold 12px sans-serif';
+          const textWidth = gCtx.measureText(text).width;
+          
+          gCtx.beginPath();
+          gCtx.arc(polyCX - textWidth / 2, polyCY, 10, Math.PI / 2, Math.PI * 1.5);
+          gCtx.arc(polyCX + textWidth / 2, polyCY, 10, Math.PI * 1.5, Math.PI / 2);
+          gCtx.closePath();
+          
+          gCtx.fillStyle = '#fff'; gCtx.fill();
+          gCtx.strokeStyle = '#FFB81C'; gCtx.lineWidth = 1.5; gCtx.stroke();
+          gCtx.fillStyle = '#FFB81C'; gCtx.textAlign = 'center'; gCtx.textBaseline = 'middle'; gCtx.fillText(text, polyCX, polyCY);
+        }
       }
 
-      const vRad = Math.max(6, Math.min(18, (rGraph * Math.PI / N) * 0.7));
-      for (let i = 0; i < N; i++) {
-        const a = Math.PI / 2 - i * (Math.PI * 2) / N, px = gx + Math.cos(a) * rGraph, py = gy + Math.sin(a) * rGraph;
-        gCtx.beginPath(); gCtx.arc(px, py, vRad, 0, Math.PI * 2);
+      const vRad = Math.max(6, Math.min(18, (rGraph * Math.PI / limit) * 0.7));
+      for (let i = 0; i < limit; i++) {
+        const p = getNodePos(i);
+        gCtx.beginPath(); gCtx.arc(p.x, p.y, vRad, 0, Math.PI * 2);
+        
         const active = activeIndices.has(i);
-        gCtx.fillStyle = isBlackArr[i] ? (active ? '#777' : '#222') : (active ? '#aadaff' : '#fff');
-        gCtx.fill(); gCtx.strokeStyle = active ? (isBlackArr[i] ? '#fff' : '#0055ff') : '#222';
-        gCtx.lineWidth = active ? 3 : 2; gCtx.stroke();
+        const isB = isBlackArr[i % N];
+        
+        gCtx.fillStyle = isB ? (active ? '#D49A18' : '#222') : (active ? '#FFB81C' : '#fff');
+        gCtx.fill(); 
+        gCtx.strokeStyle = active ? (isB ? '#fff' : '#111') : '#222';
+        gCtx.lineWidth = active ? 3 : 2; 
+        gCtx.stroke();
+        
         if (vRad >= 10) {
-          gCtx.fillStyle = isBlackArr[i] ? (active ? '#fff' : '#ddd') : (active ? '#000' : '#444');
-          gCtx.font = `bold ${Math.max(9, vRad - 4)}px sans-serif`; gCtx.textAlign = 'center'; gCtx.fillText(i, px, py + 4);
+          gCtx.fillStyle = isB ? (active ? '#fff' : '#ddd') : (active ? '#000' : '#444');
+          gCtx.font = `bold ${Math.max(9, vRad - 4)}px sans-serif`; gCtx.textAlign = 'center'; gCtx.fillText(i, p.x, p.y + 4);
         }
       }
     }
@@ -320,11 +576,13 @@
     function draw() {
       ctx.clearRect(0, 0, 400, 400);
       const activeIndices = new Set(Array.from(activeVoices.values()).map(v => v.index));
-      keys.filter(k => !k.isBlack).forEach(k => drawWedge(k.radius, k.start, k.end, activeIndices.has(k.index) ? '#d9eaff' : '#fff'));
-      keys.filter(k => k.isBlack).forEach(k => drawWedge(k.radius, k.center-k.width/2, k.center+k.width/2, activeIndices.has(k.index) ? '#555' : '#222'));
+      
+      keys.filter(k => !k.isBlack).forEach(k => drawWedge(k.rInner, k.rOuter, k.start, k.end, activeIndices.has(k.index) ? '#FFB81C' : '#fff'));
+      keys.filter(k => k.isBlack).forEach(k => drawWedge(k.rInner, k.rOuter, k.center-k.width/2, k.center+k.width/2, activeIndices.has(k.index) ? '#D49A18' : '#222'));
+      
+      drawMobiusArrows();
+
       if (showQwerty || showInteger) drawLabels();
-      ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(cx, cy, rHole, 0, Math.PI*2); ctx.fill();
-      ctx.globalCompositeOperation = 'source-over'; ctx.beginPath(); ctx.arc(cx, cy, rHole, 0, Math.PI*2); ctx.strokeStyle = '#222'; ctx.lineWidth = 3; ctx.stroke();
       drawGraph(activeIndices);
     }
 
@@ -332,41 +590,45 @@
 
     function startVoice(index) {
       if (!audioUnlocked) unlockAudio();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
 
       const masterGain = audioCtx.createGain();
       masterGain.connect(audioCtx.destination);
       const now = audioCtx.currentTime;
       masterGain.gain.setValueAtTime(0, now);
       
-      // Balancing & Buffer Optimization: 0.02s ramp helps sync threads
       const targetVolume = shepardToggle.checked ? 0.05 : 0.15;
-      masterGain.gain.linearRampToValueAtTime(targetVolume, now + 0.02);
+      masterGain.gain.setTargetAtTime(targetVolume, now, 0.01);
 
       const oscillators = [];
       const baseFreq = 261.63 * Math.pow(2, index / N);
 
-      if (shepardToggle.checked) {
+      if (showMobius && shepardToggle.checked) {
+        for (let i = -2; i <= 2; i++) {
+          const freq = baseFreq * Math.pow(4, i); 
+          const osc = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          const lfreq = Math.log2(freq / 261.63);
+          const volume = Math.exp(-0.5 * Math.pow(lfreq / 2.0, 2)); 
+          osc.type = 'sine'; osc.frequency.value = freq; g.gain.value = volume;
+          osc.connect(g); g.connect(masterGain); osc.start(now);
+          oscillators.push(osc);
+        }
+      } else if (shepardToggle.checked) {
         for (let i = -3; i <= 3; i++) {
           const freq = baseFreq * Math.pow(2, i);
           const osc = audioCtx.createOscillator();
           const g = audioCtx.createGain();
           const lfreq = Math.log2(freq / 261.63);
           const volume = Math.exp(-0.5 * Math.pow(lfreq / 1.5, 2)); 
-          osc.type = 'sine';
-          osc.frequency.value = freq;
-          g.gain.value = volume;
-          osc.connect(g);
-          g.connect(masterGain);
-          osc.start(now);
+          osc.type = 'sine'; osc.frequency.value = freq; g.gain.value = volume;
+          osc.connect(g); g.connect(masterGain); osc.start(now);
           oscillators.push(osc);
         }
       } else {
         const osc = audioCtx.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.value = baseFreq;
-        osc.connect(masterGain);
-        osc.start(now);
+        osc.type = 'sine'; osc.frequency.value = baseFreq;
+        osc.connect(masterGain); osc.start(now);
         oscillators.push(osc);
       }
 
@@ -382,8 +644,8 @@
       const now = audioCtx.currentTime;
       gain.gain.cancelScheduledValues(now);
       gain.gain.setValueAtTime(gain.gain.value, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
-      oscillators.forEach(o => o.stop(now + 0.4));
+      gain.gain.setTargetAtTime(0, now, 0.08);
+      oscillators.forEach(o => o.stop(now + 0.5));
       activeVoices.delete(voiceId);
       sustainedVoices.delete(voiceId);
       requestAnimationFrame(draw);
@@ -400,7 +662,26 @@
       else {
         sustainContainer.classList.remove('sustain-active');
         const held = new Set([...pointerToVoice.values(), ...keyToVoice.values()]);
+        if (arpVoiceId !== null) held.add(arpVoiceId);
         sustainedVoices.forEach(id => { if (!held.has(id)) stopVoice(id); });
+      }
+    }
+
+    function handleAutoplayChange(active) {
+      if (active) {
+        if (!audioUnlocked) unlockAudio();
+        arpIndex = 0;
+        autoplayInterval = setInterval(() => {
+          if (arpVoiceId !== null) releaseVoice(arpVoiceId);
+          let limit = showMobius ? N * 2 : N;
+          if (arpIndex >= limit) arpIndex = 0;
+          arpVoiceId = startVoice(arpIndex);
+          arpIndex++;
+        }, 250); 
+      } else {
+        clearInterval(autoplayInterval);
+        autoplayInterval = null;
+        if (arpVoiceId !== null) { releaseVoice(arpVoiceId); arpVoiceId = null; }
       }
     }
 
@@ -408,20 +689,23 @@
       const rect = canvas.getBoundingClientRect();
       const x = (e.clientX - rect.left) * (400/rect.width) - cx, y = (e.clientY - rect.top) * (400/rect.height) - cy;
       const dist = Math.sqrt(x*x + y*y);
-      if (dist < rHole) return -1;
+      if (dist < 35) return -1;
       let ang = Math.PI/2 - Math.atan2(y, x);
       if (ang < 0) ang += Math.PI*2; if (ang >= Math.PI*2) ang -= Math.PI*2;
-      if (dist <= rBlack) {
-        for (let k of keys) if (k.isBlack) {
+      
+      for (let k of keys) {
+        if (k.isBlack && dist <= k.rOuter && dist >= k.rInner) {
           let d = Math.abs(ang - k.center); if (d > Math.PI) d = 2*Math.PI - d;
           if (d <= k.width/2) return k.index;
         }
       }
-      if (dist <= rWhite) {
-        const W = N-K, aW = (Math.PI*2)/W, off = -aW/2;
-        let gA = ang - off; if (gA < 0) gA += Math.PI*2; if (gA >= Math.PI*2) gA -= Math.PI*2;
-        const target = Math.floor(gA / aW);
-        for (let k of keys) if (!k.isBlack && k.whiteIndex === target) return k.index;
+      for (let k of keys) {
+        if (!k.isBlack && dist <= k.rOuter && dist >= k.rInner) {
+          const W = N-K, aW = (Math.PI*2)/W, off = -aW/2;
+          let gA = ang - off; if (gA < 0) gA += Math.PI*2; if (gA >= Math.PI*2) gA -= Math.PI*2;
+          const target = Math.floor(gA / aW);
+          if (k.whiteIndex === target) return k.index;
+        }
       }
       return -1;
     }
@@ -466,6 +750,9 @@
     qwertyToggle.onchange = updateKeyboard; integerToggle.onchange = updateKeyboard;
     distancesToggle.onchange = updateKeyboard; polygonsToggle.onchange = updateKeyboard;
     sustainToggle.onchange = (e) => handleSustainChange(e.target.checked);
+    autoplayToggle.onchange = (e) => handleAutoplayChange(e.target.checked);
+    shepardToggle.onchange = updateKeyboard; mobiusToggle.onchange = updateKeyboard;
+    
     updateKeyboard();
   </script>
 </body>
