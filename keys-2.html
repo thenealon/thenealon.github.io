@@ -342,89 +342,91 @@
 
     function drawMobiusArrows() {
       if (!showMobius) return;
+      const W = N - K;
+      const angleW = (Math.PI * 2) / W;
+      const rotationOffset = -angleW / 2;
+      // Seam angle on the canvas
+      const boundaryAngle = Math.PI / 2 - rotationOffset;
 
-      // Extract the precise keys bounding the topological seam
-      const keyOutC = keys.find(k => k.index === 0);         // Start of outer loop
-      const keyOutB = keys.find(k => k.index === N - 1);     // End of outer loop
-      const keyInC  = keys.find(k => k.index === N);         // Start of inner loop
-      const keyInB  = keys.find(k => k.index === 2 * N - 1); // End of inner loop
+      ctx.save();
+      ctx.translate(cx, cy);
+      // Rotate the seam to the X-axis
+      ctx.rotate(boundaryAngle);
 
-      if (!keyOutC || !keyOutB || !keyInC || !keyInB) return;
+      const rOuterMid = (190 + 114) / 2;
+      const rInnerMid = (110 + 35) / 2;
 
-      // Dynamically calculate their exact geometric centers
-      const getCenterAngle = (k) => k.isBlack ? k.center : (k.start + k.end) / 2;
-      const getRadius = (k) => (k.rOuter + k.rInner) / 2;
+      // Internal function to draw an arrowhead, abstracted for reuse
+      const drawArrowHeadHelper = (color) => {
+          // Arrowhead background
+          ctx.beginPath();
+          ctx.moveTo(0, 4);
+          ctx.lineTo(-10, -12);
+          ctx.lineTo(10, -12);
+          ctx.closePath();
+          ctx.fillStyle = '#111'; // VCU Black shadow
+          ctx.fill();
 
-      const getPoint = (k) => {
-        const ang = Math.PI / 2 - getCenterAngle(k);
-        const r = getRadius(k);
-        return { x: cx + Math.cos(ang) * r, y: cy + Math.sin(ang) * r };
-      };
+          // Arrowhead foreground
+          ctx.beginPath();
+          ctx.moveTo(0, 2);
+          ctx.lineTo(-7, -9);
+          ctx.lineTo(7, -9);
+          ctx.closePath();
+          ctx.fillStyle = color; // VCU Gold
+          ctx.fill();
+      }
 
-      const pOutC = getPoint(keyOutC);
-      const pOutB = getPoint(keyOutB);
-      const pInC  = getPoint(keyInC);
-      const pInB  = getPoint(keyInB);
+      // Function to draw an elegant DOUBLE-HEADED S-curve swap arrow
+      const drawSArrow = (startX, startY, endX, endY) => {
+        const headColor = '#FFB81C'; // VCU Gold
 
-      const drawArrowHead = (x, y, angle) => {
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(angle);
-        
-        // Background shadow exactly terminating at center point
+        // --- 1. Draw Paths ---
+
+        // Shadow stroke
         ctx.beginPath();
-        ctx.moveTo(1, 0); 
-        ctx.lineTo(-8, -6);
-        ctx.lineTo(-8, 6);
-        ctx.closePath();
-        ctx.fillStyle = '#111';
-        ctx.fill();
-
-        // Foreground gold
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(-7, -4);
-        ctx.lineTo(-7, 4);
-        ctx.closePath();
-        ctx.fillStyle = '#FFB81C';
-        ctx.fill();
-        
-        ctx.restore();
-      };
-
-      const drawHorizontalCurve = (p1, p2) => {
-        // Enforce pure Left-to-Right orientation to avoid crossovers
-        const pLeft = p1.x < p2.x ? p1 : p2;
-        const pRight = p1.x < p2.x ? p2 : p1;
-        
-        // Pure horizontal X-axis offset for smooth, horizontal entry/exits
-        const cpOffset = Math.max(30, Math.abs(pRight.x - pLeft.x) * 0.5);
-
-        // Shadow Line
-        ctx.beginPath();
-        ctx.moveTo(pLeft.x, pLeft.y);
-        ctx.bezierCurveTo(pLeft.x + cpOffset, pLeft.y, pRight.x - cpOffset, pRight.y, pRight.x, pRight.y);
+        ctx.moveTo(startX, startY);
+        ctx.bezierCurveTo(startX, 0, endX, 0, endX, endY);
         ctx.strokeStyle = '#111';
         ctx.lineWidth = 6;
         ctx.stroke();
 
-        // Gold Line
+        // Gold line
         ctx.beginPath();
-        ctx.moveTo(pLeft.x, pLeft.y);
-        ctx.bezierCurveTo(pLeft.x + cpOffset, pLeft.y, pRight.x - cpOffset, pRight.y, pRight.x, pRight.y);
+        ctx.moveTo(startX, startY);
+        ctx.bezierCurveTo(startX, 0, endX, 0, endX, endY);
         ctx.strokeStyle = '#FFB81C';
         ctx.lineWidth = 3;
         ctx.stroke();
 
-        // Double Horizontal Arrowheads
-        drawArrowHead(pLeft.x, pLeft.y, Math.PI); // Lock pointing strictly Left
-        drawArrowHead(pRight.x, pRight.y, 0);     // Lock pointing strictly Right
+        // --- 2. Draw Arrowheads ---
+
+        // Draw arrowhead at START point (Inner loop or current loop)
+        ctx.save();
+        ctx.translate(startX, startY);
+        // The path ENTERS the loop, curve points to center, arrow points AWAY.
+        // We use the same rotation logic as the exit, but reversed (-PI vs PI)
+        ctx.rotate(endY > startY ? -Math.PI / 2 : Math.PI / 2);
+        drawArrowHeadHelper(headColor);
+        ctx.restore();
+
+        // Draw arrowhead at END point (Outer loop or current loop)
+        ctx.save();
+        ctx.translate(endX, endY);
+        // Path EXITS the loop, standard tangent rotation logic.
+        ctx.rotate(endY > startY ? Math.PI / 2 : -Math.PI / 2); 
+        drawArrowHeadHelper(headColor);
+        ctx.restore();
       };
 
-      // Path 1: Connect Outer loop end to Inner loop start
-      drawHorizontalCurve(pOutB, pInC);
-      // Path 2: Connect Inner loop end to Outer loop start
-      drawHorizontalCurve(pInB, pOutC);
+      // Draw the crossover indicators right over the gap
+      // The swap is bi-directional, each path is now double-headed.
+      // Curve 1: Upper Inner Gap -> Lower Outer Gap
+      drawSArrow(rOuterMid, -25, rInnerMid, 25);
+      // Curve 2: Upper Outer Gap -> Lower Inner Gap
+      drawSArrow(rInnerMid, -25, rOuterMid, 25);
+
+      ctx.restore();
     }
 
     function drawLabels() {
@@ -580,6 +582,7 @@
       keys.filter(k => !k.isBlack).forEach(k => drawWedge(k.rInner, k.rOuter, k.start, k.end, activeIndices.has(k.index) ? '#FFB81C' : '#fff'));
       keys.filter(k => k.isBlack).forEach(k => drawWedge(k.rInner, k.rOuter, k.center-k.width/2, k.center+k.width/2, activeIndices.has(k.index) ? '#D49A18' : '#222'));
       
+      // Draw the topological arrows right over the seam
       drawMobiusArrows();
 
       if (showQwerty || showInteger) drawLabels();
