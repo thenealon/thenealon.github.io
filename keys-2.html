@@ -5,138 +5,61 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
 <title>Cyclic Pianos - VCU Theme</title>
 <style>
+  /* --- Global Styles --- */
   body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #e4e4e4; 
-    margin: 0;
-    padding: 10px;
-    touch-action: none; 
-    user-select: none;
-    -webkit-tap-highlight-color: transparent; 
+    display: flex; flex-direction: column; align-items: center;
+    background: #e4e4e4; margin: 0; padding: 10px;
+    touch-action: none; user-select: none; -webkit-tap-highlight-color: transparent; 
   }
 
-  /* --- Splash Screen Styles --- */
+  /* --- Splash Screen --- */
   #splash {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: #111111; 
-    color: #FFB81C; 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    transition: opacity 0.4s ease;
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: #111111; color: #FFB81C; 
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    z-index: 9999; transition: opacity 0.4s ease;
   }
-  #splash h1 {
-    font-size: 3rem;
-    margin: 0 0 10px 0;
-    text-align: center;
-  }
-  #splash p {
-    font-size: 1.2rem;
-    color: #fdfdfd;
-    margin-bottom: 30px;
-  }
+  #splash h1 { font-size: 3rem; margin: 0 0 10px 0; text-align: center; }
+  #splash p { font-size: 1.2rem; color: #fdfdfd; margin-bottom: 30px; }
   #start-btn {
-    background: #FFB81C;
-    color: #111;
-    border: none;
-    padding: 15px 30px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(255, 184, 28, 0.3);
-    transition: transform 0.1s;
+    background: #FFB81C; color: #111; border: none; padding: 15px 30px;
+    font-size: 1.2rem; font-weight: bold; border-radius: 8px; cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 184, 28, 0.3); transition: transform 0.1s;
   }
-  #start-btn:active {
-    transform: scale(0.95);
-  }
+  #start-btn:active { transform: scale(0.95); }
 
-  /* --- Main App Styles --- */
-  header {
-    text-align: center;
-    color: #111;
-    margin-bottom: 15px;
-  }
+  /* --- Header & Controls --- */
+  header { text-align: center; color: #111; margin-bottom: 15px; }
   header h1 { margin: 0; font-size: 1.8rem; color: #111; }
   header p { margin: 4px 0; font-size: 0.95rem; opacity: 0.9; color: #444; }
   header a { color: #D49A18; text-decoration: none; font-weight: bold; }
   
   #controls {
-    background: #fdfdfd;
-    color: #111;
-    padding: 10px 15px;
-    border-radius: 12px;
-    margin-bottom: 15px;
-    text-align: center;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-    width: 100%;
-    max-width: 650px;
-    box-sizing: border-box;
-    border-top: 4px solid #FFB81C; 
+    background: #fdfdfd; color: #111; padding: 10px 15px; border-radius: 12px;
+    margin-bottom: 15px; text-align: center; box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    width: 100%; max-width: 650px; box-sizing: border-box; border-top: 4px solid #FFB81C; 
   }
-  .control-row {
-    margin-top: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .control-group {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #eee;
-  }
+  .control-row { margin-top: 8px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; }
+  .control-group { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+  
+  /* --- Canvas Layout --- */
   #canvas-container {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    gap: 10px;
-    justify-content: center;
-    align-items: flex-start;
-    width: 100%;
-    max-width: 900px;
+    display: flex; flex-direction: row; flex-wrap: nowrap; gap: 10px;
+    justify-content: center; align-items: flex-start; width: 100%; max-width: 900px;
   }
-  .canvas-wrapper {
-    flex: 1 1 50%;
-    display: flex;
-    justify-content: center;
-    max-width: 400px;
-  }
+  .canvas-wrapper { flex: 1 1 50%; display: flex; justify-content: center; max-width: 400px; }
   canvas {
-    background: transparent;
-    cursor: pointer;
-    outline: none; 
+    background: transparent; outline: none; 
     filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1 / 1;
+    width: 100%; height: auto; aspect-ratio: 1 / 1;
   }
-  #graph {
-    cursor: default; 
-  }
-  .hint {
-    margin-top: 8px;
-    font-size: 0.8em;
-    color: #555;
-    font-style: italic;
-  }
-  .sustain-active {
-    background-color: #FFB81C !important;
-    color: #000;
-    border-radius: 6px;
-    padding: 2px 6px;
-  }
+  #keyboard { cursor: pointer; }
+  #graph { cursor: default; }
+  
+  /* --- UI Helpers --- */
+  .hint { margin-top: 8px; font-size: 0.8em; color: #555; font-style: italic; }
+  .sustain-active { background-color: #FFB81C !important; color: #000; border-radius: 6px; padding: 2px 6px; }
   label[for="autoplay-toggle"] { color: #008000; }
   label[for="shepard-toggle"] { color: #d00; }
   label[for="mobius-toggle"] { color: #800080; }
@@ -162,79 +85,42 @@
     </div>
     <div class="control-row">
       <label>Black Keys (K): <strong id="k-val">5</strong></label>
-      <input type="range" id="k-slider" min="1" max="11" value="5">
+      <input type="range" id="k-slider" min="1" max="6" value="5">
     </div>
     
     <div class="control-group">
-      <div>
-        <input type="checkbox" id="qwerty-toggle">
-        <label for="qwerty-toggle" style="cursor:pointer; font-size: 0.9em;">QWERTY</label>
-      </div>
-      <div>
-        <input type="checkbox" id="integer-toggle">
-        <label for="integer-toggle" style="cursor:pointer; font-size: 0.9em;">Numbers</label>
-      </div>
-      <div>
-        <input type="checkbox" id="distances-toggle" checked>
-        <label for="distances-toggle" style="cursor:pointer; font-size: 0.9em;">Distances</label>
-      </div>
-      <div>
-        <input type="checkbox" id="polygons-toggle" checked>
-        <label for="polygons-toggle" style="cursor:pointer; font-size: 0.9em;">Polygons</label>
-      </div>
-      <div id="sustain-container">
-        <input type="checkbox" id="sustain-toggle">
-        <label for="sustain-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Sustain</label>
-      </div>
-      <div>
-        <input type="checkbox" id="autoplay-toggle">
-        <label for="autoplay-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Auto-Play</label>
-      </div>
-      <div>
-        <input type="checkbox" id="shepard-toggle">
-        <label for="shepard-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Shepard</label>
-      </div>
-      <div>
-        <input type="checkbox" id="mobius-toggle">
-        <label for="mobius-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Möbius</label>
-      </div>
+      <div><input type="checkbox" id="qwerty-toggle"><label for="qwerty-toggle" style="cursor:pointer; font-size: 0.9em;">QWERTY</label></div>
+      <div><input type="checkbox" id="integer-toggle"><label for="integer-toggle" style="cursor:pointer; font-size: 0.9em;">Numbers</label></div>
+      <div><input type="checkbox" id="distances-toggle" checked><label for="distances-toggle" style="cursor:pointer; font-size: 0.9em;">Distances</label></div>
+      <div><input type="checkbox" id="polygons-toggle" checked><label for="polygons-toggle" style="cursor:pointer; font-size: 0.9em;">Polygons</label></div>
+      <div id="sustain-container"><input type="checkbox" id="sustain-toggle"><label for="sustain-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Sustain</label></div>
+      <div><input type="checkbox" id="autoplay-toggle"><label for="autoplay-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Auto-Play</label></div>
+      <div><input type="checkbox" id="shepard-toggle"><label for="shepard-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Shepard</label></div>
+      <div><input type="checkbox" id="mobius-toggle"><label for="mobius-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Möbius</label></div>
     </div>
     <div class="hint">Toggle <strong>Möbius + Shepard + Auto-Play</strong> to traverse the non-orientable topology.</div>
   </div>
 
   <div id="canvas-container">
-    <div class="canvas-wrapper">
-      <canvas id="keyboard" width="400" height="400" tabindex="0"></canvas>
-    </div>
-    <div class="canvas-wrapper">
-      <canvas id="graph" width="400" height="400"></canvas>
-    </div>
+    <div class="canvas-wrapper"><canvas id="keyboard" width="400" height="400" tabindex="0"></canvas></div>
+    <div class="canvas-wrapper"><canvas id="graph" width="400" height="400"></canvas></div>
   </div>
 
   <script>
-    // Obfuscate Email
+    // --- Setup & Initialization ---
     (function() {
-      const u = "nobushaw";
-      const d = "vcu.edu";
+      const u = "nobushaw", d = "vcu.edu";
       document.getElementById('contact').innerHTML = `<a href="mailto:${u}@${d}">${u}@${d}</a>`;
     })();
 
-    const canvas = document.getElementById('keyboard');
-    const ctx = canvas.getContext('2d');
-    const graphCanvas = document.getElementById('graph');
-    const gCtx = graphCanvas.getContext('2d');
+    const canvas = document.getElementById('keyboard'), ctx = canvas.getContext('2d');
+    const graphCanvas = document.getElementById('graph'), gCtx = graphCanvas.getContext('2d');
 
-    const nSlider = document.getElementById('n-slider');
-    const kSlider = document.getElementById('k-slider');
-    const qwertyToggle = document.getElementById('qwerty-toggle');
-    const integerToggle = document.getElementById('integer-toggle');
-    const distancesToggle = document.getElementById('distances-toggle');
-    const polygonsToggle = document.getElementById('polygons-toggle');
-    const sustainToggle = document.getElementById('sustain-toggle');
-    const sustainContainer = document.getElementById('sustain-container');
-    const autoplayToggle = document.getElementById('autoplay-toggle');
-    const shepardToggle = document.getElementById('shepard-toggle');
-    const mobiusToggle = document.getElementById('mobius-toggle');
+    const nSlider = document.getElementById('n-slider'), kSlider = document.getElementById('k-slider');
+    const qwertyToggle = document.getElementById('qwerty-toggle'), integerToggle = document.getElementById('integer-toggle');
+    const distancesToggle = document.getElementById('distances-toggle'), polygonsToggle = document.getElementById('polygons-toggle');
+    const sustainToggle = document.getElementById('sustain-toggle'), sustainContainer = document.getElementById('sustain-container');
+    const autoplayToggle = document.getElementById('autoplay-toggle'), shepardToggle = document.getElementById('shepard-toggle'), mobiusToggle = document.getElementById('mobius-toggle');
 
     let N = 12, K = 5;
     let showQwerty = false, showInteger = false, showDistances = true, showPolygons = true, showMobius = false;
@@ -244,22 +130,17 @@
     const activeVoices = new Map(), sustainedVoices = new Set();
     const pointerToVoice = new Map(), keyToVoice = new Map();
     const activePointers = new Set(), pressedKeys = new Set();
-    let isSustainDown = false;
-    
-    let autoplayInterval = null, arpIndex = 0, arpVoiceId = null;
+    let isSustainDown = false, autoplayInterval = null, arpIndex = 0, arpVoiceId = null;
 
     const cx = 200, cy = 200, gx = 200, gy = 200, rGraph = 160;
     const noteNames12 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
-    // --- Splash Screen & Audio Unlock ---
-    const splash = document.getElementById('splash');
-    const startBtn = document.getElementById('start-btn');
-
+    // --- Audio System Unlock ---
+    const splash = document.getElementById('splash'), startBtn = document.getElementById('start-btn');
     function unlockAudio() {
       if (audioUnlocked) return;
       audioCtx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
-      const buffer = audioCtx.createBuffer(1, 1, 22050);
-      const source = audioCtx.createBufferSource();
+      const buffer = audioCtx.createBuffer(1, 1, 22050), source = audioCtx.createBufferSource();
       source.buffer = buffer; source.connect(audioCtx.destination); source.start(0);
       if (audioCtx.state === 'suspended') audioCtx.resume();
       audioUnlocked = true;
@@ -271,19 +152,21 @@
       setTimeout(() => { splash.style.display = 'none'; }, 400); 
     });
 
+    // --- Keyboard Math & Geometry ---
     function updateKeyboard() {
       N = parseInt(nSlider.value);
-      kSlider.max = N - 1;
-      if (parseInt(kSlider.value) >= N) kSlider.value = N - 1;
+      
+      // Black keys must be the minority set (<= N/2)
+      const maxK = Math.floor(N / 2);
+      kSlider.max = maxK;
+      if (parseInt(kSlider.value) > maxK) kSlider.value = maxK;
       K = parseInt(kSlider.value);
-      showQwerty = qwertyToggle.checked;
-      showInteger = integerToggle.checked;
-      showDistances = distancesToggle.checked;
-      showPolygons = polygonsToggle.checked;
+      
+      showQwerty = qwertyToggle.checked; showInteger = integerToggle.checked;
+      showDistances = distancesToggle.checked; showPolygons = polygonsToggle.checked;
       showMobius = mobiusToggle.checked;
 
-      document.getElementById('n-val').innerText = N;
-      document.getElementById('k-val').innerText = K;
+      document.getElementById('n-val').innerText = N; document.getElementById('k-val').innerText = K;
 
       isBlackArr = Array(N).fill(false);
       let standardPianoMap = null;
@@ -303,9 +186,15 @@
 
       keys = [];
       let numRings = showMobius ? 2 : 1;
+      
       let ringProps = showMobius 
-        ? [ { rw: 190, rb: 154, ri: 114 }, { rw: 110, rb: 74, ri: 35 } ]
-        : [ { rw: 190, rb: 110, ri: 35 } ];
+        ? [ 
+            { rwOut: 190, rwIn: 114, rbOut: 154, rbIn: 114 }, // Outer Ring
+            { rwOut: 110, rwIn: 35,  rbOut: 110, rbIn: 70 }   // Inner Ring (Inverted)
+          ]
+        : [ 
+            { rwOut: 190, rwIn: 35,  rbOut: 110, rbIn: 35 }   // Standard Mode
+          ];
 
       for (let ring = 0; ring < numRings; ring++) {
         let currentWhite = 0, wIdx = 0, bIdx = 0;
@@ -314,16 +203,24 @@
         for (let i = 0; i < N; i++) {
           let logicalIndex = i + ring * N;
           let ql = "";
+          
           if (ring === 0) {
             ql = standardPianoMap ? standardPianoMap[i] : (isBlackArr[i] ? fB_out[bIdx++ % 11] : fW_out[wIdx++ % 11]);
           } else {
             ql = isBlackArr[i] ? fB_in[bIdx++ % 12] : fW_in[wIdx++ % 10];
           }
 
+          let labRad;
           if (isBlackArr[i]) {
-            keys.push({ index: logicalIndex, isBlack: true, center: currentWhite * angleW + rotationOffset, width: blackWidth, rOuter: props.rb, rInner: props.ri, qwertyLabel: ql });
+            labRad = props.rbOut - 15; 
           } else {
-            keys.push({ index: logicalIndex, isBlack: false, start: currentWhite * angleW + rotationOffset, end: (currentWhite + 1) * angleW + rotationOffset, whiteIndex: currentWhite, rOuter: props.rw, rInner: props.ri, qwertyLabel: ql });
+            labRad = (ring === 1 && showMobius) ? props.rwIn + 22 : props.rwOut - 22;
+          }
+
+          if (isBlackArr[i]) {
+            keys.push({ index: logicalIndex, isBlack: true, center: currentWhite * angleW + rotationOffset, width: blackWidth, rOuter: props.rbOut, rInner: props.rbIn, qwertyLabel: ql, labelRadius: labRad });
+          } else {
+            keys.push({ index: logicalIndex, isBlack: false, start: currentWhite * angleW + rotationOffset, end: (currentWhite + 1) * angleW + rotationOffset, whiteIndex: currentWhite, rOuter: props.rwOut, rInner: props.rwIn, qwertyLabel: ql, labelRadius: labRad });
             currentWhite++;
           }
         }
@@ -331,6 +228,7 @@
       draw();
     }
 
+    // --- Canvas Drawing Logic ---
     function drawWedge(rInner, rOuter, logicalStart, logicalEnd, color) {
       ctx.beginPath(); 
       ctx.arc(cx, cy, rOuter, Math.PI / 2 - logicalEnd, Math.PI / 2 - logicalStart);
@@ -340,93 +238,74 @@
       ctx.strokeStyle = '#222'; ctx.lineWidth = 2.5; ctx.stroke();
     }
 
+    const drawArrowHead = (x, y, angle) => {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      
+      const stemOverhang = 2; 
+
+      ctx.beginPath();
+      ctx.moveTo(9, 0);
+      ctx.lineTo(0, -6);
+      ctx.lineTo(0, 6);
+      ctx.closePath();
+      ctx.fillStyle = '#111';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(8, 0);
+      ctx.lineTo(stemOverhang, -4);
+      ctx.lineTo(stemOverhang, 4);
+      ctx.closePath();
+      ctx.fillStyle = '#FFB81C';
+      ctx.fill();
+      
+      ctx.restore();
+    };
+
+    const drawHorizontalCurve = (p1, p2) => {
+      const pLeft = p1.x < p2.x ? p1 : p2;
+      const pRight = p1.x < p2.x ? p2 : p1;
+      const cpOffset = Math.max(30, Math.abs(pRight.x - pLeft.x) * 0.5);
+
+      ctx.beginPath();
+      ctx.moveTo(pLeft.x, pLeft.y);
+      ctx.bezierCurveTo(pLeft.x + cpOffset, pLeft.y, pRight.x - cpOffset, pRight.y, pRight.x, pRight.y);
+      ctx.strokeStyle = '#111'; ctx.lineWidth = 6; ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(pLeft.x, pLeft.y);
+      ctx.bezierCurveTo(pLeft.x + cpOffset, pLeft.y, pRight.x - cpOffset, pRight.y, pRight.x, pRight.y);
+      ctx.strokeStyle = '#FFB81C'; ctx.lineWidth = 3; ctx.stroke();
+
+      drawArrowHead(pLeft.x, pLeft.y, Math.PI); 
+      drawArrowHead(pRight.x, pRight.y, 0);     
+    };
+
     function drawMobiusArrows() {
       if (!showMobius) return;
-      const W = N - K;
-      const angleW = (Math.PI * 2) / W;
-      const rotationOffset = -angleW / 2;
-      // Seam angle on the canvas
-      const boundaryAngle = Math.PI / 2 - rotationOffset;
 
-      ctx.save();
-      ctx.translate(cx, cy);
-      // Rotate the seam to the X-axis
-      ctx.rotate(boundaryAngle);
+      const keyOutC = keys.find(k => k.index === 0);         
+      const keyOutB = keys.find(k => k.index === N - 1);     
+      const keyInC  = keys.find(k => k.index === N);         
+      const keyInB  = keys.find(k => k.index === 2 * N - 1); 
 
-      const rOuterMid = (190 + 114) / 2;
-      const rInnerMid = (110 + 35) / 2;
+      if (!keyOutC || !keyOutB || !keyInC || !keyInB) return;
 
-      // Internal function to draw an arrowhead, abstracted for reuse
-      const drawArrowHeadHelper = (color) => {
-          // Arrowhead background
-          ctx.beginPath();
-          ctx.moveTo(0, 4);
-          ctx.lineTo(-10, -12);
-          ctx.lineTo(10, -12);
-          ctx.closePath();
-          ctx.fillStyle = '#111'; // VCU Black shadow
-          ctx.fill();
-
-          // Arrowhead foreground
-          ctx.beginPath();
-          ctx.moveTo(0, 2);
-          ctx.lineTo(-7, -9);
-          ctx.lineTo(7, -9);
-          ctx.closePath();
-          ctx.fillStyle = color; // VCU Gold
-          ctx.fill();
-      }
-
-      // Function to draw an elegant DOUBLE-HEADED S-curve swap arrow
-      const drawSArrow = (startX, startY, endX, endY) => {
-        const headColor = '#FFB81C'; // VCU Gold
-
-        // --- 1. Draw Paths ---
-
-        // Shadow stroke
-        ctx.beginPath();
-        ctx.moveTo(startX, startY);
-        ctx.bezierCurveTo(startX, 0, endX, 0, endX, endY);
-        ctx.strokeStyle = '#111';
-        ctx.lineWidth = 6;
-        ctx.stroke();
-
-        // Gold line
-        ctx.beginPath();
-        ctx.moveTo(startX, startY);
-        ctx.bezierCurveTo(startX, 0, endX, 0, endX, endY);
-        ctx.strokeStyle = '#FFB81C';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        // --- 2. Draw Arrowheads ---
-
-        // Draw arrowhead at START point (Inner loop or current loop)
-        ctx.save();
-        ctx.translate(startX, startY);
-        // The path ENTERS the loop, curve points to center, arrow points AWAY.
-        // We use the same rotation logic as the exit, but reversed (-PI vs PI)
-        ctx.rotate(endY > startY ? -Math.PI / 2 : Math.PI / 2);
-        drawArrowHeadHelper(headColor);
-        ctx.restore();
-
-        // Draw arrowhead at END point (Outer loop or current loop)
-        ctx.save();
-        ctx.translate(endX, endY);
-        // Path EXITS the loop, standard tangent rotation logic.
-        ctx.rotate(endY > startY ? Math.PI / 2 : -Math.PI / 2); 
-        drawArrowHeadHelper(headColor);
-        ctx.restore();
+      const getCenterAngle = (k) => k.isBlack ? k.center : (k.start + k.end) / 2;
+      const getRadius = (k) => (k.rOuter + k.rInner) / 2; 
+      const getPoint = (k) => {
+        const ang = Math.PI / 2 - getCenterAngle(k);
+        const r = getRadius(k);
+        return { x: cx + Math.cos(ang) * r, y: cy + Math.sin(ang) * r };
       };
 
-      // Draw the crossover indicators right over the gap
-      // The swap is bi-directional, each path is now double-headed.
-      // Curve 1: Upper Inner Gap -> Lower Outer Gap
-      drawSArrow(rOuterMid, -25, rInnerMid, 25);
-      // Curve 2: Upper Outer Gap -> Lower Inner Gap
-      drawSArrow(rInnerMid, -25, rOuterMid, 25);
+      const pOutC = getPoint(keyOutC), pOutB = getPoint(keyOutB);
+      const pInC  = getPoint(keyInC),  pInB  = getPoint(keyInB);
 
-      ctx.restore();
+      drawHorizontalCurve(pOutB, pInC);
+      drawHorizontalCurve(pInB, pOutC);
     }
 
     function drawLabels() {
@@ -434,15 +313,12 @@
       ctx.font = 'bold 15px Georgia, serif'; 
       for (let key of keys) {
         const angle = key.isBlack ? key.center : (key.start + key.end) / 2;
-        const radiusPos = key.isBlack ? key.rOuter - 15 : key.rOuter - 22;
-        const tx = cx + Math.cos(Math.PI/2 - angle) * radiusPos;
-        const ty = cy + Math.sin(Math.PI/2 - angle) * radiusPos;
+        const tx = cx + Math.cos(Math.PI/2 - angle) * key.labelRadius;
+        const ty = cy + Math.sin(Math.PI/2 - angle) * key.labelRadius;
         ctx.fillStyle = key.isBlack ? '#f0f0f0' : '#333';
-        
         let lines = [];
         if (showInteger) lines.push(N === 12 && !showMobius ? noteNames12[key.index % N] : key.index);
         if (showQwerty) lines.push(key.qwertyLabel.toUpperCase());
-        
         if (lines.length === 1) ctx.fillText(lines[0], tx, ty);
         else if (lines.length === 2) { ctx.fillText(lines[0], tx, ty - 8); ctx.fillText(lines[1], tx, ty + 8); }
       }
@@ -455,19 +331,13 @@
       } else {
         const R = rGraph - 25; 
         const w = 35;          
-        
         const u = Math.PI / 2 - i * (Math.PI * 2) / N; 
-        const v = i * Math.PI / N; 
-        
+        const v = i * Math.PI / N;                     
         const lx = (R + w * Math.cos(v)) * Math.cos(u);
         const ly = (R + w * Math.cos(v)) * Math.sin(u);
         const lz = w * Math.sin(v);
-        
         const tilt = 0.7; 
-        return { 
-          x: gx + lx, 
-          y: gy + ly * Math.cos(tilt) - lz * Math.sin(tilt)
-        };
+        return { x: gx + lx, y: gy + ly * Math.cos(tilt) - lz * Math.sin(tilt) };
       }
     }
 
@@ -478,14 +348,10 @@
       if (showMobius) {
         gCtx.beginPath();
         for (let i = 0; i < N; i++) {
-          const p1 = getNodePos(i);
-          const p2 = getNodePos(i + N);
-          gCtx.moveTo(p1.x, p1.y);
-          gCtx.lineTo(p2.x, p2.y);
+          const p1 = getNodePos(i); const p2 = getNodePos(i + N);
+          gCtx.moveTo(p1.x, p1.y); gCtx.lineTo(p2.x, p2.y);
         }
-        gCtx.strokeStyle = 'rgba(34, 34, 34, 0.4)'; 
-        gCtx.lineWidth = 1.5; 
-        gCtx.stroke();
+        gCtx.strokeStyle = 'rgba(34, 34, 34, 0.4)'; gCtx.lineWidth = 1.5; gCtx.stroke();
       }
 
       gCtx.beginPath();
@@ -502,11 +368,9 @@
         if (showPolygons) {
           gCtx.beginPath();
           for (let i = 0; i < activeArr.length; i++) {
-            const uIdx = activeArr[i];
-            const p = getNodePos(uIdx);
+            const uIdx = activeArr[i], p = getNodePos(uIdx);
             cxSum += p.x; cySum += p.y;
             i === 0 ? gCtx.moveTo(p.x, p.y) : gCtx.lineTo(p.x, p.y);
-            
             const a1 = Math.PI / 2 - uIdx * (Math.PI * 2) / limit;
             const a2 = Math.PI / 2 - activeArr[(i + 1) % activeArr.length] * (Math.PI * 2) / limit;
             polyArea += Math.sin(a1 - a2);
@@ -518,14 +382,12 @@
         if (showDistances) {
           activeArr.forEach((u, i) => {
             activeArr.slice(i+1).forEach(v => {
-              const p1 = getNodePos(u);
-              const p2 = getNodePos(v);
+              const p1 = getNodePos(u), p2 = getNodePos(v);
               gCtx.beginPath(); gCtx.moveTo(p1.x, p1.y); gCtx.lineTo(p2.x, p2.y);
               gCtx.strokeStyle = '#FFB81C'; gCtx.stroke();
               
               const dist = Math.min(Math.abs(u-v), limit - Math.abs(u-v));
-              const mx = (p1.x + p2.x) / 2;
-              const my = (p1.y + p2.y) / 2;
+              const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
               
               gCtx.beginPath(); gCtx.arc(mx, my, 8, 0, Math.PI*2); gCtx.fillStyle='#fff'; gCtx.fill();
               gCtx.strokeStyle='#FFB81C'; gCtx.lineWidth=1.5; gCtx.stroke();
@@ -535,10 +397,8 @@
         }
         
         if (showPolygons && activeArr.length >= 3) {
-          const finalArea = Math.abs(polyArea * 0.5);
-          const text = `A=${finalArea.toFixed(2)}`;
-          const polyCX = cxSum / activeArr.length;
-          const polyCY = cySum / activeArr.length;
+          const finalArea = Math.abs(polyArea * 0.5), text = `A=${finalArea.toFixed(2)}`;
+          const polyCX = cxSum / activeArr.length, polyCY = cySum / activeArr.length;
           
           gCtx.font = 'bold 12px sans-serif';
           const textWidth = gCtx.measureText(text).width;
@@ -559,14 +419,9 @@
         const p = getNodePos(i);
         gCtx.beginPath(); gCtx.arc(p.x, p.y, vRad, 0, Math.PI * 2);
         
-        const active = activeIndices.has(i);
-        const isB = isBlackArr[i % N];
-        
-        gCtx.fillStyle = isB ? (active ? '#D49A18' : '#222') : (active ? '#FFB81C' : '#fff');
-        gCtx.fill(); 
-        gCtx.strokeStyle = active ? (isB ? '#fff' : '#111') : '#222';
-        gCtx.lineWidth = active ? 3 : 2; 
-        gCtx.stroke();
+        const active = activeIndices.has(i), isB = isBlackArr[i % N];
+        gCtx.fillStyle = isB ? (active ? '#D49A18' : '#222') : (active ? '#FFB81C' : '#fff'); gCtx.fill(); 
+        gCtx.strokeStyle = active ? (isB ? '#fff' : '#111') : '#222'; gCtx.lineWidth = active ? 3 : 2; gCtx.stroke();
         
         if (vRad >= 10) {
           gCtx.fillStyle = isB ? (active ? '#fff' : '#ddd') : (active ? '#000' : '#444');
@@ -582,15 +437,12 @@
       keys.filter(k => !k.isBlack).forEach(k => drawWedge(k.rInner, k.rOuter, k.start, k.end, activeIndices.has(k.index) ? '#FFB81C' : '#fff'));
       keys.filter(k => k.isBlack).forEach(k => drawWedge(k.rInner, k.rOuter, k.center-k.width/2, k.center+k.width/2, activeIndices.has(k.index) ? '#D49A18' : '#222'));
       
-      // Draw the topological arrows right over the seam
       drawMobiusArrows();
-
       if (showQwerty || showInteger) drawLabels();
       drawGraph(activeIndices);
     }
 
-    // --- Audio Logic ---
-
+    // --- Web Audio Synthesis Engine ---
     function startVoice(index) {
       if (!audioUnlocked) unlockAudio();
       if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
@@ -598,8 +450,8 @@
       const masterGain = audioCtx.createGain();
       masterGain.connect(audioCtx.destination);
       const now = audioCtx.currentTime;
-      masterGain.gain.setValueAtTime(0, now);
       
+      masterGain.gain.setValueAtTime(0, now);
       const targetVolume = shepardToggle.checked ? 0.05 : 0.15;
       masterGain.gain.setTargetAtTime(targetVolume, now, 0.01);
 
@@ -647,8 +499,8 @@
       const now = audioCtx.currentTime;
       gain.gain.cancelScheduledValues(now);
       gain.gain.setValueAtTime(gain.gain.value, now);
-      gain.gain.setTargetAtTime(0, now, 0.08);
-      oscillators.forEach(o => o.stop(now + 0.5));
+      gain.gain.linearRampToValueAtTime(0.0001, now + 0.1); 
+      oscillators.forEach(o => o.stop(now + 0.15));
       activeVoices.delete(voiceId);
       sustainedVoices.delete(voiceId);
       requestAnimationFrame(draw);
@@ -680,7 +532,7 @@
           if (arpIndex >= limit) arpIndex = 0;
           arpVoiceId = startVoice(arpIndex);
           arpIndex++;
-        }, 250); 
+        }, 350); 
       } else {
         clearInterval(autoplayInterval);
         autoplayInterval = null;
@@ -688,14 +540,14 @@
       }
     }
 
+    // --- Input Handling ---
     function getIndexFromClick(e) {
       const rect = canvas.getBoundingClientRect();
       const x = (e.clientX - rect.left) * (400/rect.width) - cx, y = (e.clientY - rect.top) * (400/rect.height) - cy;
       const dist = Math.sqrt(x*x + y*y);
-      if (dist < 35) return -1;
+      if (dist < 35) return -1; 
       let ang = Math.PI/2 - Math.atan2(y, x);
       if (ang < 0) ang += Math.PI*2; if (ang >= Math.PI*2) ang -= Math.PI*2;
-      
       for (let k of keys) {
         if (k.isBlack && dist <= k.rOuter && dist >= k.rInner) {
           let d = Math.abs(ang - k.center); if (d > Math.PI) d = 2*Math.PI - d;
@@ -721,7 +573,7 @@
       if (!activePointers.has(e.pointerId)) return;
       const nIdx = getIndexFromClick(e), oVid = pointerToVoice.get(e.pointerId);
       const cIdx = oVid !== undefined ? activeVoices.get(oVid).index : -1;
-      if (nIdx !== cIdx) {
+      if (nIdx !== cIdx) { 
         if (oVid !== undefined) { releaseVoice(oVid); pointerToVoice.delete(e.pointerId); }
         if (nIdx !== -1) pointerToVoice.set(e.pointerId, startVoice(nIdx));
       }
@@ -754,7 +606,12 @@
     distancesToggle.onchange = updateKeyboard; polygonsToggle.onchange = updateKeyboard;
     sustainToggle.onchange = (e) => handleSustainChange(e.target.checked);
     autoplayToggle.onchange = (e) => handleAutoplayChange(e.target.checked);
-    shepardToggle.onchange = updateKeyboard; mobiusToggle.onchange = updateKeyboard;
+    shepardToggle.onchange = updateKeyboard; 
+    
+    mobiusToggle.onchange = (e) => {
+      if (e.target.checked) shepardToggle.checked = true;
+      updateKeyboard();
+    };
     
     updateKeyboard();
   </script>
