@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hajós Construction Explorer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary: #10b981;
+            --bg-color: #f8fafc;
+            --panel-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+            --info-bg: #e0e7ff;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--panel-bg);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        h1 { margin: 0; font-size: 1.25rem; color: var(--text-main); }
+
+        .score-badge {
+            background-color: var(--secondary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+        }
+
+        #toolbar {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1rem 2rem;
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-right: 1.5rem;
+            border-right: 1px solid var(--border);
+        }
+        .control-group:last-child { border-right: none; }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+        button:hover { background-color: var(--primary-hover); }
+
+        input[type="number"], select {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+            font-family: inherit;
+        }
+        input[type="number"]:focus, select:focus { border-color: var(--primary); }
+
+        #workspace-container {
+            display: flex;
+            flex: 1;
+            gap: 1rem;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        .workspace {
+            flex: 1;
+            background: var(--panel-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .workspace-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fcfcfd;
+        }
+
+        .workspace-header h2 { margin: 0; font-size: 1rem; }
+
+        .status-bar {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: #f1f5f9;
+            border-bottom: 1px solid var(--border);
+            min-height: 1.2rem;
+        }
+
+        /* Graph Stats Panel */
+        .graph-stats {
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+            background: var(--info-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            min-height: 1.5rem;
+            align-items: center;
+        }
+        .stat-item {
+            font-weight: 500;
+            color: var(--text-main);
+        }
+        .stat-val {
+            color: var(--primary);
+            font-weight: 700;
+            margin-left: 0.2rem;
+        }
+
+        .cy-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
+        .toast {
+            background: #334155;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            font-size: 0.9rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            max-width: 350px;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { background: var(--danger); }
+        .toast.success { background: var(--secondary); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Hajós Construction Explorer</h1>
+        <div class="score-badge">Unique Graphs: <span id="score">0</span></div>
+    </header>
+
+    <div id="toolbar">
+        <div class="control-group">
+            <label style="font-size: 0.9rem; font-weight: 500;">Base Graph (K_k):</label>
+            <input type="number" id="k-input" value="4" min="1" max="10" style="width: 60px;">
+            <button onclick="addBaseGraph()">Generate</button>
+        </div>
+        <div class="control-group">
+            <button onclick="performHajosJoin()">Hajós Join (A + B)</button>
+        </div>
+        <div class="control-group">
+            <button onclick="performIdentify()" style="background-color: #6366f1;">Identify Vertices (A only)</button>
+        </div>
+    </div>
+
+    <div id="workspace-container">
+        <div class="workspace">
+            <div class="workspace-header">
+                <h2>Workspace A</h2>
+                <select id="select-a" onchange="loadGraphToWorkspace('a')">
+                    <option value="">-- Empty --</option>
+                </select>
+            </div>
+            <div class="status-bar" id="status-a">Selected: None</div>
+            <div class="graph-stats" id="stats-a"><em>No graph loaded</em></div>
+            <div id="cyA" class="cy-container"></div>
+        </div>
+        
+        <div class="workspace">
+            <div class="workspace-header">
+                <h2>Workspace B</h2>
+                <select id="select-b" onchange="loadGraphToWorkspace('b')">
+                    <option value="">-- Empty --</option>
+                </select>
+            </div>
+            <div class="status-bar" id="status-b">Selected: None</div>
+            <div class="graph-stats" id="stats-b"><em>No graph loaded</em></div>
+            <div id="cyB" class="cy-container"></div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script>
+        let graphDatabase = []; 
+        let score = 0;
+        let nextNodeId = 1;
+
+        const NODE_COLORS = [
+            '#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', 
+            '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16'
+        ];
+
+        // --- UI Updates ---
+        function showToast(message, type = 'normal', duration = 3500) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerText = message;
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        function updateStatus(cy, elementId) {
+            const nodes = cy.$('node:selected').length;
+            const edges = cy.$('edge:selected').length;
+            let text = [];
+            if (nodes > 0) text.push(`${nodes} Node${nodes > 1 ? 's' : ''}`);
+            if (edges > 0) text.push(`${edges} Edge${edges > 1 ? 's' : ''}`);
+            
+            document.getElementById(elementId).innerText = 
+                text.length > 0 ? `Selected: ${text.join(', ')}` : 'Selected: None';
+        }
+
+        function renderStatsUI(workspace) {
+            let selectId = workspace === 'a' ? 'select-a' : 'select-b';
+            let statsId = workspace === 'a' ? 'stats-a' : 'stats-b';
+            let index = document.getElementById(selectId).value;
+            let statsDiv = document.getElementById(statsId);
+
+            if (index === "") {
+                statsDiv.innerHTML = "<em>No graph loaded</em>";
+                return;
+            }
+
+            let graph = graphDatabase[index];
+            
+            let html = `
+                <span class="stat-item">Vertices: <span class="stat-val">${graph.nodes.length}</span></span>
+                <span class="stat-item">Edges: <span class="stat-val">${graph.edges.length}</span></span>
+                <span class="stat-item">Chromatic No: <span class="stat-val">${graph.chromaticNumber || '?'}</span></span>
+            `;
+
+            if (graph.stats) {
+                html += `
+                    <span class="stat-item">Clique No: <span class="stat-val">${graph.stats.clique}</span></span>
+                    <span class="stat-item">Indep. No: <span class="stat-val">${graph.stats.indNum}</span></span>
+                    <span class="stat-item">Girth: <span class="stat-val">${graph.stats.girth}</span></span>
+                    <span class="stat-item">Diameter: <span class="stat-val">${graph.stats.diameter}</span></span>
+                    <span class="stat-item">Max Deg: <span class="stat-val">${graph.stats.maxDeg}</span></span>
+                `;
+            } 
+
+            statsDiv.innerHTML = html;
+        }
+
+        // --- Cytoscape Setup ---
+        const cyOptions = (containerId) => ({
+            container: document.getElementById(containerId),
+            selectionType: 'additive', 
+            style: [
+                {
+                    selector: 'node',
+                    style: {
+                        'background-color': 'data(color)',
+                        'label': 'data(id)',
+                        'text-valign': 'center',
+                        'color': '#ffffff',
+                        'font-size': '12px',
+                        'width': 28,
+                        'height': 28
+                    }
+                },
+                {
+                    selector: 'edge',
+                    style: {
+                        'width': 3,
+                        'line-color': '#cbd5e1',
+                        'curve-style': 'bezier'
+                    }
+                },
+                {
+                    selector: 'node:selected',
+                    style: {
+                        'border-width': 4,
+                        'border-color': '#1e293b'
+                    }
+                },
+                {
+                    selector: 'edge:selected',
+                    style: {
+                        'line-color': '#1e293b',
+                        'width': 5
+                    }
+                }
+            ],
+            layout: { name: 'cose', padding: 30 }
+        });
+
+        const cyA = cytoscape(cyOptions('cyA'));
+        const cyB = cytoscape(cyOptions('cyB'));
+
+        cyA.on('select unselect', () => updateStatus(cyA, 'status-a'));
+        cyB.on('select unselect', () => updateStatus(cyB, 'status-b'));
+
+        function getUID() { return 'v' + (nextNodeId++); }
+
+        // --- Database & Loading ---
+        function addGraphToDatabase(graphData, originText) {
+            
+            // Generate everything instantly via local calculation
+            colorGraph(graphData);
+            calculateAdvancedStats(graphData);
+
+            if (graphDatabase.some(existing => areIsomorphic(existing, graphData))) {
+                showToast("Graph is already in database. Isomorphic duplicate!", "error");
+                return;
+            }
+            
+            graphDatabase.push(graphData);
+            score++;
+            document.getElementById('score').innerText = score;
+            
+            let graphName = `Graph ${graphDatabase.length} (${originText}, V:${graphData.nodes.length}, E:${graphData.edges.length})`;
+            showToast(`Calculated: ${graphName}`, "success");
+            
+            let optA = new Option(graphName, graphDatabase.length - 1);
+            let optB = new Option(graphName, graphDatabase.length - 1);
+            
+            document.getElementById('select-a').add(optA);
+            document.getElementById('select-b').add(optB);
+            
+            document.getElementById('select-a').value = graphDatabase.length - 1;
+            loadGraphToWorkspace('a'); 
+            
+            if (graphDatabase.length === 1) {
+                document.getElementById('select-b').value = graphDatabase.length - 1;
+                loadGraphToWorkspace('b');
+            }
+        }
+
+        function addBaseGraph() {
+            let k = parseInt(document.getElementById('k-input').value);
+            if (isNaN(k) || k < 1) return;
+
+            let nodes = [];
+            let edges = [];
+            
+            for(let i=0; i<k; i++) nodes.push({ data: { id: getUID() } });
+            
+            for(let i=0; i<k; i++) {
+                for(let j=i+1; j<k; j++) {
+                    edges.push({ data: { source: nodes[i].data.id, target: nodes[j].data.id, id: 'e' + getUID() } });
+                }
+            }
+            addGraphToDatabase({ nodes, edges }, `K${k}`);
+        }
+
+        function loadGraphToWorkspace(workspace) {
+            let selectId = workspace === 'a' ? 'select-a' : 'select-b';
+            let index = document.getElementById(selectId).value;
+            let cy = workspace === 'a' ? cyA : cyB;
+            
+            cy.elements().remove();
+            
+            if (index !== "") {
+                let elements = JSON.parse(JSON.stringify(graphDatabase[index]));
+                cy.add(elements);
+                cy.layout({ name: 'cose', padding: 40, idealEdgeLength: 60, refresh: 20 }).run();
+            }
+            
+            updateStatus(cy, workspace === 'a' ? 'status-a' : 'status-b');
+            renderStatsUI(workspace);
+        }
+
+        // --- Graph Operations ---
+        function getJoinSelection(cy, wsName) {
+            let selNodes = cy.$('node:selected');
+            let selEdges = cy.$('edge:selected');
+
+            if (selNodes.length !== 1 || selEdges.length !== 1) {
+                showToast(`Workspace ${wsName}: Select exactly ONE Edge and ONE of its endpoint Nodes.`, "error");
+                return null;
+            }
+
+            let u = selNodes[0];
+            let e = selEdges[0];
+
+            if (e.source().id() !== u.id() && e.target().id() !== u.id()) {
+                showToast(`Workspace ${wsName}: The selected node must be connected to the selected edge.`, "error");
+                return null;
+            }
+            return { u, e };
+        }
+
+        function performHajosJoin() {
+            let selA = getJoinSelection(cyA, "A");
+            if (!selA) return;
+            
+            let selB = getJoinSelection(cyB, "B");
+            if (!selB) return;
+
+            let newNodes = [];
+            let newEdges = [];
+            let idMapA = {}; 
+            let idMapB = {};
+
+            cyA.nodes().forEach(n => {
+                let newId = getUID();
+                idMapA[n.id()] = newId;
+                newNodes.push({ data: { id: newId } });
+            });
+
+            cyB.nodes().forEach(n => {
+                if (n.id() === selB.u.id()) {
+                    idMapB[n.id()] = idMapA[selA.u.id()]; 
+                } else {
+                    let newId = getUID();
+                    idMapB[n.id()] = newId;
+                    newNodes.push({ data: { id: newId } });
+                }
+            });
+
+            cyA.edges().forEach(e => {
+                if (e.id() !== selA.e.id()) {
+                    newEdges.push({ data: { source: idMapA[e.source().id()], target: idMapA[e.target().id()], id: 'e'+getUID() } });
+                }
+            });
+
+            cyB.edges().forEach(e => {
+                if (e.id() !== selB.e.id()) {
+                    let s = idMapB[e.source().id()];
+                    let t = idMapB[e.target().id()];
+                    if (!edgeExists(newEdges, s, t)) {
+                        newEdges.push({ data: { source: s, target: t, id: 'e'+getUID() } });
+                    }
+                }
+            });
+
+            let v1_id = selA.u.id() === selA.e.source().id() ? selA.e.target().id() : selA.e.source().id();
+            let v2_id = selB.u.id() === selB.e.source().id() ? selB.e.target().id() : selB.e.source().id();
+            
+            if (!edgeExists(newEdges, idMapA[v1_id], idMapB[v2_id])) {
+                newEdges.push({ data: { source: idMapA[v1_id], target: idMapB[v2_id], id: 'e'+getUID() } });
+            }
+
+            addGraphToDatabase({ nodes: newNodes, edges: newEdges }, "Join");
+            cyA.elements().unselect();
+            cyB.elements().unselect();
+        }
+
+        function performIdentify() {
+            let selNodes = cyA.$('node:selected');
+            if (selNodes.length !== 2 || cyA.$('edge:selected').length > 0) {
+                showToast("Workspace A: Select exactly TWO Nodes (and no edges) to identify.", "error");
+                return;
+            }
+
+            let u = selNodes[0];
+            let v = selNodes[1];
+
+            if (cyA.edges(`[source = "${u.id()}"][target = "${v.id()}"], [source = "${v.id()}"][target = "${u.id()}"]`).length > 0) {
+                showToast("Cannot identify: Selected vertices are adjacent.", "error");
+                return;
+            }
+
+            let newNodes = [];
+            let newEdges = [];
+            let idMap = {};
+            let mergedId = getUID();
+            
+            cyA.nodes().forEach(n => {
+                if (n.id() === u.id() || n.id() === v.id()) {
+                    idMap[n.id()] = mergedId;
+                    if (n.id() === u.id()) newNodes.push({ data: { id: mergedId } });
+                } else {
+                    let newId = getUID();
+                    idMap[n.id()] = newId;
+                    newNodes.push({ data: { id: newId } });
+                }
+            });
+
+            cyA.edges().forEach(e => {
+                let s = idMap[e.source().id()];
+                let t = idMap[e.target().id()];
+                if (!edgeExists(newEdges, s, t) && s !== t) {
+                    newEdges.push({ data: { source: s, target: t, id: 'e'+getUID() } });
+                }
+            });
+
+            addGraphToDatabase({ nodes: newNodes, edges: newEdges }, "Identify");
+            cyA.elements().unselect();
+        }
+
+        function edgeExists(edgeArray, s, t) {
+            return edgeArray.some(e => 
+                (e.data.source === s && e.data.target === t) || 
+                (e.data.source === t && e.data.target === s)
+            );
+        }
+
+        // --- Math & Local Graph Calculations ---
+        function getAdjacencyMatrix(graph) {
+            let n = graph.nodes.length;
+            let mat = Array(n).fill(0).map(() => Array(n).fill(0));
+            let indexMap = {};
+            graph.nodes.forEach((node, i) => indexMap[node.data.id] = i);
+            
+            graph.edges.forEach(edge => {
+                let u = indexMap[edge.data.source];
+                let v = indexMap[edge.data.target];
+                mat[u][v] = 1;
+                mat[v][u] = 1;
+            });
+            return mat;
+        }
+
+        function colorGraph(graph) {
+            let n = graph.nodes.length;
+            if (n === 0) return;
+            
+            let adj = getAdjacencyMatrix(graph);
+            let bestColors = [];
+            
+            function isValid(node, color, colorArr) {
+                for (let i = 0; i < n; i++) {
+                    if (adj[node][i] === 1 && colorArr[i] === color) return false;
+                }
+                return true;
+            }
+
+            function solve(node, maxColors, colorArr) {
+                if (node === n) {
+                    bestColors = [...colorArr];
+                    return true;
+                }
+                for (let c = 0; c < maxColors; c++) {
+                    if (isValid(node, c, colorArr)) {
+                        colorArr[node] = c;
+                        if (solve(node + 1, maxColors, colorArr)) return true;
+                        colorArr[node] = -1; 
+                    }
+                }
+                return false;
+            }
+
+            for (let k = 1; k <= n; k++) {
+                let colorArr = Array(n).fill(-1);
+                if (solve(0, k, colorArr)) {
+                    for (let i = 0; i < n; i++) {
+                        graph.nodes[i].data.color = NODE_COLORS[bestColors[i] % NODE_COLORS.length];
+                    }
+                    graph.chromaticNumber = k; 
+                    break;
+                }
+            }
+        }
+
+        // Calculates all properties entirely within the browser
+        function calculateAdvancedStats(graph) {
+            let n = graph.nodes.length;
+            if (n === 0) {
+                graph.stats = { clique: 0, indNum: 0, girth: 0, diameter: 0, maxDeg: 0 };
+                return;
+            }
+
+            let adj = getAdjacencyMatrix(graph);
+            
+            // 1. Max Degree
+            let maxDeg = 0;
+            for (let i = 0; i < n; i++) {
+                let deg = adj[i].reduce((sum, val) => sum + val, 0);
+                if (deg > maxDeg) maxDeg = deg;
+            }
+
+            // 2. Clique Number (Basic backtracking algorithm)
+            let maxClique = 0;
+            function searchClique(clique, candidates) {
+                if (clique.length > maxClique) maxClique = clique.length;
+                for (let i = 0; i < candidates.length; i++) {
+                    let v = candidates[i];
+                    let newCands = candidates.slice(i + 1).filter(u => adj[v][u] === 1);
+                    searchClique([...clique, v], newCands);
+                }
+            }
+            searchClique([], Array.from({length: n}, (_, i) => i));
+
+            // 3. Independence Number (Complement of Clique)
+            let maxInd = 0;
+            function searchInd(indSet, candidates) {
+                if (indSet.length > maxInd) maxInd = indSet.length;
+                for (let i = 0; i < candidates.length; i++) {
+                    let v = candidates[i];
+                    let newCands = candidates.slice(i + 1).filter(u => adj[v][u] === 0 && u !== v);
+                    searchInd([...indSet, v], newCands);
+                }
+            }
+            searchInd([], Array.from({length: n}, (_, i) => i));
+
+            // 4. Diameter (Floyd-Warshall algorithm)
+            let dist = Array(n).fill(0).map(() => Array(n).fill(Infinity));
+            for (let i = 0; i < n; i++) {
+                dist[i][i] = 0;
+                for (let j = 0; j < n; j++) {
+                    if (adj[i][j]) dist[i][j] = 1;
+                }
+            }
+            for (let k = 0; k < n; k++) {
+                for (let i = 0; i < n; i++) {
+                    for (let j = 0; j < n; j++) {
+                        if (dist[i][k] + dist[k][j] < dist[i][j]) {
+                            dist[i][j] = dist[i][k] + dist[k][j];
+                        }
+                    }
+                }
+            }
+            let diameter = 0;
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    if (dist[i][j] === Infinity) {
+                        diameter = "∞"; // Graph is disconnected
+                    } else if (dist[i][j] > diameter && diameter !== "∞") {
+                        diameter = dist[i][j];
+                    }
+                }
+            }
+
+            // 5. Girth (Breadth-First Search for shortest cycle)
+            let girth = Infinity;
+            for (let i = 0; i < n; i++) {
+                let d = Array(n).fill(-1);
+                let p = Array(n).fill(-1);
+                let q = [i];
+                d[i] = 0;
+                
+                while (q.length > 0) {
+                    let u = q.shift();
+                    for (let v = 0; v < n; v++) {
+                        if (adj[u][v]) {
+                            if (d[v] === -1) {
+                                d[v] = d[u] + 1;
+                                p[v] = u;
+                                q.push(v);
+                            } else if (p[u] !== v) {
+                                girth = Math.min(girth, d[u] + d[v] + 1);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Store calculated stats directly to the graph
+            graph.stats = {
+                clique: maxClique,
+                indNum: maxInd,
+                diameter: diameter,
+                girth: girth === Infinity ? "∞ (Tree)" : girth,
+                maxDeg: maxDeg
+            };
+        }
+
+        // --- Isomorphism Check ---
+        function areIsomorphic(g1, g2) {
+            if (g1.nodes.length !== g2.nodes.length || g1.edges.length !== g2.edges.length) return false;
+
+            let adj1 = getAdjacencyMatrix(g1);
+            let adj2 = getAdjacencyMatrix(g2);
+            let deg1 = adj1.map(row => row.reduce((a, b) => a + b, 0));
+            let deg2 = adj2.map(row => row.reduce((a, b) => a + b, 0));
+
+            let ds1 = [...deg1].sort((a,b)=>a-b);
+            let ds2 = [...deg2].sort((a,b)=>a-b);
+            for(let i=0; i<ds1.length; i++) if (ds1[i] !== ds2[i]) return false;
+
+            let n = g1.nodes.length;
+            let isIso = false;
+
+            function backtrack(perm, depth) {
+                if (isIso) return;
+                if (depth === n) {
+                    let valid = true;
+                    for (let i = 0; i < n && valid; i++) {
+                        for (let j = 0; j < n && valid; j++) {
+                            if (adj1[i][j] !== adj2[perm[i]][perm[j]]) valid = false;
+                        }
+                    }
+                    if (valid) isIso = true;
+                    return;
+                }
+                for (let i = depth; i < n; i++) {
+                    [perm[depth], perm[i]] = [perm[i], perm[depth]];
+                    if (deg1[depth] === deg2[perm[depth]]) { 
+                        backtrack(perm, depth + 1);
+                    }
+                    [perm[depth], perm[i]] = [perm[i], perm[depth]];
+                }
+            }
+
+            backtrack(Array.from({length: n}, (_, i) => i), 0);
+            return isIso;
+        }
+
+    </script>
+</body>
+</html>
