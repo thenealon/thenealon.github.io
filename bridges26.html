@@ -85,7 +85,7 @@
     </div>
     <div class="control-row">
       <label>Black Keys (K): <strong id="k-val">5</strong></label>
-      <input type="range" id="k-slider" min="1" max="6" value="5">
+      <input type="range" id="k-slider" min="1" max="15" value="5">
     </div>
     
     <div class="control-group">
@@ -135,6 +135,118 @@
     const cx = 200, cy = 200, gx = 200, gy = 200, rGraph = 160;
     const noteNames12 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
+    // --- Graph Distance Logic ---
+    function getGraphDist(u, v) {
+      let limit = showMobius ? N * 2 : N;
+      let d_cycle = Math.min(Math.abs(u - v), limit - Math.abs(u - v));
+      if (showMobius) {
+        let u_jump = (u + N) % limit;
+        let d_jump = 1 + Math.min(Math.abs(u_jump - v), limit - Math.abs(u_jump - v));
+        return Math.min(d_cycle, d_jump);
+      }
+      return d_cycle;
+    }
+
+    function findOptimalMobiusBlackKeys(N, K) {
+      let limit = 2 * N;
+      let numBlack = K; // Directly use total black keys
+      let distMap = Array(limit).fill(0).map(()=>Array(limit).fill(0));
+      
+      for(let i=0; i<limit; i++) {
+        for(let j=0; j<limit; j++) {
+          let d_cycle = Math.min(Math.abs(i - j), limit - Math.abs(i - j));
+          let i_jump = (i + N) % limit;
+          let d_jump = 1 + Math.min(Math.abs(i_jump - j), limit - Math.abs(i_jump - j));
+          distMap[i][j] = i === j ? 0 : Math.min(d_cycle, d_jump);
+        }
+      }
+
+      function getE(arr) {
+        let e = 0;
+        for(let i=0; i<limit; i++) {
+          if(!arr[i]) continue;
+          for(let j=i+1; j<limit; j++) {
+            if(arr[j]) e += 1.0 / distMap[i][j];
+          }
+        }
+        return e;
+      }
+
+      function isValid(arr) {
+        for(let i=0; i<N; i++) {
+          if(arr[i] && arr[(i+1)%N]) return false;
+        }
+        for(let i=0; i<N; i++) {
+          let u = N + i, v = N + (i+1)%N;
+          if(arr[u] && arr[v]) return false;
+        }
+        return true;
+      }
+
+      let bestArr = Array(limit).fill(false);
+      for (let i = 0; i < numBlack; i++) {
+        bestArr[(Math.floor((i * limit) / numBlack) + 1) % limit] = true;
+      }
+      if (!isValid(bestArr)) {
+        bestArr.fill(false);
+        for(let i=0; i<numBlack; i++) bestArr[i*2] = true;
+      }
+
+      let globalBestArr = [...bestArr];
+      let globalBestE = getE(bestArr);
+
+      for(let restart=0; restart<3; restart++) {
+        let currArr = [...bestArr];
+        if (restart > 0) {
+          currArr.fill(false);
+          let c = 0;
+          while(c < numBlack) {
+            let idx = Math.floor(Math.random() * limit);
+            if(!currArr[idx]) {
+              currArr[idx] = true;
+              if(!isValid(currArr)) currArr[idx] = false;
+              else c++;
+            }
+          }
+        }
+
+        let currE = getE(currArr);
+        let improved = true;
+        while(improved) {
+          improved = false;
+          for(let i=0; i<limit; i++) {
+            if(!currArr[i]) continue;
+            for(let j=0; j<limit; j++) {
+              if(currArr[j]) continue;
+              
+              currArr[i] = false; currArr[j] = true;
+              if(isValid(currArr)) {
+                let delta = 0;
+                for(let k=0; k<limit; k++) {
+                  if(currArr[k] && k !== j) {
+                    delta -= 1.0 / distMap[i][k];
+                    delta += 1.0 / distMap[j][k];
+                  }
+                }
+                if(delta < -1e-7) {
+                  currE = getE(currArr);
+                  improved = true;
+                  break;
+                }
+              }
+              currArr[i] = true; currArr[j] = false; // backtrack
+            }
+            if(improved) break;
+          }
+        }
+        if (currE < globalBestE) {
+          globalBestE = currE;
+          globalBestArr = [...currArr];
+        }
+      }
+      return globalBestArr;
+    }
+
     // --- Audio System Unlock ---
     const splash = document.getElementById('splash'), startBtn = document.getElementById('start-btn');
     function unlockAudio() {
@@ -154,31 +266,46 @@
 
     // --- Keyboard Math & Geometry ---
     function updateKeyboard() {
-      N = parseInt(nSlider.value);
-      
-      // Black keys must be the minority set (<= N/2)
-      const maxK = Math.floor(N / 2);
-      kSlider.max = maxK;
-      if (parseInt(kSlider.value) > maxK) kSlider.value = maxK;
-      K = parseInt(kSlider.value);
-      
+      showMobius = mobiusToggle.checked;
       showQwerty = qwertyToggle.checked; showInteger = integerToggle.checked;
       showDistances = distancesToggle.checked; showPolygons = polygonsToggle.checked;
-      showMobius = mobiusToggle.checked;
 
-      document.getElementById('n-val').innerText = N; document.getElementById('k-val').innerText = K;
+      // Handle the slider as TOTAL keys
+      let requestedTotal = parseInt(nSlider.value);
+      if (showMobius && requestedTotal % 2 !== 0) {
+        requestedTotal++; // Force even for Möbius
+        if (requestedTotal > parseInt(nSlider.max)) requestedTotal -= 2;
+        nSlider.value = requestedTotal;
+      }
+      let totalKeys = requestedTotal;
+      
+      // N acts as keys-per-ring to preserve mathematical integrity
+      N = showMobius ? totalKeys / 2 : totalKeys; 
 
-      isBlackArr = Array(N).fill(false);
+      // Black keys must be the minority set globally (<= totalKeys / 2)
+      const maxK = Math.floor(totalKeys / 2);
+      kSlider.max = maxK;
+      if (parseInt(kSlider.value) > maxK) kSlider.value = maxK;
+      K = parseInt(kSlider.value); // K is now TOTAL black keys
+      
+      document.getElementById('n-val').innerText = totalKeys; 
+      document.getElementById('k-val').innerText = K;
+
+      let limitKeys = totalKeys;
+      isBlackArr = Array(limitKeys).fill(false);
       let standardPianoMap = null;
-      if (N === 12 && K === 5) {
-        [1, 3, 6, 8, 10].forEach(i => isBlackArr[i] = true);
-        standardPianoMap = {0:'a', 1:'w', 2:'s', 3:'e', 4:'d', 5:'f', 6:'t', 7:'g', 8:'y', 9:'h', 10:'u', 11:'j'};
+
+      if (!showMobius) {
+        if (N === 12 && K === 5) {
+          [1, 3, 6, 8, 10].forEach(i => isBlackArr[i] = true);
+          standardPianoMap = {0:'a', 1:'w', 2:'s', 3:'e', 4:'d', 5:'f', 6:'t', 7:'g', 8:'y', 9:'h', 10:'u', 11:'j'};
+        } else {
+          for (let i = 0; i < K; i++) isBlackArr[(Math.floor((i * N) / K) + 1) % N] = true;
+        }
       } else {
-        for (let i = 0; i < K; i++) isBlackArr[(Math.floor((i * N) / K) + 1) % N] = true;
+        isBlackArr = findOptimalMobiusBlackKeys(N, K);
       }
 
-      const W = N - K, angleW = (Math.PI * 2) / W, blackWidth = angleW * 0.55, rotationOffset = -angleW / 2;
-      
       const fW_out = ['a','s','d','f','g','h','j','k','l',';',"'"];
       const fB_out = ['w','e','r','t','y','u','i','o','p','[',']'];
       const fW_in = ['z','x','c','v','b','n','m',',','.','/'];
@@ -197,27 +324,38 @@
           ];
 
       for (let ring = 0; ring < numRings; ring++) {
+        // Calculate W and Angle logic per ring to support uneven black key distributions
+        let k_ring = 0;
+        for (let i = 0; i < N; i++) {
+          if (isBlackArr[i + ring * N]) k_ring++;
+        }
+        let W = N - k_ring;
+        let angleW = (Math.PI * 2) / W;
+        let blackWidth = angleW * 0.55;
+        let rotationOffset = -angleW / 2;
+
         let currentWhite = 0, wIdx = 0, bIdx = 0;
         let props = ringProps[ring];
         
         for (let i = 0; i < N; i++) {
           let logicalIndex = i + ring * N;
+          let isB = isBlackArr[logicalIndex];
           let ql = "";
           
           if (ring === 0) {
-            ql = standardPianoMap ? standardPianoMap[i] : (isBlackArr[i] ? fB_out[bIdx++ % 11] : fW_out[wIdx++ % 11]);
+            ql = standardPianoMap ? standardPianoMap[i] : (isB ? fB_out[bIdx++ % 11] : fW_out[wIdx++ % 11]);
           } else {
-            ql = isBlackArr[i] ? fB_in[bIdx++ % 12] : fW_in[wIdx++ % 10];
+            ql = isB ? fB_in[bIdx++ % 12] : fW_in[wIdx++ % 10];
           }
 
           let labRad;
-          if (isBlackArr[i]) {
+          if (isB) {
             labRad = props.rbOut - 15; 
           } else {
             labRad = (ring === 1 && showMobius) ? props.rwIn + 22 : props.rwOut - 22;
           }
 
-          if (isBlackArr[i]) {
+          if (isB) {
             keys.push({ index: logicalIndex, isBlack: true, center: currentWhite * angleW + rotationOffset, width: blackWidth, rOuter: props.rbOut, rInner: props.rbIn, qwertyLabel: ql, labelRadius: labRad });
           } else {
             keys.push({ index: logicalIndex, isBlack: false, start: currentWhite * angleW + rotationOffset, end: (currentWhite + 1) * angleW + rotationOffset, whiteIndex: currentWhite, rOuter: props.rwOut, rInner: props.rwIn, qwertyLabel: ql, labelRadius: labRad });
@@ -287,7 +425,7 @@
       if (!showMobius) return;
 
       const keyOutC = keys.find(k => k.index === 0);         
-      const keyOutB = keys.find(k => k.index === N - 1);     
+      const keyOutB = keys.find(k => k.index === N - 1);    
       const keyInC  = keys.find(k => k.index === N);         
       const keyInB  = keys.find(k => k.index === 2 * N - 1); 
 
@@ -386,7 +524,7 @@
               gCtx.beginPath(); gCtx.moveTo(p1.x, p1.y); gCtx.lineTo(p2.x, p2.y);
               gCtx.strokeStyle = '#FFB81C'; gCtx.stroke();
               
-              const dist = Math.min(Math.abs(u-v), limit - Math.abs(u-v));
+              const dist = getGraphDist(u, v);
               const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
               
               gCtx.beginPath(); gCtx.arc(mx, my, 8, 0, Math.PI*2); gCtx.fillStyle='#fff'; gCtx.fill();
@@ -419,7 +557,7 @@
         const p = getNodePos(i);
         gCtx.beginPath(); gCtx.arc(p.x, p.y, vRad, 0, Math.PI * 2);
         
-        const active = activeIndices.has(i), isB = isBlackArr[i % N];
+        const active = activeIndices.has(i), isB = isBlackArr[i];
         gCtx.fillStyle = isB ? (active ? '#D49A18' : '#222') : (active ? '#FFB81C' : '#fff'); gCtx.fill(); 
         gCtx.strokeStyle = active ? (isB ? '#fff' : '#111') : '#222'; gCtx.lineWidth = active ? 3 : 2; gCtx.stroke();
         
@@ -548,18 +686,22 @@
       if (dist < 35) return -1; 
       let ang = Math.PI/2 - Math.atan2(y, x);
       if (ang < 0) ang += Math.PI*2; if (ang >= Math.PI*2) ang -= Math.PI*2;
+      
       for (let k of keys) {
         if (k.isBlack && dist <= k.rOuter && dist >= k.rInner) {
           let d = Math.abs(ang - k.center); if (d > Math.PI) d = 2*Math.PI - d;
           if (d <= k.width/2) return k.index;
         }
       }
+      
       for (let k of keys) {
         if (!k.isBlack && dist <= k.rOuter && dist >= k.rInner) {
-          const W = N-K, aW = (Math.PI*2)/W, off = -aW/2;
-          let gA = ang - off; if (gA < 0) gA += Math.PI*2; if (gA >= Math.PI*2) gA -= Math.PI*2;
-          const target = Math.floor(gA / aW);
-          if (k.whiteIndex === target) return k.index;
+          let st = k.start % (2 * Math.PI); if (st < 0) st += 2 * Math.PI;
+          let en = k.end % (2 * Math.PI); if (en < 0) en += 2 * Math.PI;
+          let inSlice = false;
+          if (st < en) inSlice = (ang >= st && ang < en);
+          else inSlice = (ang >= st || ang < en);
+          if (inSlice) return k.index;
         }
       }
       return -1;
