@@ -63,6 +63,7 @@
   label[for="autoplay-toggle"] { color: #008000; }
   label[for="shepard-toggle"] { color: #d00; }
   label[for="mobius-toggle"] { color: #800080; }
+  label[for="balanced-toggle"] { color: #005a8b; }
 </style>
 </head>
 <body>
@@ -97,6 +98,7 @@
       <div><input type="checkbox" id="autoplay-toggle"><label for="autoplay-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Auto-Play</label></div>
       <div><input type="checkbox" id="shepard-toggle"><label for="shepard-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Shepard</label></div>
       <div><input type="checkbox" id="mobius-toggle"><label for="mobius-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Möbius</label></div>
+      <div><input type="checkbox" id="balanced-toggle" checked><label for="balanced-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Balanced</label></div>
     </div>
     <div class="hint">Toggle <strong>Möbius + Shepard + Auto-Play</strong> to see all the bells and whistles!</div>
   </div>
@@ -120,7 +122,7 @@
     const qwertyToggle = document.getElementById('qwerty-toggle'), integerToggle = document.getElementById('integer-toggle');
     const distancesToggle = document.getElementById('distances-toggle'), polygonsToggle = document.getElementById('polygons-toggle');
     const sustainToggle = document.getElementById('sustain-toggle'), sustainContainer = document.getElementById('sustain-container');
-    const autoplayToggle = document.getElementById('autoplay-toggle'), shepardToggle = document.getElementById('shepard-toggle'), mobiusToggle = document.getElementById('mobius-toggle');
+    const autoplayToggle = document.getElementById('autoplay-toggle'), shepardToggle = document.getElementById('shepard-toggle'), mobiusToggle = document.getElementById('mobius-toggle'), balancedToggle = document.getElementById('balanced-toggle');
 
     let N = 12, K = 6;
     let showQwerty = false, showInteger = false, showDistances = true, showPolygons = true, showMobius = false;
@@ -147,104 +149,113 @@
       return d_cycle;
     }
 
-    function findOptimalMobiusBlackKeys(N, K) {
-      let limit = 2 * N;
-      let numBlack = K; // Directly use total black keys
-      let distMap = Array(limit).fill(0).map(()=>Array(limit).fill(0));
-      
-      for(let i=0; i<limit; i++) {
-        for(let j=0; j<limit; j++) {
-          let d_cycle = Math.min(Math.abs(i - j), limit - Math.abs(i - j));
-          let i_jump = (i + N) % limit;
-          let d_jump = 1 + Math.min(Math.abs(i_jump - j), limit - Math.abs(i_jump - j));
-          distMap[i][j] = i === j ? 0 : Math.min(d_cycle, d_jump);
+    const MOBIUS_MAX_TOTAL_KEYS = 30;
+    const mobiusSearchCache = new Map();
+
+    function findOptimalMobiusBlackKeys(N, K, preferBalanced) {
+      const ringSize = N | 0;
+      const numBlack = K | 0;
+      const limit = 2 * ringSize;
+      const requireBalanced = !!preferBalanced && numBlack % 2 === 0;
+      const cacheKey = `${ringSize},${numBlack},${requireBalanced ? 'balanced' : 'unbalanced'}`;
+
+      if (mobiusSearchCache.has(cacheKey)) return mobiusSearchCache.get(cacheKey).slice();
+
+      const result = Array(limit).fill(false);
+      if (numBlack <= 0 || limit < 2) {
+        mobiusSearchCache.set(cacheKey, result.slice());
+        return result;
+      }
+
+      // Exact Möbius-ladder distances, matching getGraphDist in Möbius mode.
+      const distMap = Array(limit).fill(0).map(() => Array(limit).fill(0));
+      for (let i = 0; i < limit; i++) {
+        for (let j = 0; j < limit; j++) {
+          if (i === j) continue;
+          const dCycle = Math.min(Math.abs(i - j), limit - Math.abs(i - j));
+          const iJump = (i + ringSize) % limit;
+          const dJump = 1 + Math.min(Math.abs(iJump - j), limit - Math.abs(iJump - j));
+          distMap[i][j] = Math.min(dCycle, dJump);
         }
       }
 
-      function getE(arr) {
-        let e = 0;
-        for(let i=0; i<limit; i++) {
-          if(!arr[i]) continue;
-          for(let j=i+1; j<limit; j++) {
-            if(arr[j]) e += 1.0 / distMap[i][j];
-          }
-        }
-        return e;
+      // Symmetry normalization requested: key 0 is white and key 1 is black.
+      const chosen = [1];
+      const candidates = [];
+      for (let i = 2; i < limit; i++) candidates.push(i);
+
+      let bestEnergy = Infinity;
+      let bestChoice = null;
+      const EPS = 1e-12;
+
+      // Early discard: no two black keys may be consecutive in the Möbius cyclic order.
+      function areConsecutiveOnMobiusCycle(a, b) {
+        const delta = Math.abs(a - b);
+        return delta === 1 || delta === limit - 1;
       }
 
-      function isValid(arr) {
-        for(let i=0; i<N; i++) {
-          if(arr[i] && arr[(i+1)%N]) return false;
-        }
-        for(let i=0; i<N; i++) {
-          let u = N + i, v = N + (i+1)%N;
-          if(arr[u] && arr[v]) return false;
+      function isAllowedByAdjacency(v) {
+        for (const u of chosen) {
+          if (areConsecutiveOnMobiusCycle(u, v)) return false;
         }
         return true;
       }
 
-      let bestArr = Array(limit).fill(false);
-      for (let i = 0; i < numBlack; i++) {
-        bestArr[(Math.floor((i * limit) / numBlack) + 1) % limit] = true;
-      }
-      if (!isValid(bestArr)) {
-        bestArr.fill(false);
-        for(let i=0; i<numBlack; i++) bestArr[i*2] = true;
+      function blackCountInOuterRing(choice) {
+        let count = 0;
+        for (const v of choice) if (v < ringSize) count++;
+        return count;
       }
 
-      let globalBestArr = [...bestArr];
-      let globalBestE = getE(bestArr);
-
-      for(let restart=0; restart<3; restart++) {
-        let currArr = [...bestArr];
-        if (restart > 0) {
-          currArr.fill(false);
-          let c = 0;
-          while(c < numBlack) {
-            let idx = Math.floor(Math.random() * limit);
-            if(!currArr[idx]) {
-              currArr[idx] = true;
-              if(!isValid(currArr)) currArr[idx] = false;
-              else c++;
-            }
+      function search(start, remaining, currentEnergy) {
+        if (remaining === 0) {
+          if (requireBalanced && blackCountInOuterRing(chosen) !== numBlack / 2) return;
+          if (currentEnergy < bestEnergy - EPS) {
+            bestEnergy = currentEnergy;
+            bestChoice = chosen.slice();
           }
+          return;
         }
 
-        let currE = getE(currArr);
-        let improved = true;
-        while(improved) {
-          improved = false;
-          for(let i=0; i<limit; i++) {
-            if(!currArr[i]) continue;
-            for(let j=0; j<limit; j++) {
-              if(currArr[j]) continue;
-              
-              currArr[i] = false; currArr[j] = true;
-              if(isValid(currArr)) {
-                let delta = 0;
-                for(let k=0; k<limit; k++) {
-                  if(currArr[k] && k !== j) {
-                    delta -= 1.0 / distMap[i][k];
-                    delta += 1.0 / distMap[j][k];
-                  }
-                }
-                if(delta < -1e-7) {
-                  currE = getE(currArr);
-                  improved = true;
-                  break;
-                }
-              }
-              currArr[i] = true; currArr[j] = false; // backtrack
-            }
-            if(improved) break;
+        if (candidates.length - start < remaining) return;
+
+        if (requireBalanced) {
+          const outerChosen = blackCountInOuterRing(chosen);
+          const targetOuter = numBlack / 2;
+          if (outerChosen > targetOuter) return;
+
+          let outerAvailable = 0;
+          for (let c = start; c < candidates.length; c++) {
+            if (candidates[c] < ringSize) outerAvailable++;
           }
+          if (outerChosen + outerAvailable < targetOuter) return;
         }
-        if (currE < globalBestE) {
-          globalBestE = currE;
-          globalBestArr = [...currArr];
+
+        for (let c = start; c <= candidates.length - remaining; c++) {
+          const v = candidates[c];
+          if (!isAllowedByAdjacency(v)) continue;
+
+          if (requireBalanced) {
+            const outerChosen = blackCountInOuterRing(chosen);
+            if (v < ringSize && outerChosen >= numBlack / 2) continue;
+          }
+
+          let addedEnergy = 0;
+          for (const u of chosen) addedEnergy += 1.0 / distMap[u][v];
+
+          chosen.push(v);
+          search(c + 1, remaining - 1, currentEnergy + addedEnergy);
+          chosen.pop();
         }
       }
-      return globalBestArr;
+
+      search(0, numBlack - 1, 0);
+
+      if (bestChoice) bestChoice.forEach(i => { result[i] = true; });
+      else if (requireBalanced) return findOptimalMobiusBlackKeys(ringSize, numBlack, false);
+
+      mobiusSearchCache.set(cacheKey, result.slice());
+      return result;
     }
 
     // --- Audio System Unlock ---
@@ -267,14 +278,18 @@
     // --- Keyboard Math & Geometry ---
     function updateKeyboard() {
       showMobius = mobiusToggle.checked;
+      const preferBalanced = balancedToggle.checked;
       showQwerty = qwertyToggle.checked; showInteger = integerToggle.checked;
       showDistances = distancesToggle.checked; showPolygons = polygonsToggle.checked;
 
       // Handle the slider as TOTAL keys
       let requestedTotal = parseInt(nSlider.value);
-      if (showMobius && requestedTotal % 2 !== 0) {
-        requestedTotal++; // Force even for Möbius
-        if (requestedTotal > parseInt(nSlider.max)) requestedTotal -= 2;
+      if (showMobius) {
+        if (requestedTotal > MOBIUS_MAX_TOTAL_KEYS) requestedTotal = MOBIUS_MAX_TOTAL_KEYS;
+        if (requestedTotal % 2 !== 0) {
+          requestedTotal++; // Force even for Möbius
+          if (requestedTotal > Math.min(parseInt(nSlider.max), MOBIUS_MAX_TOTAL_KEYS)) requestedTotal -= 2;
+        }
         nSlider.value = requestedTotal;
       }
       let totalKeys = requestedTotal;
@@ -303,7 +318,7 @@
           for (let i = 0; i < K; i++) isBlackArr[(Math.floor((i * N) / K) + 1) % N] = true;
         }
       } else {
-        isBlackArr = findOptimalMobiusBlackKeys(N, K);
+        isBlackArr = findOptimalMobiusBlackKeys(N, K, preferBalanced);
       }
 
       const fW_out = ['a','s','d','f','g','h','j','k','l',';',"'"];
@@ -402,23 +417,23 @@
       ctx.restore();
     };
 
-    const drawHorizontalCurve = (p1, p2) => {
-      const pLeft = p1.x < p2.x ? p1 : p2;
-      const pRight = p1.x < p2.x ? p2 : p1;
-      const cpOffset = Math.max(30, Math.abs(pRight.x - pLeft.x) * 0.5);
+    const drawDirectedHorizontalCurve = (from, to) => {
+      const dir = to.x >= from.x ? 1 : -1;
+      const cpOffset = Math.max(30, Math.abs(to.x - from.x) * 0.5);
+      const c1 = { x: from.x + dir * cpOffset, y: from.y };
+      const c2 = { x: to.x - dir * cpOffset, y: to.y };
 
       ctx.beginPath();
-      ctx.moveTo(pLeft.x, pLeft.y);
-      ctx.bezierCurveTo(pLeft.x + cpOffset, pLeft.y, pRight.x - cpOffset, pRight.y, pRight.x, pRight.y);
+      ctx.moveTo(from.x, from.y);
+      ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, to.x, to.y);
       ctx.strokeStyle = '#111'; ctx.lineWidth = 6; ctx.stroke();
 
       ctx.beginPath();
-      ctx.moveTo(pLeft.x, pLeft.y);
-      ctx.bezierCurveTo(pLeft.x + cpOffset, pLeft.y, pRight.x - cpOffset, pRight.y, pRight.x, pRight.y);
+      ctx.moveTo(from.x, from.y);
+      ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, to.x, to.y);
       ctx.strokeStyle = '#FFB81C'; ctx.lineWidth = 3; ctx.stroke();
 
-      drawArrowHead(pLeft.x, pLeft.y, Math.PI); 
-      drawArrowHead(pRight.x, pRight.y, 0);     
+      drawArrowHead(to.x, to.y, Math.atan2(to.y - c2.y, to.x - c2.x));
     };
 
     function drawMobiusArrows() {
@@ -442,8 +457,8 @@
       const pOutC = getPoint(keyOutC), pOutB = getPoint(keyOutB);
       const pInC  = getPoint(keyInC),  pInB  = getPoint(keyInB);
 
-      drawHorizontalCurve(pOutB, pInC);
-      drawHorizontalCurve(pInB, pOutC);
+      drawDirectedHorizontalCurve(pInB, pOutC);
+      drawDirectedHorizontalCurve(pOutB, pInC);
     }
 
     function drawLabels() {
@@ -749,9 +764,25 @@
     sustainToggle.onchange = (e) => handleSustainChange(e.target.checked);
     autoplayToggle.onchange = (e) => handleAutoplayChange(e.target.checked);
     shepardToggle.onchange = updateKeyboard; 
+    balancedToggle.onchange = updateKeyboard;
     
     mobiusToggle.onchange = (e) => {
-      if (e.target.checked) shepardToggle.checked = true;
+      if (e.target.checked) {
+        shepardToggle.checked = true;
+        let requestedTotal = parseInt(nSlider.value);
+        if (requestedTotal > MOBIUS_MAX_TOTAL_KEYS) requestedTotal = MOBIUS_MAX_TOTAL_KEYS;
+        if (requestedTotal % 2 !== 0) requestedTotal += 1;
+        if (requestedTotal > MOBIUS_MAX_TOTAL_KEYS) requestedTotal -= 2;
+        nSlider.value = requestedTotal;
+
+        const maxK = Math.floor(requestedTotal / 2);
+        let requestedK = Math.min(parseInt(kSlider.value), maxK);
+        if (requestedK % 2 !== 0) {
+          requestedK = requestedK + 1 <= maxK ? requestedK + 1 : requestedK - 1;
+          if (requestedK < 1) requestedK = 1;
+        }
+        kSlider.value = requestedK;
+      }
       updateKeyboard();
     };
     
