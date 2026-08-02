@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rhythms">
+<title>Mathematical Rhythms</title>
+<style>
+  /* ---------- global ---------- */
+  /* ---------- theme: companion palette to Cyclic Pianos ----------
+     Piano materials: ebony stage, ivory ink, brass, felt crimson.
+     To match the partner page exactly, edit these values only.  */
+  :root {
+    --bg:        #0c0a07;                 /* warm ebony-black          */
+    --bg-glow-a: #201812;                 /* stage-light wash          */
+    --bg-glow-b: #171208;
+    --ink:       #f2ead8;                 /* ivory                     */
+    --panel:     rgba(30,25,19,0.93);     /* dark walnut               */
+    --brass:     #d9a441;
+    --brass-hi:  #eec96a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-user-select:none; user-select:none;
+      -webkit-tap-highlight-color:transparent; }
+  html,body { width:100%; height:100%; overflow:hidden; touch-action:none; }
+  body {
+    background:
+      radial-gradient(1200px 700px at 30% 20%, var(--bg-glow-a) 0%, transparent 60%),
+      radial-gradient(1000px 800px at 75% 80%, var(--bg-glow-b) 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family: "Avenir Next", "Futura", -apple-system, "Segoe UI", sans-serif;
+  }
+
+  /* faint instructional phrases woven into the background */
+  .whisper {
+    position:absolute; pointer-events:none;
+    color:var(--ink); opacity:0.22;
+    font-size: clamp(18px, 3.2vw, 40px);
+    font-weight:600; letter-spacing:0.04em; white-space:nowrap;
+  }
+
+  /* ---------- start overlay ---------- */
+  #overlay {
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:26px; z-index:50;
+    transition:opacity 0.8s ease;
+  }
+  #overlay.gone { opacity:0; pointer-events:none; }
+  .bigbtn {
+    border:none; cursor:pointer; color:#241a08;
+    font-family:inherit; font-weight:700; letter-spacing:0.12em;
+    border-radius:999px; padding:22px 64px; font-size:30px;
+    background:linear-gradient(135deg, var(--brass-hi), var(--brass));
+    box-shadow:0 0 60px rgba(217,164,65,0.45), 0 8px 30px rgba(0,0,0,0.5);
+    animation:breathe 2.6s ease-in-out infinite;
+  }
+  .smallbtn {
+    border:1px solid rgba(242,234,216,0.3); cursor:pointer; color:var(--ink);
+    background:rgba(242,234,216,0.07); font-family:inherit; font-weight:600;
+    letter-spacing:0.06em; border-radius:999px; padding:12px 30px; font-size:17px;
+  }
+  @keyframes breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.045)} }
+  @media (prefers-reduced-motion: reduce){ .bigbtn{animation:none} }
+
+  /* ---------- workspace & panels ---------- */
+  #space { position:absolute; inset:0; }
+  .panel {
+    position:absolute; width:230px; border-radius:22px;
+    background:var(--panel);
+    box-shadow:0 14px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(242,234,216,0.07),
+               0 0 34px var(--glow, rgba(242,234,216,0.05));
+    padding:12px 14px 10px; touch-action:none;
+    transition:box-shadow 0.4s ease;
+  }
+  .panel.muted { opacity:0.45; }
+  .phead { display:flex; align-items:center; justify-content:space-between;
+           cursor:grab; padding:2px 2px 8px; }
+  .pname { font-weight:700; font-size:15px; color:var(--accent,#fff); letter-spacing:0.03em; }
+  .psub  { font-size:11px; color:#efe7d2; margin-top:1px; }
+  .phint { font-size:10.5px; color:rgba(242,234,216,0.78); text-align:center;
+           padding-top:6px; letter-spacing:0.04em; }
+  .mutedot {
+    width:20px; height:20px; border-radius:50%; flex:0 0 auto;
+    background:var(--accent,#fff); box-shadow:0 0 10px var(--accent,#fff);
+    border:none; cursor:pointer;
+  }
+  .panel.muted .mutedot { background:transparent; box-shadow:none;
+    border:2px solid var(--accent,#fff); }
+  .panel canvas { display:block; width:202px; height:202px; cursor:crosshair; }
+  .pfoot { display:flex; align-items:center; justify-content:space-between;
+           padding-top:6px; }
+  .penergy { font-size:10.5px; color:rgba(242,234,216,0.45); letter-spacing:0.05em; }
+  .gtoggle {
+    border:1px solid var(--accent,#fff); color:var(--accent,#fff);
+    background:transparent; font-family:inherit; font-weight:700;
+    font-size:10px; letter-spacing:0.08em; border-radius:999px;
+    padding:4px 12px; cursor:pointer;
+  }
+
+  /* ---------- panel menu ---------- */
+  #menu {
+    position:absolute; z-index:60; display:none; min-width:190px;
+    background:rgba(36,30,22,0.97); border-radius:16px; overflow:hidden;
+    box-shadow:0 16px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(242,234,216,0.09);
+  }
+  #menu button {
+    display:block; width:100%; border:none; background:none; color:var(--ink);
+    font-family:inherit; font-size:15px; text-align:left;
+    padding:13px 18px; cursor:pointer;
+  }
+  #menu button:active { background:rgba(242,234,216,0.09); }
+  #menu .sep { height:1px; background:rgba(242,234,216,0.09); }
+
+  /* ---------- bottom controls ---------- */
+  #controls {
+    position:absolute; right:18px; bottom:16px; z-index:40;
+    display:flex; align-items:center; gap:16px;
+    background:rgba(30,25,19,0.85); border-radius:999px; padding:10px 20px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.4), 0 0 0 1px rgba(242,234,216,0.08);
+  }
+  #controls label { font-size:12px; letter-spacing:0.08em; color:rgba(242,234,216,0.6); }
+  #tempo { width:130px; accent-color:var(--brass); }
+</style>
+</head>
+<body>
+
+<div id="space">
+  <div class="whisper" style="top:7%;  left:6%;  transform:rotate(-2deg)">TAP START.</div>
+  <div class="whisper" style="top:20%; right:5%; transform:rotate(1.5deg)">DRAG UP/DOWN TO CHANGE THE TOTAL PER CYCLE.</div>
+  <div class="whisper" style="top:36%; left:8%; transform:rotate(-1deg)">DRAG LEFT/RIGHT TO CHANGE THE NUM OF BOOMS.</div>
+  <div class="whisper" style="top:52%; right:10%; transform:rotate(1deg)">DOUBLE-TAP A SHAPE TO ROTATE ITS RHYTHM.</div>
+  <div class="whisper" style="bottom:30%; left:7%; transform:rotate(-1.5deg)">TAP CYCLE / M&Ouml;BIUS ON A PANEL TO CHANGE ITS SHAPE.</div>
+  <div class="whisper" style="bottom:16%; right:9%; transform:rotate(1.5deg)">Double-tap empty space to add another rhythm. Drag panels by their titles.</div>
+  <div class="whisper" style="bottom:5%; left:12%; transform:rotate(2deg)">Long-press a panel for instruments &amp; more.</div>
+</div>
+
+<div id="overlay">
+  <button class="bigbtn" id="startBtn">START</button>
+  <button class="smallbtn" id="surpriseBtn0">Surprise Me!</button>
+</div>
+
+<div id="controls" style="display:none">
+  <label>TEMPO</label>
+  <input id="tempo" type="range" min="70" max="160" value="112">
+  <button class="smallbtn" id="surpriseBtn" style="padding:8px 18px; font-size:14px">Surprise Me!</button>
+</div>
+
+<div id="menu"></div>
+
+<script>
+"use strict";
+/* =====================================================================
+   Mathematical Rhythms — Bridges Family Day exhibit
+   Every rhythm is the minimum-energy k-subset of the vertices of a
+   graph (cycle C_n or Möbius ladder on n vertices), found by exhaustive
+   search over all k-subsets with Coulomb energy  E = Σ 1/d(i,j)²,
+   where d is graph distance.  Users choose only (graph, n, k, rotation).
+   ===================================================================== */
+
+/* ------------------------------ graphs ------------------------------ */
+
+// Adjacency: cycle edges always; Möbius ladder adds antipodal chords (n even).
+function buildAdjacency(n, graph){
+  const adj = Array.from({length:n}, () => []);
+  for (let i = 0; i < n; i++){ adj[i].push((i+1) % n, (i+n-1) % n); }
+  if (graph === "mobius" && n % 2 === 0){
+    for (let i = 0; i < n/2; i++){ adj[i].push(i + n/2); adj[i + n/2].push(i); }
+  }
+  return adj;
+}
+
+// All-pairs graph distances by BFS from every vertex.
+function distMatrix(n, graph){
+  const adj = buildAdjacency(n, graph);
+  const D = Array.from({length:n}, () => new Array(n).fill(-1));
+  for (let s = 0; s < n; s++){
+    const q = [s]; D[s][s] = 0;
+    for (let h = 0; h < q.length; h++){
+      const v = q[h];
+      for (const w of adj[v]) if (D[s][w] < 0){ D[s][w] = D[s][v] + 1; q.push(w); }
+    }
+  }
+  return D;
+}
+
+/* --------------------- minimum-energy onset sets --------------------- */
+
+const rhythmCache = new Map();
+
+// Exhaustive search (NOT Björklund): canonical = lexicographically first
+// among the global minimizers.  n ≤ 16, so C(n,k) is tiny.
+function minEnergySet(n, k, graph){
+  const key = graph + ":" + n + ":" + k;
+  if (rhythmCache.has(key)) return rhythmCache.get(key);
+  const D = distMatrix(n, graph);
+  let best = null, bestE = Infinity;
+  const S = [];
+  (function rec(start){
+    if (S.length === k){
+      let E = 0;
+      for (let a = 0; a < k; a++)
+        for (let b = a+1; b < k; b++){ const d = D[S[a]][S[b]]; E += 1/(d*d); }
+      if (E < bestE - 1e-12){ bestE = E; best = S.slice(); }
+      return;
+    }
+    for (let v = start; v <= n - (k - S.length); v++){ S.push(v); rec(v+1); S.pop(); }
+  })(0);
+  const res = { set: best || [], energy: (k > 1 ? bestE : 0) };
+  rhythmCache.set(key, res);
+  return res;
+}
+
+/* ------------------------------ audio ------------------------------- */
+
+const AC = window.AudioContext || window.webkitAudioContext;
+let ctx = null, master = null, noiseBuf = null;
+
+function initAudio(){
+  if (ctx) return;
+  ctx = new AC();
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -14; comp.ratio.value = 6;
+  master = ctx.createGain(); master.gain.value = 0.9;
+  master.connect(comp); comp.connect(ctx.destination);
+  // shared white-noise buffer
+  noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+  const d = noiseBuf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random()*2 - 1;
+}
+
+function noise(t, dur, filterType, freq, q, gain){
+  const src = ctx.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
+  const f = ctx.createBiquadFilter(); f.type = filterType;
+  f.frequency.value = freq; f.Q.value = q;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(gain, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  src.connect(f); f.connect(g); g.connect(master);
+  src.start(t); src.stop(t + dur + 0.02);
+}
+
+function tone(t, dur, type, f0, f1, gain){
+  const o = ctx.createOscillator(); o.type = type;
+  o.frequency.setValueAtTime(f0, t);
+  if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(gain, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  o.connect(g); g.connect(master);
+  o.start(t); o.stop(t + dur + 0.02);
+}
+
+// Each instrument: name + synthesis function(t, v) where v = overall level.
+const INSTRUMENTS = [
+  { name:"Kick",       play:(t,v)=>{ tone(t,0.28,"sine",150,44,0.95*v); tone(t,0.02,"square",120,120,0.2*v); } },
+  { name:"Snare",      play:(t,v)=>{ noise(t,0.18,"bandpass",1800,0.8,0.55*v); tone(t,0.10,"triangle",190,150,0.4*v); } },
+  { name:"Hi-Hat",     play:(t,v)=>{ noise(t,0.05,"highpass",7500,0.7,0.35*v); } },
+  { name:"Open Hat",   play:(t,v)=>{ noise(t,0.32,"highpass",6800,0.7,0.28*v); } },
+  { name:"Cowbell",    play:(t,v)=>{ tone(t,0.20,"square",545,545,0.18*v); tone(t,0.20,"square",800,800,0.14*v); } },
+  { name:"Wood Block", play:(t,v)=>{ tone(t,0.07,"sine",850,780,0.6*v); noise(t,0.02,"bandpass",2000,2,0.25*v); } },
+  { name:"Claves",     play:(t,v)=>{ tone(t,0.06,"sine",2450,2450,0.5*v); } },
+  { name:"Shaker",     play:(t,v)=>{ noise(t,0.07,"bandpass",5200,1.4,0.4*v); } },
+  { name:"Conga",      play:(t,v)=>{ tone(t,0.22,"sine",195,165,0.65*v); } },
+  { name:"Rimshot",    play:(t,v)=>{ noise(t,0.04,"bandpass",3400,3,0.5*v); tone(t,0.03,"sine",1100,900,0.3*v); } },
+];
+
+/* ----------------------------- transport ----------------------------- */
+
+const transport = {
+  bpm: 112,
+  nextStep: 0,          // global integer step counter (16th notes)
+  nextStepTime: 0,      // audio-clock time of that step
+  timer: null,
+  get stepDur(){ return 60 / this.bpm / 4; },
+  start(){
+    this.nextStep = 0;
+    this.nextStepTime = ctx.currentTime + 0.1;
+    this.timer = setInterval(() => this.tick(), 25);
+  },
+  stop(){
+    clearInterval(this.timer); this.timer = null;
+  },
+  tick(){
+    const horizon = ctx.currentTime + 0.12;
+    while (this.nextStepTime < horizon){
+      const level = 0.9 / Math.sqrt(Math.max(1, panels.filter(p => !p.muted).length));
+      for (const p of panels) p.scheduleStep(this.nextStep, this.nextStepTime, level);
+      this.nextStep++;
+      this.nextStepTime += this.stepDur;   // tempo changes take effect step-by-step
+    }
+  },
+  // continuous global phase in steps, for smooth playheads
+  phase(){
+    if (!ctx) return 0;
+    return this.nextStep - (this.nextStepTime - ctx.currentTime) / this.stepDur;
+  }
+};
+
+/* ------------------------------ panels ------------------------------ */
+
+/* Accent pool — piano materials: brass, felt crimson, ivory, patina,
+   copper, mahogany rose, verdigris, aged gold.  Edit freely to match. */
+const PALETTE = ["#d9a441","#c8434e","#f0e6cd","#5f8a8b","#c87a3e","#b06a80","#7d9c7f","#e6c05a"];
+const panels = [];
+let colorIdx = 0;
+
+class Panel {
+  constructor(opts){
+    this.n     = opts.n;                    // vertices
+    this.k     = opts.k;                    // onsets
+    this.rot   = opts.rot   || 0;           // rotation of onset set
+    this.graph = opts.graph || "cycle";     // "cycle" | "mobius"
+    this.inst  = opts.inst  || 0;           // instrument index
+    this.muted = false;
+    this.accent = PALETTE[colorIdx++ % PALETTE.length];
+    this.morph = (this.graph === "mobius") ? 1 : 0;   // circle→band morph, 0..1
+    this.lastHit = {};                      // vertex → audio time, for pulses
+    this.pending = [];                      // scheduled {v,t} not yet shown
+
+    // DOM
+    this.el = document.createElement("div");
+    this.el.className = "panel";
+    this.el.style.setProperty("--accent", this.accent);
+    this.el.style.setProperty("--glow", this.accent + "33");
+    this.el.style.left = (opts.x || 100) + "px";
+    this.el.style.top  = (opts.y || 100) + "px";
+    this.el.innerHTML =
+      '<div class="phead"><div><div class="pname"></div><div class="psub"></div></div>' +
+      '<button class="mutedot" aria-label="mute"></button></div>' +
+      '<canvas width="404" height="404"></canvas>' +
+      '<div class="phint">&#8597; total per cycle &nbsp;&#183;&nbsp; &#8596; num of booms &nbsp;&#183;&nbsp; double-tap rotates</div>' +
+      '<div class="pfoot"><span class="penergy"></span><button class="gtoggle"></button></div>';
+    document.getElementById("space").appendChild(this.el);
+    this.canvas = this.el.querySelector("canvas");
+    this.g = this.canvas.getContext("2d");
+    this.el.querySelector(".mutedot").addEventListener("pointerup", e => {
+      e.stopPropagation(); this.muted = !this.muted;
+      this.el.classList.toggle("muted", this.muted);
+    });
+    this.el.querySelector(".gtoggle").addEventListener("pointerup", e => {
+      e.stopPropagation();
+      this.graph = this.graph === "mobius" ? "cycle" : "mobius";
+      this.recompute();
+    });
+    attachPanelGestures(this);
+    this.recompute();
+  }
+
+  recompute(){
+    if (this.graph === "mobius" && this.n % 2) this.n += 1;     // Möbius needs even n
+    this.n = Math.max(4, Math.min(16, this.n));
+    this.k = Math.max(1, Math.min(this.n, this.k));
+    this.rot = ((this.rot % this.n) + this.n) % this.n;
+    const r = minEnergySet(this.n, this.k, this.graph);
+    this.onsets = new Set(r.set.map(v => (v + this.rot) % this.n));
+    this.energy = r.energy;
+    const gname = this.graph === "mobius" ? "M\u00d6BIUS" : "CYCLE";
+    this.el.querySelector(".pname").textContent = INSTRUMENTS[this.inst].name;
+    this.el.querySelector(".psub").textContent =
+      this.n + " per cycle \u00b7 " + this.k + " boom" + (this.k === 1 ? "" : "s") +
+      " \u00b7 turn " + this.rot;
+    this.el.querySelector(".penergy").textContent = "E = " + this.energy.toFixed(3);
+    this.el.querySelector(".gtoggle").textContent = gname;
+  }
+
+  scheduleStep(step, time, level){
+    if (this.muted) return;
+    const v = step % this.n;
+    if (this.onsets.has(v)){
+      INSTRUMENTS[this.inst].play(time, level);
+      this.pending.push({ v, t: time });
+    }
+  }
+
+  draw(now){
+    const g = this.g, W = 404, cx = W/2, cy = W/2, R = 152;
+    // morph 0 (circle) → 1 (Möbius band edge)
+    const target = this.graph === "mobius" ? 1 : 0;
+    this.morph += (target - this.morph) * 0.12;
+    const m = this.morph;
+    // promote pending hits whose time has arrived
+    while (this.pending.length && this.pending[0].t <= now)
+      this.lastHit[this.pending.shift().v] = now;
+
+    g.clearRect(0, 0, W, W);
+    const PH = -Math.PI/2;                          // vertex 0 at top
+
+    // circle layout
+    const circ = i => {
+      const a = PH + i * 2*Math.PI/this.n;
+      return [cx + R*Math.cos(a), cy + R*Math.sin(a)];
+    };
+    // Möbius band boundary: ONE closed curve, twice around the band.
+    // Standard parametrization, tilted orthographic projection.
+    const edge = t => {
+      const Rb = 128, w = 38, u = t + PH;
+      const r3 = Rb + w * Math.cos(u/2);
+      return [cx + r3 * Math.cos(u),
+              cy + r3 * Math.sin(u) * 0.58 + w * Math.sin(u/2) * 0.95];
+    };
+    // vertex i sits at boundary parameter 4π·i/n — around the edge twice,
+    // so (i, i+n/2) share an angular station on opposite sides of the strip.
+    const mob = i => edge(4*Math.PI*i/this.n);
+    const pos = i => {
+      const [xa,ya] = circ(i), [xb,yb] = mob(i);
+      return [xa + (xb-xa)*m, ya + (yb-ya)*m];
+    };
+
+    // cycle edge fades out as the band fades in
+    if (m < 0.98){
+      g.strokeStyle = "rgba(242,234,216," + (0.16*(1-m)).toFixed(3) + ")";
+      g.lineWidth = 2;
+      g.beginPath(); g.arc(cx, cy, R, 0, 2*Math.PI); g.stroke();
+    }
+
+    if (m > 0.02 && this.n % 2 === 0){
+      // faint band surface: matched stations on the two sides of the strip
+      g.fillStyle = "rgba(242,234,216," + (0.05*m).toFixed(3) + ")";
+      g.beginPath();
+      for (let s = 0; s <= 90; s++){
+        const [x,y] = edge(2*Math.PI*s/90); s ? g.lineTo(x,y) : g.moveTo(x,y);
+      }
+      for (let s = 90; s >= 0; s--){
+        const [x,y] = edge(2*Math.PI + 2*Math.PI*s/90); g.lineTo(x,y);
+      }
+      g.closePath(); g.fill();
+      // the boundary curve itself
+      g.strokeStyle = "rgba(242,234,216," + (0.30*m).toFixed(3) + ")";
+      g.lineWidth = 2;
+      g.beginPath();
+      for (let s = 0; s <= 220; s++){
+        const [x,y] = edge(4*Math.PI*s/220); s ? g.lineTo(x,y) : g.moveTo(x,y);
+      }
+      g.closePath(); g.stroke();
+      // rungs across the width of the band
+      g.strokeStyle = "rgba(242,234,216," + (0.22*m).toFixed(3) + ")";
+      g.lineWidth = 1.5;
+      for (let i = 0; i < this.n/2; i++){
+        const [x1,y1] = pos(i), [x2,y2] = pos(i + this.n/2);
+        g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.stroke();
+      }
+    }
+
+    // playhead
+    const local = (transport.phase() % this.n + this.n) % this.n;
+    if (m < 0.6){                                  // center ray, circle mode only
+      const pa = PH + local * 2*Math.PI/this.n;
+      g.strokeStyle = this.accent + "44"; g.lineWidth = 3;
+      g.beginPath(); g.moveTo(cx, cy);
+      g.lineTo(cx + (R+14)*Math.cos(pa), cy + (R+14)*Math.sin(pa)); g.stroke();
+    }
+    {                                              // traveling spark, both modes
+      const a = PH + local * 2*Math.PI/this.n;
+      const xc = cx + R*Math.cos(a), yc = cy + R*Math.sin(a);
+      const [xm,ym] = edge(4*Math.PI*local/this.n);
+      const x = xc + (xm-xc)*m, y = yc + (ym-yc)*m;
+      g.beginPath(); g.arc(x, y, 6, 0, 2*Math.PI);
+      g.shadowColor = this.accent; g.shadowBlur = 16;
+      g.fillStyle = this.accent; g.fill(); g.shadowBlur = 0;
+    }
+
+    // vertices
+    for (let i = 0; i < this.n; i++){
+      const [x, y] = pos(i);
+      const active = this.onsets.has(i);
+      let r = active ? 11 : 5.5;
+      const h = this.lastHit[i];
+      if (h !== undefined){
+        const dt = now - h;
+        if (dt < 0.4) r += 8 * Math.exp(-dt * 9);       // pulse on hit
+      }
+      g.beginPath(); g.arc(x, y, r, 0, 2*Math.PI);
+      if (active){
+        g.shadowColor = this.accent; g.shadowBlur = 22;
+        g.fillStyle = this.accent;
+      } else {
+        g.shadowBlur = 0; g.fillStyle = "rgba(242,234,216,0.35)";
+      }
+      g.fill(); g.shadowBlur = 0;
+    }
+  }
+}
+
+/* ----------------------------- gestures ------------------------------ */
+
+// Header drag → move panel.  Canvas drag → vertical: n (total notes),
+// horizontal: k (hits).  Double-tap on the canvas → rotate the onset set.
+// Long-press anywhere on panel → menu.
+function attachPanelGestures(p){
+  let mode = null, sx = 0, sy = 0, ox = 0, oy = 0, base = null, lpTimer = null,
+      moved = false, lastCanvasTap = 0;
+
+  const down = e => {
+    if (e.target.classList.contains("mutedot")) return;
+    e.preventDefault();
+    p.el.setPointerCapture(e.pointerId);
+    sx = e.clientX; sy = e.clientY; moved = false;
+    mode = (e.target === p.canvas) ? "param" : "move";
+    ox = p.el.offsetLeft; oy = p.el.offsetTop;
+    base = { n: p.n, k: p.k };
+    hideMenu();
+    lpTimer = setTimeout(() => { if (!moved) showMenu(p, e.clientX, e.clientY); mode = null; }, 550);
+  };
+  const move = e => {
+    if (!mode) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.abs(dx) + Math.abs(dy) > 8){ moved = true; clearTimeout(lpTimer); }
+    if (!moved) return;
+    if (mode === "move"){
+      p.el.style.left = (ox + dx) + "px";
+      p.el.style.top  = (oy + dy) + "px";
+    } else {                                   // parameter drag on the graph
+      const step = (p.graph === "mobius") ? 2 : 1;         // keep n even on Möbius
+      const dn = -Math.round(dy / 36) * step;              // drag up  → more total notes
+      const dk =  Math.round(dx / 30);                     // drag right → more hits
+      const n2 = Math.max(4, Math.min(16, base.n + dn));
+      const k2 = Math.max(1, Math.min(n2, base.k + dk));
+      if (n2 !== p.n || k2 !== p.k){ p.n = n2; p.k = k2; p.recompute(); }
+    }
+  };
+  const up = () => {
+    clearTimeout(lpTimer);
+    if (mode === "param" && !moved){          // clean tap on the graph
+      const now = performance.now();
+      if (now - lastCanvasTap < 350){         // double-tap → rotate
+        p.rot = (p.rot + 1) % p.n; p.recompute();
+      }
+      lastCanvasTap = now;
+    }
+    mode = null;
+  };
+
+  p.el.addEventListener("pointerdown", down);
+  p.el.addEventListener("pointermove", move);
+  p.el.addEventListener("pointerup", up);
+  p.el.addEventListener("pointercancel", up);
+}
+
+/* ------------------------------- menu -------------------------------- */
+
+const menuEl = document.getElementById("menu");
+function hideMenu(){ menuEl.style.display = "none"; }
+
+function showMenu(p, x, y){
+  const gOther = p.graph === "mobius" ? "Cycle" : "Möbius ladder";
+  menuEl.innerHTML =
+    '<button data-a="graph">Graph → ' + gOther + '</button><div class="sep"></div>' +
+    '<button data-a="inst">Instrument → next</button><div class="sep"></div>' +
+    '<button data-a="kup">Booms +</button>' +
+    '<button data-a="kdn">Booms &#8722;</button><div class="sep"></div>' +
+    '<button data-a="dup">Duplicate panel</button>' +
+    '<button data-a="del">Delete panel</button>';
+  menuEl.style.display = "block";
+  menuEl.style.left = Math.min(x, window.innerWidth - 210) + "px";
+  menuEl.style.top  = Math.min(y, window.innerHeight - 300) + "px";
+  menuEl.onclick = e => {
+    const a = e.target.dataset.a; if (!a) return;
+    if (a === "graph"){ p.graph = p.graph === "mobius" ? "cycle" : "mobius"; p.recompute(); }
+    if (a === "inst"){ p.inst = (p.inst + 1) % INSTRUMENTS.length; p.recompute(); }
+    if (a === "kup"){ p.k++; p.recompute(); }
+    if (a === "kdn"){ p.k--; p.recompute(); }
+    if (a === "dup"){
+      panels.push(new Panel({ n:p.n, k:p.k, rot:p.rot, graph:p.graph, inst:p.inst,
+        x:p.el.offsetLeft + 40, y:p.el.offsetTop + 40 }));
+    }
+    if (a === "del"){ p.el.remove(); panels.splice(panels.indexOf(p), 1); }
+    if (a !== "kup" && a !== "kdn") hideMenu();
+  };
+}
+
+/* ---------------------------- ensembles ------------------------------ */
+
+function clearPanels(){ for (const p of panels) p.el.remove(); panels.length = 0; }
+
+function spot(i, total){
+  const W = window.innerWidth, H = window.innerHeight;
+  const cols = Math.min(total, Math.max(2, Math.floor(W / 270)));
+  const col = i % cols, row = Math.floor(i / cols);
+  return { x: 40 + col * Math.min(260, (W-280)/Math.max(1,cols-1) || 260) + row*18,
+           y: 50 + row * 300 };
+}
+
+function defaultEnsemble(){
+  clearPanels();
+  const specs = [
+    { n:16, k:4,  rot:0, graph:"cycle",  inst:0 },   // kick: four on the floor
+    { n:16, k:2,  rot:4, graph:"cycle",  inst:1 },   // snare: backbeat
+    { n:16, k:7,  rot:0, graph:"cycle",  inst:2 },   // hats
+    { n:12, k:5,  rot:0, graph:"mobius", inst:4 },   // cowbell on a Möbius ladder
+  ];
+  specs.forEach((s, i) => panels.push(new Panel(Object.assign(s, spot(i, specs.length)))));
+}
+
+function surpriseEnsemble(){
+  clearPanels();
+  const ri = a => a[Math.floor(Math.random()*a.length)];
+  const count = 3 + Math.floor(Math.random()*3);
+  const used = new Set();
+  for (let i = 0; i < count; i++){
+    let inst; do { inst = Math.floor(Math.random()*INSTRUMENTS.length); } while (used.has(inst));
+    used.add(inst);
+    const graph = Math.random() < 0.4 ? "mobius" : "cycle";
+    const n = graph === "mobius" ? ri([8,10,12,14,16]) : ri([8,9,10,12,13,15,16]);
+    const k = 2 + Math.floor(Math.random() * Math.min(6, n-2));
+    panels.push(new Panel(Object.assign(
+      { n, k, rot: Math.floor(Math.random()*n), graph, inst }, spot(i, count))));
+  }
+}
+
+/* --------------------------- wiring & loop --------------------------- */
+
+const overlay = document.getElementById("overlay");
+
+/* ---- idle watchdog: 15 s without a touch → back to the intro ---- */
+const IDLE_MS = 30000;
+let running = false, idleTimer = null;
+
+function bumpIdle(){
+  if (!running) return;
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(goIdle, IDLE_MS);
+}
+function goIdle(){
+  running = false;
+  clearTimeout(idleTimer);
+  transport.stop();
+  if (ctx) ctx.suspend();
+  clearPanels();
+  hideMenu();
+  overlay.classList.remove("gone");
+  document.getElementById("controls").style.display = "none";
+}
+// any touch or drag anywhere counts as activity
+document.addEventListener("pointerdown", bumpIdle, true);
+document.addEventListener("pointermove", bumpIdle, true);
+
+function begin(build){
+  initAudio();
+  ctx.resume();
+  build();
+  if (!transport.timer) transport.start();
+  overlay.classList.add("gone");
+  document.getElementById("controls").style.display = "flex";
+  running = true;
+  bumpIdle();
+}
+document.getElementById("startBtn").addEventListener("pointerup", () => begin(defaultEnsemble));
+document.getElementById("surpriseBtn0").addEventListener("pointerup", () => begin(surpriseEnsemble));
+document.getElementById("surpriseBtn").addEventListener("pointerup", surpriseEnsemble);
+document.getElementById("tempo").addEventListener("input", e => { transport.bpm = +e.target.value; });
+
+// double-tap empty workspace → new panel
+let lastTap = 0;
+document.getElementById("space").addEventListener("pointerup", e => {
+  if (e.target !== e.currentTarget) return;
+  hideMenu();
+  const now = performance.now();
+  if (now - lastTap < 350 && ctx){
+    panels.push(new Panel({ n:12, k:5, rot:0, graph:"cycle",
+      inst: Math.floor(Math.random()*INSTRUMENTS.length),
+      x: e.clientX - 115, y: e.clientY - 130 }));
+  }
+  lastTap = now;
+});
+
+(function loop(){
+  if (ctx){ const now = ctx.currentTime; for (const p of panels) p.draw(now); }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
