@@ -9,7 +9,6 @@
 <meta name="apple-mobile-web-app-title" content="Rhythms">
 <title>Mathematical Rhythms</title>
 <style>
-  /* ---------- global ---------- */
   /* ---------- theme: companion palette to Cyclic Pianos ----------
      Piano materials: ebony stage, ivory ink, brass, felt crimson.
      To match the partner page exactly, edit these values only.  */
@@ -34,13 +33,24 @@
     font-family: "Avenir Next", "Futura", -apple-system, "Segoe UI", sans-serif;
   }
 
-  /* faint instructional phrases woven into the background */
-  .whisper {
-    position:absolute; pointer-events:none;
-    color:var(--ink); opacity:0.22;
-    font-size: clamp(18px, 3.2vw, 40px);
-    font-weight:600; letter-spacing:0.04em; white-space:nowrap;
+  /* readable instruction list on the intro screen */
+  #howto {
+    list-style:none; display:flex; flex-direction:column; gap:14px;
+    background:rgba(30,25,19,0.75); border-radius:20px; padding:24px 34px;
+    box-shadow:0 10px 34px rgba(0,0,0,0.4), 0 0 0 1px rgba(242,234,216,0.1);
+    font-size: clamp(18px, 2.4vw, 26px); line-height:1.35;
   }
+  #howto li::before { content:"\25CF"; color:var(--brass); margin-right:14px; font-size:0.7em; }
+  #howto b { color:var(--brass-hi); font-weight:700; }
+
+  /* corner credit + QR link to nealbushaw.com, visible at all times */
+  #credit {
+    position:absolute; left:16px; bottom:16px; z-index:45; pointer-events:none;
+    display:flex; align-items:center; gap:12px;
+    font-size:14px; letter-spacing:0.05em; color:rgba(242,234,216,0.6);
+  }
+  #qr { width:92px; height:92px; border-radius:6px;
+        box-shadow:0 4px 18px rgba(0,0,0,0.45); }
 
   /* ---------- start overlay ---------- */
   #overlay {
@@ -65,58 +75,53 @@
   @keyframes breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.045)} }
   @media (prefers-reduced-motion: reduce){ .bigbtn{animation:none} }
 
-  /* ---------- workspace & panels ---------- */
+  /* ---------- fixed 2x2 workspace ---------- */
   #space { position:absolute; inset:0; }
+  #grid {
+    position:absolute; inset:12px 12px 78px 12px;
+    display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr;
+    gap:14px;
+  }
   .panel {
-    position:absolute; width:230px; border-radius:22px;
-    background:var(--panel);
+    position:relative; display:flex; flex-direction:column;
+    border-radius:22px; background:var(--panel);
     box-shadow:0 14px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(242,234,216,0.07),
                0 0 34px var(--glow, rgba(242,234,216,0.05));
-    padding:12px 14px 10px; touch-action:none;
-    transition:box-shadow 0.4s ease;
+    padding:14px 18px 12px; touch-action:none; min-width:0; min-height:0;
   }
   .panel.muted { opacity:0.45; }
-  .phead { display:flex; align-items:center; justify-content:space-between;
-           cursor:grab; padding:2px 2px 8px; }
-  .pname { font-weight:700; font-size:15px; color:var(--accent,#fff); letter-spacing:0.03em; }
-  .psub  { font-size:11px; color:#efe7d2; margin-top:1px; }
-  .phint { font-size:10.5px; color:rgba(242,234,216,0.78); text-align:center;
-           padding-top:6px; letter-spacing:0.04em; }
+  .phead { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .pname {
+    font-weight:700; font-size:21px; color:var(--accent,#fff); letter-spacing:0.03em;
+    border:none; background:none; font-family:inherit; cursor:pointer; padding:0;
+    border-bottom:1px dashed var(--accent,#fff);
+  }
+  .psub  { font-size:15px; color:#efe7d2; margin-top:2px; }
   .mutedot {
-    width:20px; height:20px; border-radius:50%; flex:0 0 auto;
-    background:var(--accent,#fff); box-shadow:0 0 10px var(--accent,#fff);
+    width:26px; height:26px; border-radius:50%; flex:0 0 auto;
+    background:var(--accent,#fff); box-shadow:0 0 12px var(--accent,#fff);
     border:none; cursor:pointer;
   }
   .panel.muted .mutedot { background:transparent; box-shadow:none;
     border:2px solid var(--accent,#fff); }
-  .panel canvas { display:block; width:202px; height:202px; cursor:crosshair; }
+  .cwrap { flex:1 1 auto; min-height:0; display:flex;
+           align-items:center; justify-content:center; }
+  .panel canvas { display:block; cursor:crosshair; }
+  .phint { font-size:14px; color:rgba(242,234,216,0.8); text-align:center;
+           padding-top:4px; letter-spacing:0.03em; }
   .pfoot { display:flex; align-items:center; justify-content:space-between;
            padding-top:6px; }
-  .penergy { font-size:10.5px; color:rgba(242,234,216,0.45); letter-spacing:0.05em; }
+  .penergy { font-size:12px; color:rgba(242,234,216,0.45); letter-spacing:0.05em; }
   .gtoggle {
-    border:1px solid var(--accent,#fff); color:var(--accent,#fff);
+    border:1.5px solid var(--accent,#fff); color:var(--accent,#fff);
     background:transparent; font-family:inherit; font-weight:700;
-    font-size:10px; letter-spacing:0.08em; border-radius:999px;
-    padding:4px 12px; cursor:pointer;
+    font-size:14px; letter-spacing:0.08em; border-radius:999px;
+    padding:7px 18px; cursor:pointer;
   }
-
-  /* ---------- panel menu ---------- */
-  #menu {
-    position:absolute; z-index:60; display:none; min-width:190px;
-    background:rgba(36,30,22,0.97); border-radius:16px; overflow:hidden;
-    box-shadow:0 16px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(242,234,216,0.09);
-  }
-  #menu button {
-    display:block; width:100%; border:none; background:none; color:var(--ink);
-    font-family:inherit; font-size:15px; text-align:left;
-    padding:13px 18px; cursor:pointer;
-  }
-  #menu button:active { background:rgba(242,234,216,0.09); }
-  #menu .sep { height:1px; background:rgba(242,234,216,0.09); }
 
   /* ---------- bottom controls ---------- */
   #controls {
-    position:absolute; right:18px; bottom:16px; z-index:40;
+    position:absolute; right:16px; bottom:14px; z-index:40;
     display:flex; align-items:center; gap:16px;
     background:rgba(30,25,19,0.85); border-radius:999px; padding:10px 20px;
     box-shadow:0 8px 30px rgba(0,0,0,0.4), 0 0 0 1px rgba(242,234,216,0.08);
@@ -128,32 +133,32 @@
 <body>
 
 <div id="space">
-  <div class="whisper" style="top:7%;  left:6%;  transform:rotate(-2deg)">TAP START.</div>
-  <div class="whisper" style="top:20%; right:5%; transform:rotate(1.5deg)">DRAG UP/DOWN TO CHANGE THE TOTAL PER CYCLE.</div>
-  <div class="whisper" style="top:36%; left:8%; transform:rotate(-1deg)">DRAG LEFT/RIGHT TO CHANGE THE NUM OF BOOMS.</div>
-  <div class="whisper" style="top:52%; right:10%; transform:rotate(1deg)">DOUBLE-TAP A SHAPE TO ROTATE ITS RHYTHM.</div>
-  <div class="whisper" style="bottom:30%; left:7%; transform:rotate(-1.5deg)">TAP CYCLE / M&Ouml;BIUS ON A PANEL TO CHANGE ITS SHAPE.</div>
-  <div class="whisper" style="bottom:16%; right:9%; transform:rotate(1.5deg)">Double-tap empty space to add another rhythm. Drag panels by their titles.</div>
-  <div class="whisper" style="bottom:5%; left:12%; transform:rotate(2deg)">Long-press a panel for instruments &amp; more.</div>
+  <div id="grid"></div>
 </div>
+<div id="credit"><svg id="qr" viewBox="0 0 33 33" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="33" height="33" rx="2" fill="#f7f2e4"/><path d="M4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM13 4h1v1h-1zM15 4h1v1h-1zM19 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM25 4h1v1h-1zM26 4h1v1h-1zM27 4h1v1h-1zM28 4h1v1h-1zM4 5h1v1h-1zM10 5h1v1h-1zM12 5h1v1h-1zM13 5h1v1h-1zM19 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM28 5h1v1h-1zM4 6h1v1h-1zM6 6h1v1h-1zM7 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM13 6h1v1h-1zM15 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM25 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM13 7h1v1h-1zM14 7h1v1h-1zM16 7h1v1h-1zM18 7h1v1h-1zM19 7h1v1h-1zM20 7h1v1h-1zM22 7h1v1h-1zM24 7h1v1h-1zM25 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM15 8h1v1h-1zM16 8h1v1h-1zM17 8h1v1h-1zM18 8h1v1h-1zM19 8h1v1h-1zM22 8h1v1h-1zM24 8h1v1h-1zM25 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM14 9h1v1h-1zM17 9h1v1h-1zM19 9h1v1h-1zM22 9h1v1h-1zM28 9h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM23 10h1v1h-1zM24 10h1v1h-1zM25 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM28 10h1v1h-1zM14 11h1v1h-1zM17 11h1v1h-1zM4 12h1v1h-1zM6 12h1v1h-1zM8 12h1v1h-1zM10 12h1v1h-1zM16 12h1v1h-1zM17 12h1v1h-1zM20 12h1v1h-1zM24 12h1v1h-1zM27 12h1v1h-1zM4 13h1v1h-1zM6 13h1v1h-1zM7 13h1v1h-1zM9 13h1v1h-1zM11 13h1v1h-1zM12 13h1v1h-1zM13 13h1v1h-1zM14 13h1v1h-1zM17 13h1v1h-1zM20 13h1v1h-1zM22 13h1v1h-1zM28 13h1v1h-1zM4 14h1v1h-1zM6 14h1v1h-1zM7 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM12 14h1v1h-1zM14 14h1v1h-1zM16 14h1v1h-1zM18 14h1v1h-1zM20 14h1v1h-1zM21 14h1v1h-1zM22 14h1v1h-1zM23 14h1v1h-1zM26 14h1v1h-1zM27 14h1v1h-1zM28 14h1v1h-1zM4 15h1v1h-1zM5 15h1v1h-1zM7 15h1v1h-1zM8 15h1v1h-1zM13 15h1v1h-1zM15 15h1v1h-1zM17 15h1v1h-1zM18 15h1v1h-1zM19 15h1v1h-1zM20 15h1v1h-1zM22 15h1v1h-1zM27 15h1v1h-1zM7 16h1v1h-1zM8 16h1v1h-1zM10 16h1v1h-1zM12 16h1v1h-1zM15 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1zM19 16h1v1h-1zM20 16h1v1h-1zM22 16h1v1h-1zM23 16h1v1h-1zM25 16h1v1h-1zM27 16h1v1h-1zM28 16h1v1h-1zM5 17h1v1h-1zM6 17h1v1h-1zM7 17h1v1h-1zM11 17h1v1h-1zM15 17h1v1h-1zM17 17h1v1h-1zM18 17h1v1h-1zM20 17h1v1h-1zM21 17h1v1h-1zM22 17h1v1h-1zM25 17h1v1h-1zM28 17h1v1h-1zM4 18h1v1h-1zM6 18h1v1h-1zM8 18h1v1h-1zM10 18h1v1h-1zM12 18h1v1h-1zM13 18h1v1h-1zM17 18h1v1h-1zM21 18h1v1h-1zM23 18h1v1h-1zM26 18h1v1h-1zM27 18h1v1h-1zM28 18h1v1h-1zM5 19h1v1h-1zM7 19h1v1h-1zM8 19h1v1h-1zM11 19h1v1h-1zM13 19h1v1h-1zM14 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM18 19h1v1h-1zM19 19h1v1h-1zM21 19h1v1h-1zM22 19h1v1h-1zM25 19h1v1h-1zM27 19h1v1h-1zM4 20h1v1h-1zM6 20h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM18 20h1v1h-1zM20 20h1v1h-1zM21 20h1v1h-1zM22 20h1v1h-1zM23 20h1v1h-1zM24 20h1v1h-1zM25 20h1v1h-1zM12 21h1v1h-1zM19 21h1v1h-1zM20 21h1v1h-1zM24 21h1v1h-1zM25 21h1v1h-1zM26 21h1v1h-1zM27 21h1v1h-1zM28 21h1v1h-1zM4 22h1v1h-1zM5 22h1v1h-1zM6 22h1v1h-1zM7 22h1v1h-1zM8 22h1v1h-1zM9 22h1v1h-1zM10 22h1v1h-1zM13 22h1v1h-1zM14 22h1v1h-1zM17 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM22 22h1v1h-1zM24 22h1v1h-1zM27 22h1v1h-1zM28 22h1v1h-1zM4 23h1v1h-1zM10 23h1v1h-1zM13 23h1v1h-1zM15 23h1v1h-1zM16 23h1v1h-1zM17 23h1v1h-1zM20 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM27 23h1v1h-1zM28 23h1v1h-1zM4 24h1v1h-1zM6 24h1v1h-1zM7 24h1v1h-1zM8 24h1v1h-1zM10 24h1v1h-1zM12 24h1v1h-1zM15 24h1v1h-1zM16 24h1v1h-1zM17 24h1v1h-1zM20 24h1v1h-1zM21 24h1v1h-1zM22 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM4 25h1v1h-1zM6 25h1v1h-1zM7 25h1v1h-1zM8 25h1v1h-1zM10 25h1v1h-1zM13 25h1v1h-1zM14 25h1v1h-1zM16 25h1v1h-1zM17 25h1v1h-1zM24 25h1v1h-1zM26 25h1v1h-1zM4 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM10 26h1v1h-1zM12 26h1v1h-1zM13 26h1v1h-1zM14 26h1v1h-1zM17 26h1v1h-1zM18 26h1v1h-1zM19 26h1v1h-1zM20 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM25 26h1v1h-1zM28 26h1v1h-1zM4 27h1v1h-1zM10 27h1v1h-1zM14 27h1v1h-1zM16 27h1v1h-1zM17 27h1v1h-1zM18 27h1v1h-1zM19 27h1v1h-1zM20 27h1v1h-1zM22 27h1v1h-1zM24 27h1v1h-1zM25 27h1v1h-1zM27 27h1v1h-1zM4 28h1v1h-1zM5 28h1v1h-1zM6 28h1v1h-1zM7 28h1v1h-1zM8 28h1v1h-1zM9 28h1v1h-1zM10 28h1v1h-1zM12 28h1v1h-1zM15 28h1v1h-1zM16 28h1v1h-1zM17 28h1v1h-1zM19 28h1v1h-1zM20 28h1v1h-1zM23 28h1v1h-1zM27 28h1v1h-1zM28 28h1v1h-1z" fill="#1a140c"/></svg><span>Neal Bushaw, VCU, Bridges2026<br>nealbushaw.com</span></div>
 
 <div id="overlay">
   <button class="bigbtn" id="startBtn">START</button>
   <button class="smallbtn" id="surpriseBtn0">Surprise Me!</button>
+  <ul id="howto">
+    <li><b>Drag up / down</b> &mdash; change # of pulses</li>
+    <li><b>Drag left / right</b> &mdash; change # of strikes</li>
+    <li><b>Pull the center</b> &mdash; rotate the pattern</li>
+    <li><b>Tap CYCLE / M&Ouml;BIUS</b> &mdash; twist the shape</li>
+  </ul>
 </div>
 
 <div id="controls" style="display:none">
+  <button class="smallbtn" id="resetBtn" style="padding:8px 18px; font-size:14px">Reset</button>
   <label>TEMPO</label>
-  <input id="tempo" type="range" min="70" max="160" value="112">
+  <input id="tempo" type="range" min="15" max="160" value="60">
   <button class="smallbtn" id="surpriseBtn" style="padding:8px 18px; font-size:14px">Surprise Me!</button>
 </div>
-
-<div id="menu"></div>
 
 <script>
 "use strict";
 /* =====================================================================
-   Mathematical Rhythms — Bridges Family Day exhibit
+   Mathematical Rhythms — Bridges Family Day exhibit (2x2 kiosk layout)
    Every rhythm is the minimum-energy k-subset of the vertices of a
    graph (cycle C_n or Möbius ladder on n vertices), found by exhaustive
    search over all k-subsets with Coulomb energy  E = Σ 1/d(i,j)²,
@@ -270,7 +275,7 @@ const INSTRUMENTS = [
 /* ----------------------------- transport ----------------------------- */
 
 const transport = {
-  bpm: 112,
+  bpm: 60,
   nextStep: 0,          // global integer step counter (16th notes)
   nextStepTime: 0,      // audio-clock time of that step
   timer: null,
@@ -309,8 +314,8 @@ let colorIdx = 0;
 
 class Panel {
   constructor(opts){
-    this.n     = opts.n;                    // vertices
-    this.k     = opts.k;                    // onsets
+    this.n     = opts.n;                    // vertices ("# of pulses")
+    this.k     = opts.k;                    // onsets ("# of strikes")
     this.rot   = opts.rot   || 0;           // rotation of onset set
     this.graph = opts.graph || "cycle";     // "cycle" | "mobius"
     this.inst  = opts.inst  || 0;           // instrument index
@@ -320,22 +325,21 @@ class Panel {
     this.lastHit = {};                      // vertex → audio time, for pulses
     this.pending = [];                      // scheduled {v,t} not yet shown
 
-    // DOM
+    // DOM — panel lives in one quarter of the fixed 2x2 grid
     this.el = document.createElement("div");
     this.el.className = "panel";
     this.el.style.setProperty("--accent", this.accent);
     this.el.style.setProperty("--glow", this.accent + "33");
-    this.el.style.left = (opts.x || 100) + "px";
-    this.el.style.top  = (opts.y || 100) + "px";
     this.el.innerHTML =
-      '<div class="phead"><div><div class="pname"></div><div class="psub"></div></div>' +
+      '<div class="phead"><div><button class="pname"></button><div class="psub"></div></div>' +
       '<button class="mutedot" aria-label="mute"></button></div>' +
-      '<canvas width="404" height="404"></canvas>' +
-      '<div class="phint">&#8597; total per cycle &nbsp;&#183;&nbsp; &#8596; num of booms &nbsp;&#183;&nbsp; double-tap rotates</div>' +
+      '<div class="cwrap"><canvas></canvas></div>' +
+      '<div class="phint">&#8597; # of pulses &nbsp;&#183;&nbsp; &#8596; # of strikes &nbsp;&#183;&nbsp; pull center to rotate</div>' +
       '<div class="pfoot"><span class="penergy"></span><button class="gtoggle"></button></div>';
-    document.getElementById("space").appendChild(this.el);
+    document.getElementById("grid").appendChild(this.el);
     this.canvas = this.el.querySelector("canvas");
     this.g = this.canvas.getContext("2d");
+
     this.el.querySelector(".mutedot").addEventListener("pointerup", e => {
       e.stopPropagation(); this.muted = !this.muted;
       this.el.classList.toggle("muted", this.muted);
@@ -345,8 +349,26 @@ class Panel {
       this.graph = this.graph === "mobius" ? "cycle" : "mobius";
       this.recompute();
     });
-    attachPanelGestures(this);
+    this.el.querySelector(".pname").addEventListener("pointerup", e => {
+      e.stopPropagation();
+      this.inst = (this.inst + 1) % INSTRUMENTS.length;
+      this.recompute();
+    });
+    attachCanvasGestures(this);
     this.recompute();
+    this.resize();
+  }
+
+  // fit the square canvas into this panel's quarter of the screen
+  resize(){
+    const w = this.el.clientWidth, h = this.el.clientHeight;
+    if (!w || !h) return;
+    const chrome = 150;                       // header + hint + foot + padding
+    const s = Math.max(120, Math.min(w - 36, h - chrome));
+    this.canvas.style.width = s + "px";
+    this.canvas.style.height = s + "px";
+    const px = Math.round(s * 2);             // 2x for retina
+    if (this.canvas.width !== px){ this.canvas.width = px; this.canvas.height = px; }
   }
 
   recompute(){
@@ -360,7 +382,7 @@ class Panel {
     const gname = this.graph === "mobius" ? "M\u00d6BIUS" : "CYCLE";
     this.el.querySelector(".pname").textContent = INSTRUMENTS[this.inst].name;
     this.el.querySelector(".psub").textContent =
-      this.n + " per cycle \u00b7 " + this.k + " boom" + (this.k === 1 ? "" : "s") +
+      this.n + " pulses \u00b7 " + this.k + " strike" + (this.k === 1 ? "" : "s") +
       " \u00b7 turn " + this.rot;
     this.el.querySelector(".penergy").textContent = "E = " + this.energy.toFixed(3);
     this.el.querySelector(".gtoggle").textContent = gname;
@@ -376,7 +398,11 @@ class Panel {
   }
 
   draw(now){
-    const g = this.g, W = 404, cx = W/2, cy = W/2, R = 152;
+    const px = this.canvas.width;
+    if (!px) return;
+    const g = this.g, f = px / 404;
+    g.setTransform(f, 0, 0, f, 0, 0);         // draw in fixed 404-space
+    const W = 404, cx = W/2, cy = W/2, R = 152;
     // morph 0 (circle) → 1 (Möbius band edge)
     const target = this.graph === "mobius" ? 1 : 0;
     this.morph += (target - this.morph) * 0.12;
@@ -444,15 +470,37 @@ class Panel {
       }
     }
 
-    // playhead
-    const local = (transport.phase() % this.n + this.n) % this.n;
-    if (m < 0.6){                                  // center ray, circle mode only
-      const pa = PH + local * 2*Math.PI/this.n;
-      g.strokeStyle = this.accent + "44"; g.lineWidth = 3;
-      g.beginPath(); g.moveTo(cx, cy);
-      g.lineTo(cx + (R+14)*Math.cos(pa), cy + (R+14)*Math.sin(pa)); g.stroke();
+    // rotation knob: hub at center + double-headed arc (rotation symbol),
+    // oriented toward the rotated station.  Pull it around to spin.
+    {
+      const [tx,ty] = pos(this.rot);
+      const dir = Math.atan2(ty - cy, tx - cx);     // toward current station
+      const AR = 62, half = 0.62*Math.PI;           // arc radius, half-span
+      const a0 = dir - half, a1 = dir + half;
+      g.fillStyle = this.accent + "22";
+      g.strokeStyle = this.accent + "77"; g.lineWidth = 2;
+      g.beginPath(); g.arc(cx, cy, 34, 0, 2*Math.PI); g.fill(); g.stroke();
+      g.strokeStyle = this.accent; g.lineWidth = 6; g.lineCap = "round";
+      g.beginPath(); g.arc(cx, cy, AR, a0, a1); g.stroke();
+      g.lineCap = "butt";
+      // arrowheads tangent to the arc at both ends
+      const head = (ang, ccw) => {
+        const hx = cx + AR*Math.cos(ang), hy = cy + AR*Math.sin(ang);
+        const ta = ang + (ccw ? Math.PI/2 : -Math.PI/2);   // tangent direction
+        g.fillStyle = this.accent;
+        g.beginPath();
+        g.moveTo(hx + 18*Math.cos(ta), hy + 18*Math.sin(ta));
+        g.lineTo(hx + 15*Math.cos(ta + 2.5), hy + 15*Math.sin(ta + 2.5));
+        g.lineTo(hx + 15*Math.cos(ta - 2.5), hy + 15*Math.sin(ta - 2.5));
+        g.closePath(); g.fill();
+      };
+      head(a1, true);                               // counterclockwise end
+      head(a0, false);                              // clockwise end
     }
-    {                                              // traveling spark, both modes
+
+    // playhead spark, both modes
+    {
+      const local = (transport.phase() % this.n + this.n) % this.n;
       const a = PH + local * 2*Math.PI/this.n;
       const xc = cx + R*Math.cos(a), yc = cy + R*Math.sin(a);
       const [xm,ym] = edge(4*Math.PI*local/this.n);
@@ -486,135 +534,106 @@ class Panel {
 
 /* ----------------------------- gestures ------------------------------ */
 
-// Header drag → move panel.  Canvas drag → vertical: n (total notes),
-// horizontal: k (hits).  Double-tap on the canvas → rotate the onset set.
-// Long-press anywhere on panel → menu.
-function attachPanelGestures(p){
-  let mode = null, sx = 0, sy = 0, ox = 0, oy = 0, base = null, lpTimer = null,
-      moved = false, lastCanvasTap = 0;
+// On the canvas only.  Near the center hub: drag the arrow around to
+// rotate (knob).  Elsewhere: vertical = # of pulses, horizontal =
+// # of strikes.  No double-taps anywhere (iPad Safari zoom).
+function attachCanvasGestures(p){
+  let mode = null, sx = 0, sy = 0, base = null, moved = false, lastAng = 0, acc = 0;
 
+  const center = () => {
+    const r = p.canvas.getBoundingClientRect();
+    return { x: r.left + r.width/2, y: r.top + r.height/2, s: r.width };
+  };
   const down = e => {
-    if (e.target.classList.contains("mutedot")) return;
     e.preventDefault();
-    p.el.setPointerCapture(e.pointerId);
+    p.canvas.setPointerCapture(e.pointerId);
     sx = e.clientX; sy = e.clientY; moved = false;
-    mode = (e.target === p.canvas) ? "param" : "move";
-    ox = p.el.offsetLeft; oy = p.el.offsetTop;
-    base = { n: p.n, k: p.k };
-    hideMenu();
-    lpTimer = setTimeout(() => { if (!moved) showMenu(p, e.clientX, e.clientY); mode = null; }, 550);
+    base = { n: p.n, k: p.k, rot: p.rot };
+    const c = center();
+    const d = Math.hypot(e.clientX - c.x, e.clientY - c.y);
+    if (d < c.s * 0.28){                       // grabbed the knob region
+      mode = "rotate";
+      lastAng = Math.atan2(e.clientY - c.y, e.clientX - c.x);
+      acc = 0;
+    } else {
+      mode = "param";
+    }
   };
   const move = e => {
     if (!mode) return;
     const dx = e.clientX - sx, dy = e.clientY - sy;
-    if (Math.abs(dx) + Math.abs(dy) > 8){ moved = true; clearTimeout(lpTimer); }
+    if (Math.abs(dx) + Math.abs(dy) > 8) moved = true;
     if (!moved) return;
-    if (mode === "move"){
-      p.el.style.left = (ox + dx) + "px";
-      p.el.style.top  = (oy + dy) + "px";
-    } else {                                   // parameter drag on the graph
-      const step = (p.graph === "mobius") ? 2 : 1;         // keep n even on Möbius
-      const dn = -Math.round(dy / 36) * step;              // drag up  → more total notes
-      const dk =  Math.round(dx / 30);                     // drag right → more hits
+    if (mode === "rotate"){
+      const c = center();
+      const a = Math.atan2(e.clientY - c.y, e.clientX - c.x);
+      let da = a - lastAng;                    // accumulate with wraparound
+      if (da >  Math.PI) da -= 2*Math.PI;
+      if (da < -Math.PI) da += 2*Math.PI;
+      acc += da; lastAng = a;
+      const steps = Math.round(acc / (2*Math.PI / p.n));
+      const r2 = ((base.rot + steps) % p.n + p.n) % p.n;
+      if (r2 !== p.rot){ p.rot = r2; p.recompute(); }
+    } else {
+      const step = (p.graph === "mobius") ? 2 : 1;       // keep n even on Möbius
+      const dn = -Math.round(dy / 40) * step;            // drag up → more pulses
+      const dk =  Math.round(dx / 34);                   // drag right → more strikes
       const n2 = Math.max(4, Math.min(16, base.n + dn));
       const k2 = Math.max(1, Math.min(n2, base.k + dk));
       if (n2 !== p.n || k2 !== p.k){ p.n = n2; p.k = k2; p.recompute(); }
     }
   };
-  const up = () => {
-    clearTimeout(lpTimer);
-    if (mode === "param" && !moved){          // clean tap on the graph
-      const now = performance.now();
-      if (now - lastCanvasTap < 350){         // double-tap → rotate
-        p.rot = (p.rot + 1) % p.n; p.recompute();
-      }
-      lastCanvasTap = now;
-    }
-    mode = null;
-  };
+  const up = () => { mode = null; };
 
-  p.el.addEventListener("pointerdown", down);
-  p.el.addEventListener("pointermove", move);
-  p.el.addEventListener("pointerup", up);
-  p.el.addEventListener("pointercancel", up);
-}
-
-/* ------------------------------- menu -------------------------------- */
-
-const menuEl = document.getElementById("menu");
-function hideMenu(){ menuEl.style.display = "none"; }
-
-function showMenu(p, x, y){
-  const gOther = p.graph === "mobius" ? "Cycle" : "Möbius ladder";
-  menuEl.innerHTML =
-    '<button data-a="graph">Graph → ' + gOther + '</button><div class="sep"></div>' +
-    '<button data-a="inst">Instrument → next</button><div class="sep"></div>' +
-    '<button data-a="kup">Booms +</button>' +
-    '<button data-a="kdn">Booms &#8722;</button><div class="sep"></div>' +
-    '<button data-a="dup">Duplicate panel</button>' +
-    '<button data-a="del">Delete panel</button>';
-  menuEl.style.display = "block";
-  menuEl.style.left = Math.min(x, window.innerWidth - 210) + "px";
-  menuEl.style.top  = Math.min(y, window.innerHeight - 300) + "px";
-  menuEl.onclick = e => {
-    const a = e.target.dataset.a; if (!a) return;
-    if (a === "graph"){ p.graph = p.graph === "mobius" ? "cycle" : "mobius"; p.recompute(); }
-    if (a === "inst"){ p.inst = (p.inst + 1) % INSTRUMENTS.length; p.recompute(); }
-    if (a === "kup"){ p.k++; p.recompute(); }
-    if (a === "kdn"){ p.k--; p.recompute(); }
-    if (a === "dup"){
-      panels.push(new Panel({ n:p.n, k:p.k, rot:p.rot, graph:p.graph, inst:p.inst,
-        x:p.el.offsetLeft + 40, y:p.el.offsetTop + 40 }));
-    }
-    if (a === "del"){ p.el.remove(); panels.splice(panels.indexOf(p), 1); }
-    if (a !== "kup" && a !== "kdn") hideMenu();
-  };
+  p.canvas.addEventListener("pointerdown", down);
+  p.canvas.addEventListener("pointermove", move);
+  p.canvas.addEventListener("pointerup", up);
+  p.canvas.addEventListener("pointercancel", up);
 }
 
 /* ---------------------------- ensembles ------------------------------ */
 
-function clearPanels(){ for (const p of panels) p.el.remove(); panels.length = 0; }
-
-function spot(i, total){
-  const W = window.innerWidth, H = window.innerHeight;
-  const cols = Math.min(total, Math.max(2, Math.floor(W / 270)));
-  const col = i % cols, row = Math.floor(i / cols);
-  return { x: 40 + col * Math.min(260, (W-280)/Math.max(1,cols-1) || 260) + row*18,
-           y: 50 + row * 300 };
+function clearPanels(){
+  for (const p of panels) p.el.remove();
+  panels.length = 0; colorIdx = 0;
 }
+function resizeAll(){ for (const p of panels) p.resize(); }
 
+// Always exactly four panels — one per quarter of the screen.
 function defaultEnsemble(){
   clearPanels();
   const specs = [
     { n:16, k:4,  rot:0, graph:"cycle",  inst:0 },   // kick: four on the floor
     { n:16, k:2,  rot:4, graph:"cycle",  inst:1 },   // snare: backbeat
     { n:16, k:7,  rot:0, graph:"cycle",  inst:2 },   // hats
-    { n:12, k:5,  rot:0, graph:"mobius", inst:4 },   // cowbell on a Möbius ladder
+    { n:12, k:5,  rot:0, graph:"mobius", inst:4 },   // cowbell on a Möbius band
   ];
-  specs.forEach((s, i) => panels.push(new Panel(Object.assign(s, spot(i, specs.length)))));
+  specs.forEach(s => panels.push(new Panel(s)));
+  requestAnimationFrame(resizeAll);
 }
 
 function surpriseEnsemble(){
   clearPanels();
   const ri = a => a[Math.floor(Math.random()*a.length)];
-  const count = 3 + Math.floor(Math.random()*3);
-  const used = new Set();
-  for (let i = 0; i < count; i++){
+  const used = new Set([0]);
+  panels.push(new Panel({ n: ri([8,12,16]), k: ri([3,4,5]), rot:0,
+                          graph:"cycle", inst:0 }));   // always anchor with a kick
+  for (let i = 1; i < 4; i++){
     let inst; do { inst = Math.floor(Math.random()*INSTRUMENTS.length); } while (used.has(inst));
     used.add(inst);
-    const graph = Math.random() < 0.4 ? "mobius" : "cycle";
+    const graph = Math.random() < 0.45 ? "mobius" : "cycle";
     const n = graph === "mobius" ? ri([8,10,12,14,16]) : ri([8,9,10,12,13,15,16]);
     const k = 2 + Math.floor(Math.random() * Math.min(6, n-2));
-    panels.push(new Panel(Object.assign(
-      { n, k, rot: Math.floor(Math.random()*n), graph, inst }, spot(i, count))));
+    panels.push(new Panel({ n, k, rot: Math.floor(Math.random()*n), graph, inst }));
   }
+  requestAnimationFrame(resizeAll);
 }
 
 /* --------------------------- wiring & loop --------------------------- */
 
 const overlay = document.getElementById("overlay");
 
-/* ---- idle watchdog: 15 s without a touch → back to the intro ---- */
+/* ---- idle watchdog: 30 s without a touch → back to the intro ---- */
 const IDLE_MS = 30000;
 let running = false, idleTimer = null;
 
@@ -629,13 +648,16 @@ function goIdle(){
   transport.stop();
   if (ctx) ctx.suspend();
   clearPanels();
-  hideMenu();
   overlay.classList.remove("gone");
   document.getElementById("controls").style.display = "none";
 }
 // any touch or drag anywhere counts as activity
 document.addEventListener("pointerdown", bumpIdle, true);
 document.addEventListener("pointermove", bumpIdle, true);
+
+// belt & suspenders against iPad Safari zoom gestures
+document.addEventListener("dblclick", e => e.preventDefault(), { passive:false });
+document.addEventListener("gesturestart", e => e.preventDefault(), { passive:false });
 
 function begin(build){
   initAudio();
@@ -650,21 +672,10 @@ function begin(build){
 document.getElementById("startBtn").addEventListener("pointerup", () => begin(defaultEnsemble));
 document.getElementById("surpriseBtn0").addEventListener("pointerup", () => begin(surpriseEnsemble));
 document.getElementById("surpriseBtn").addEventListener("pointerup", surpriseEnsemble);
+document.getElementById("resetBtn").addEventListener("pointerup", goIdle);
 document.getElementById("tempo").addEventListener("input", e => { transport.bpm = +e.target.value; });
-
-// double-tap empty workspace → new panel
-let lastTap = 0;
-document.getElementById("space").addEventListener("pointerup", e => {
-  if (e.target !== e.currentTarget) return;
-  hideMenu();
-  const now = performance.now();
-  if (now - lastTap < 350 && ctx){
-    panels.push(new Panel({ n:12, k:5, rot:0, graph:"cycle",
-      inst: Math.floor(Math.random()*INSTRUMENTS.length),
-      x: e.clientX - 115, y: e.clientY - 130 }));
-  }
-  lastTap = now;
-});
+window.addEventListener("resize", resizeAll);
+window.addEventListener("orientationchange", () => setTimeout(resizeAll, 250));
 
 (function loop(){
   if (ctx){ const now = ctx.currentTime; for (const p of panels) p.draw(now); }
