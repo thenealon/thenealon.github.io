@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Rhythms">
-<title>Mathematical Rhythms</title>
+<title>Maximally Even Rhythms</title>
 <style>
   /* ---------- theme: companion palette to Cyclic Pianos ----------
      Piano materials: ebony stage, ivory ink, brass, felt crimson.
@@ -383,7 +383,7 @@ class Panel {
     this.el.querySelector(".pname").textContent = INSTRUMENTS[this.inst].name;
     this.el.querySelector(".psub").textContent =
       this.n + " pulses \u00b7 " + this.k + " strike" + (this.k === 1 ? "" : "s") +
-      " \u00b7 turn " + this.rot;
+      " \u00b7 rotated " + this.rot;
     this.el.querySelector(".penergy").textContent = "E = " + this.energy.toFixed(3);
     this.el.querySelector(".gtoggle").textContent = gname;
   }
