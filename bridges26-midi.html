@@ -87,6 +87,26 @@
   #keyboard { cursor: pointer; }
   #graph { cursor: default; }
 
+  /* --- Comparison View --- */
+  #compare-wrapper {
+    width: 100%; max-width: 900px; margin-top: 14px;
+    background: #fdfdfd; border-radius: 14px; padding: 10px 10px 6px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08);
+  }
+  #compare-wrapper.hidden { display: none; }
+  .compare-caption {
+    text-align: center; font-size: 0.85em; font-weight: bold; color: #A87510;
+    margin-bottom: 8px;
+  }
+  #compare-canvases {
+    display: flex; flex-direction: row; flex-wrap: wrap; gap: 12px;
+    justify-content: center; align-items: flex-start;
+  }
+  #keyboard2, #graph2 {
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.14), 0 0 0 1px rgba(0,0,0,0.07);
+  }
+
   /* --- Sheet Music --- */
   #staff-wrapper {
     width: 100%; max-width: 900px; margin-top: 14px;
@@ -94,7 +114,7 @@
     box-shadow: 0 6px 16px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08);
   }
   #staff-wrapper.hidden { display: none; }
-  #staff { width: 100%; height: auto; aspect-ratio: 900 / 200; touch-action: none;
+  #staff { width: 100%; height: auto; aspect-ratio: 900 / 330; touch-action: none;
            background: transparent; box-shadow: none; border-radius: 0; }
   
   /* --- UI Helpers --- */
@@ -122,11 +142,11 @@
   <div id="controls">
     <div class="control-row">
       <label>Notes (N): <strong id="n-val">12</strong></label>
-      <input type="range" id="n-slider" min="5" max="31" value="12">
+      <input type="range" id="n-slider" min="5" max="48" value="12">
     </div>
     <div class="control-row">
       <label>Black Keys (K): <strong id="k-val">6</strong></label>
-      <input type="range" id="k-slider" min="1" max="15" value="6">
+      <input type="range" id="k-slider" min="1" max="24" value="6">
     </div>
     
     <div class="control-group">
@@ -139,6 +159,7 @@
       <div><input type="checkbox" id="shepard-toggle"><label for="shepard-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Shepard</label></div>
       <div><input type="checkbox" id="mobius-toggle"><label for="mobius-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Möbius</label></div>
       <div><input type="checkbox" id="balanced-toggle" checked><label for="balanced-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Balanced</label></div>
+      <div><input type="checkbox" id="compare-toggle"><label for="compare-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Compare Both</label></div>
     </div>
 
     <div class="control-group">
@@ -164,6 +185,7 @@
     </div>
     <div id="midi-status">No MIDI loaded. Every note is mapped onto the current keyboard &mdash; move the <strong>N</strong> slider while it plays.</div>
 
+    <div class="hint" id="search-note"></div>
     <div class="hint">Toggle <strong>Möbius + Shepard + Auto-Play</strong> to see all the bells and whistles!</div>
   </div>
 
@@ -172,8 +194,16 @@
     <div class="canvas-wrapper"><div class="canvas-caption">Graph</div><canvas id="graph" width="400" height="400"></canvas></div>
   </div>
 
+  <div id="compare-wrapper" class="hidden">
+    <div id="compare-caption" class="compare-caption"></div>
+    <div id="compare-canvases">
+      <div class="canvas-wrapper"><div class="canvas-caption">Keyboard</div><canvas id="keyboard2" width="400" height="400"></canvas></div>
+      <div class="canvas-wrapper"><div class="canvas-caption">Graph</div><canvas id="graph2" width="400" height="400"></canvas></div>
+    </div>
+  </div>
+
   <div id="staff-wrapper" class="hidden">
-    <canvas id="staff" width="900" height="200"></canvas>
+    <canvas id="staff" width="900" height="330"></canvas>
   </div>
 
   <script>
@@ -183,17 +213,23 @@
       document.getElementById('contact').innerHTML = `<a href="mailto:${u}@${d}">${u}@${d}</a>`;
     })();
 
-    const canvas = document.getElementById('keyboard'), ctx = canvas.getContext('2d');
-    const graphCanvas = document.getElementById('graph'), gCtx = graphCanvas.getContext('2d');
+    let canvas = document.getElementById('keyboard'), ctx = canvas.getContext('2d');
+    let graphCanvas = document.getElementById('graph'), gCtx = graphCanvas.getContext('2d');
+    const mainCanvas = canvas, mainCtx = ctx, mainGraph = graphCanvas, mainGCtx = gCtx;
 
     const nSlider = document.getElementById('n-slider'), kSlider = document.getElementById('k-slider');
     const qwertyToggle = document.getElementById('qwerty-toggle'), integerToggle = document.getElementById('integer-toggle');
     const distancesToggle = document.getElementById('distances-toggle'), polygonsToggle = document.getElementById('polygons-toggle');
     const sustainToggle = document.getElementById('sustain-toggle'), sustainContainer = document.getElementById('sustain-container');
+    const compareToggle = document.getElementById('compare-toggle');
+    const compareWrapper = document.getElementById('compare-wrapper');
+    const canvas2 = document.getElementById('keyboard2'), ctx2 = canvas2.getContext('2d');
+    const graph2 = document.getElementById('graph2'), gCtx2 = graph2.getContext('2d');
     const autoplayToggle = document.getElementById('autoplay-toggle'), shepardToggle = document.getElementById('shepard-toggle'), mobiusToggle = document.getElementById('mobius-toggle'), balancedToggle = document.getElementById('balanced-toggle');
 
     let N = 12, K = 6;
     let showQwerty = false, showInteger = false, showDistances = true, showPolygons = true, showMobius = false;
+    let showCompare = false, compareLayout = null;
     let keys = [], isBlackArr = []; 
 
     let audioCtx = null, audioUnlocked = false, nextVoiceId = 0;
@@ -217,10 +253,126 @@
       return d_cycle;
     }
 
-    const MOBIUS_MAX_TOTAL_KEYS = 30;
+    /* Up to 24 notes per octave: a cycle has that many keys, a Mobius ladder
+       twice as many.  The exhaustive black-key search is fine up to about 36
+       keys (worst case ~0.26 s) but blows up beyond it — measured 1.9 s at 40
+       keys and 9.2 s at 44, which would freeze the page — so above the exact
+       limit we switch to a fast greedy + local-search placement and say so.  */
+    const MAX_NOTES_PER_OCTAVE = 24;
+    const MOBIUS_MAX_TOTAL_KEYS = 2 * MAX_NOTES_PER_OCTAVE;   // 48
+    const EXACT_SEARCH_MAX_KEYS = 36;
+    let lastSearchWasExact = true;
+
+    // Mobius-ladder distances, same rule as getGraphDist in Mobius mode.
+    function mobiusDistMatrix(ringSize){
+      const limit = 2 * ringSize;
+      const D = Array.from({length: limit}, () => new Array(limit).fill(0));
+      for (let i = 0; i < limit; i++)
+        for (let j = 0; j < limit; j++){
+          if (i === j) continue;
+          const dC = Math.min(Math.abs(i - j), limit - Math.abs(i - j));
+          const iJ = (i + ringSize) % limit;
+          const dJ = 1 + Math.min(Math.abs(iJ - j), limit - Math.abs(iJ - j));
+          D[i][j] = Math.min(dC, dJ);
+        }
+      return D;
+    }
+
+    /* Greedy placement followed by local search, used only when the exact
+       search would be too slow.  Same energy functional as the exact search
+       (sum of 1/d over pairs), same constraints: key 1 black, no two blacks
+       adjacent on the Mobius cycle, and — when Balanced is on — half the
+       blacks in each ring.  Deterministic, so the picture never flickers. */
+    function heuristicMobiusBlackKeys(ringSize, numBlack, preferBalanced){
+      const limit = 2 * ringSize;
+      const result = Array(limit).fill(false);
+      if (numBlack <= 0) return result;
+      const D = mobiusDistMatrix(ringSize);
+      const balanced = preferBalanced && numBlack % 2 === 0;
+      const adjacent = (a, b) => { const d = Math.abs(a - b); return d === 1 || d === limit - 1; };
+
+      const outer = v => v < ringSize;
+      const adjacentToSet = (set, v, skip) =>
+        set.some((u, k) => k !== skip && adjacent(u, v));
+
+      /* Seed with evenly spaced keys starting at 1.  Even spacing is close to
+         optimal for a 1/d energy and, unlike a greedy fill, always places the
+         full K: at the maximum K = limit/2 it lands exactly on the odd
+         positions, the unique independent set of that size containing key 1.
+         A purely greedy start could strand itself and place fewer than K.  */
+      const chosen = [];
+      for (let i = 0; i < numBlack; i++){
+        let v = (Math.round(i * limit / numBlack) + 1) % limit;
+        let guard = 0;
+        while ((chosen.includes(v) || adjacentToSet(chosen, v, -1)) && guard++ < limit)
+          v = (v + 1) % limit;
+        if (guard <= limit) chosen.push(v);
+      }
+      // if spacing could not place them all, top up with any legal slot
+      for (let v = 0; v < limit && chosen.length < numBlack; v++)
+        if (!chosen.includes(v) && !adjacentToSet(chosen, v, -1)) chosen.push(v);
+      if (!chosen.includes(1)){                    // keep the normalisation
+        const swap = chosen.findIndex(v => !adjacentToSet(chosen.filter(u => u !== v), 1, -1));
+        if (swap >= 0) chosen[swap] = 1;
+      }
+      // balance the two rings by swapping across if needed
+      if (balanced){
+        const half = numBlack / 2;
+        let guard = 0;
+        while (chosen.filter(outer).length !== half && guard++ < limit){
+          const tooMany = chosen.filter(outer).length > half;
+          const from = chosen.findIndex(v => outer(v) === tooMany && v !== 1);
+          if (from < 0) break;
+          let moved = false;
+          for (let v = 0; v < limit && !moved; v++){
+            if (outer(v) === tooMany) continue;
+            if (chosen.includes(v) || adjacentToSet(chosen, v, from)) continue;
+            chosen[from] = v; moved = true;
+          }
+          if (!moved) break;
+        }
+      }
+
+      // local search: move one black key at a time while it lowers the energy
+      const energy = set => {
+        let s = 0;
+        for (let a = 0; a < set.length; a++)
+          for (let b = a + 1; b < set.length; b++) s += 1 / D[set[a]][set[b]];
+        return s;
+      };
+      let improved = true, guard = 0;
+      while (improved && guard++ < 40){
+        improved = false;
+        for (let i = 1; i < chosen.length; i++){        // key 1 stays fixed
+          const cur = chosen[i];
+          let bestV = cur, bestE = energy(chosen);
+          for (let v = 0; v < limit; v++){
+            if (v === cur) continue;
+            chosen[i] = v;
+            const ok = !adjacentToSet(chosen, v, i) &&
+                       new Set(chosen).size === chosen.length &&
+                       (!balanced || chosen.filter(outer).length === numBlack / 2) &&
+                       chosen.includes(1);
+            if (ok){
+              const e = energy(chosen);
+              if (e < bestE - 1e-12){ bestE = e; bestV = v; }
+            }
+          }
+          chosen[i] = bestV;
+          if (bestV !== cur) improved = true;
+        }
+      }
+      chosen.forEach(v => { result[v] = true; });
+      return result;
+    }
     const mobiusSearchCache = new Map();
 
     function findOptimalMobiusBlackKeys(N, K, preferBalanced) {
+      if (2 * (N | 0) > EXACT_SEARCH_MAX_KEYS) {
+        lastSearchWasExact = false;
+        return heuristicMobiusBlackKeys(N | 0, K | 0, !!preferBalanced);
+      }
+      lastSearchWasExact = true;
       const ringSize = N | 0;
       const numBlack = K | 0;
       const limit = 2 * ringSize;
@@ -344,108 +496,157 @@
     });
 
     // --- Keyboard Math & Geometry ---
+    /* ---------------------------------------------------------------------
+       LAYOUT — pure function, no globals touched.
+
+       Given a TOTAL key count and a topology it returns everything needed to
+       draw one instrument.  Making this pure is what lets two pianos exist at
+       once: the comparison view calls it a second time with the opposite
+       topology and renders the result into its own canvases.
+
+       For a fixed total T the two instruments have the SAME number of keys
+       (and so the same number of graph vertices) but different topology and
+       different tuning:
+           cycle  C_T      : T notes to the octave, one ring
+           Mobius M_{T/2}  : T/2 notes to the octave, two rings, spanning two
+                             octaves and joined by the half-twist.
+       --------------------------------------------------------------------- */
+    const QW = {
+      wOut: ['a','s','d','f','g','h','j','k','l',';',"'"],
+      bOut: ['w','e','r','t','y','u','i','o','p','[',']'],
+      wIn:  ['z','x','c','v','b','n','m',',','.','/'],
+      bIn:  ['1','2','3','4','5','6','7','8','9','0','-','=']
+    };
+    const RING_PROPS = {
+      mobius: [ { rwOut: 190, rwIn: 114, rbOut: 154, rbIn: 114 },   // outer ring
+                { rwOut: 110, rwIn: 35,  rbOut: 110, rbIn: 70  } ], // inner ring
+      cycle:  [ { rwOut: 190, rwIn: 35,  rbOut: 110, rbIn: 35  } ]
+    };
+
+    function buildLayout(totalKeys, mobius, blackKeys, preferBalanced) {
+      const ringN = mobius ? totalKeys / 2 : totalKeys;   // keys per octave
+      const Kt = Math.min(blackKeys, Math.floor(totalKeys / 2));
+
+      let isBlack = Array(totalKeys).fill(false);
+      let standardPianoMap = null;
+
+      if (!mobius) {
+        if (ringN === 12 && Kt === 5) {
+          [1, 3, 6, 8, 10].forEach(i => isBlack[i] = true);
+          standardPianoMap = {0:'a',1:'w',2:'s',3:'e',4:'d',5:'f',6:'t',7:'g',8:'y',9:'h',10:'u',11:'j'};
+        } else {
+          for (let i = 0; i < Kt; i++) isBlack[(Math.floor((i * ringN) / Kt) + 1) % ringN] = true;
+        }
+      } else {
+        isBlack = findOptimalMobiusBlackKeys(ringN, Kt, preferBalanced);
+      }
+
+      const layoutKeys = [];
+      const rings = mobius ? 2 : 1;
+      const props = mobius ? RING_PROPS.mobius : RING_PROPS.cycle;
+
+      for (let ring = 0; ring < rings; ring++) {
+        // count blacks in THIS ring so uneven distributions still space evenly
+        let kRing = 0;
+        for (let i = 0; i < ringN; i++) if (isBlack[i + ring * ringN]) kRing++;
+        const W = ringN - kRing;
+        const angleW = (Math.PI * 2) / W;
+        const blackWidth = angleW * 0.55;
+        const rotationOffset = -angleW / 2;
+
+        let currentWhite = 0, wIdx = 0, bIdx = 0;
+        const pr = props[ring];
+
+        for (let i = 0; i < ringN; i++) {
+          const logicalIndex = i + ring * ringN;
+          const isB = isBlack[logicalIndex];
+          const ql = (ring === 0)
+            ? (standardPianoMap ? standardPianoMap[i] : (isB ? QW.bOut[bIdx++ % 11] : QW.wOut[wIdx++ % 11]))
+            : (isB ? QW.bIn[bIdx++ % 12] : QW.wIn[wIdx++ % 10]);
+
+          const labRad = isB ? pr.rbOut - 15
+                             : ((ring === 1 && mobius) ? pr.rwIn + 22 : pr.rwOut - 22);
+
+          if (isB) {
+            layoutKeys.push({ index: logicalIndex, isBlack: true,
+              center: currentWhite * angleW + rotationOffset, width: blackWidth,
+              rOuter: pr.rbOut, rInner: pr.rbIn, qwertyLabel: ql, labelRadius: labRad });
+          } else {
+            layoutKeys.push({ index: logicalIndex, isBlack: false,
+              start: currentWhite * angleW + rotationOffset,
+              end: (currentWhite + 1) * angleW + rotationOffset, whiteIndex: currentWhite,
+              rOuter: pr.rwOut, rInner: pr.rwIn, qwertyLabel: ql, labelRadius: labRad });
+            currentWhite++;
+          }
+        }
+      }
+      return { N: ringN, K: Kt, total: totalKeys, mobius, keys: layoutKeys, isBlackArr: isBlack };
+    }
+
     function updateKeyboard() {
       showMobius = mobiusToggle.checked;
       const preferBalanced = balancedToggle.checked;
       showQwerty = qwertyToggle.checked; showInteger = integerToggle.checked;
       showDistances = distancesToggle.checked; showPolygons = polygonsToggle.checked;
+      showCompare = compareToggle.checked;
 
-      // Handle the slider as TOTAL keys
-      let requestedTotal = parseInt(nSlider.value);
+      /* The slider is TOTAL keys.  Mobius always needs an even total (two
+         rings).  In comparison mode the two instruments are matched by
+         NOTES PER OCTAVE, not by total key count, so that both play the
+         SAME scale at the same pitches — matching totals instead would put
+         two different tunings side by side.  The Mobius partner therefore
+         has twice the keys of the cycle, spanning two octaves of the very
+         same n-note scale.  That caps the cycle at half the Mobius limit. */
+      let totalKeys = parseInt(nSlider.value);
+      const mobCap = Math.min(parseInt(nSlider.max), MOBIUS_MAX_TOTAL_KEYS);
       if (showMobius) {
-        if (requestedTotal > MOBIUS_MAX_TOTAL_KEYS) requestedTotal = MOBIUS_MAX_TOTAL_KEYS;
-        if (requestedTotal % 2 !== 0) {
-          requestedTotal++; // Force even for Möbius
-          if (requestedTotal > Math.min(parseInt(nSlider.max), MOBIUS_MAX_TOTAL_KEYS)) requestedTotal -= 2;
-        }
-        nSlider.value = requestedTotal;
+        if (totalKeys > mobCap) totalKeys = mobCap;
+        if (totalKeys % 2 !== 0) totalKeys = (totalKeys + 1 <= mobCap) ? totalKeys + 1 : totalKeys - 1;
+        nSlider.value = totalKeys;
+      } else {
+        // a cycle's total IS its notes per octave; comparison needs a Mobius
+        // partner of twice the size, which is already within the same cap
+        const cap = MAX_NOTES_PER_OCTAVE;
+        if (totalKeys > cap) { totalKeys = cap; nSlider.value = totalKeys; }
       }
-      let totalKeys = requestedTotal;
-      
-      // N acts as keys-per-ring to preserve mathematical integrity
-      N = showMobius ? totalKeys / 2 : totalKeys; 
 
-      // Black keys must be the minority set globally (<= totalKeys / 2)
       const maxK = Math.floor(totalKeys / 2);
       kSlider.max = maxK;
       if (parseInt(kSlider.value) > maxK) kSlider.value = maxK;
-      K = parseInt(kSlider.value); // K is now TOTAL black keys
-      
-      document.getElementById('n-val').innerText = totalKeys; 
+
+      const layout = buildLayout(totalKeys, showMobius, parseInt(kSlider.value), preferBalanced);
+      N = layout.N; K = layout.K; keys = layout.keys; isBlackArr = layout.isBlackArr;
+
+      document.getElementById('n-val').innerText = totalKeys;
       document.getElementById('k-val').innerText = K;
 
-      let limitKeys = totalKeys;
-      isBlackArr = Array(limitKeys).fill(false);
-      let standardPianoMap = null;
-
-      if (!showMobius) {
-        if (N === 12 && K === 5) {
-          [1, 3, 6, 8, 10].forEach(i => isBlackArr[i] = true);
-          standardPianoMap = {0:'a', 1:'w', 2:'s', 3:'e', 4:'d', 5:'f', 6:'t', 7:'g', 8:'y', 9:'h', 10:'u', 11:'j'};
-        } else {
-          for (let i = 0; i < K; i++) isBlackArr[(Math.floor((i * N) / K) + 1) % N] = true;
-        }
+      /* The partner instrument: opposite topology, SAME notes per octave.
+         Its black keys are scaled to keep the same proportion, so the two
+         min-energy sets are genuinely comparable (the Mobius set is not
+         merely the cycle's set repeated — that is the point of looking). */
+      if (showCompare) {
+        const partnerTotal = showMobius ? N : 2 * N;      // same N per octave
+        const partnerK = showMobius ? Math.max(1, Math.round(K / 2))
+                                    : Math.min(2 * K, partnerTotal / 2);
+        compareLayout = buildLayout(partnerTotal, !showMobius, partnerK, preferBalanced);
       } else {
-        isBlackArr = findOptimalMobiusBlackKeys(N, K, preferBalanced);
+        compareLayout = null;
       }
+      const exactEl = document.getElementById('search-note');
+      exactEl.textContent = (showMobius || showCompare)
+        ? (lastSearchWasExact ? 'black keys: exact minimum energy'
+                              : 'black keys: near-optimal (exhaustive search too slow above '
+                                + EXACT_SEARCH_MAX_KEYS + ' keys)')
+        : 'black keys: exact minimum energy';
+      compareWrapper.classList.toggle('hidden', !showCompare);
+      document.getElementById('compare-caption').innerHTML = showCompare
+        ? (compareLayout.mobius
+            ? `Möbius ladder M<sub>${compareLayout.N}</sub> &mdash; ${compareLayout.total} keys, `
+              + `<b>the same ${N} notes per octave</b>, spanning two octaves &nbsp;·&nbsp; ${compareLayout.K} black`
+            : `Cycle C<sub>${compareLayout.total}</sub> &mdash; ${compareLayout.total} keys, `
+              + `<b>the same ${N} notes per octave</b>, one octave &nbsp;·&nbsp; ${compareLayout.K} black`)
+        : '';
 
-      const fW_out = ['a','s','d','f','g','h','j','k','l',';',"'"];
-      const fB_out = ['w','e','r','t','y','u','i','o','p','[',']'];
-      const fW_in = ['z','x','c','v','b','n','m',',','.','/'];
-      const fB_in = ['1','2','3','4','5','6','7','8','9','0','-','='];
-
-      keys = [];
-      let numRings = showMobius ? 2 : 1;
-      
-      let ringProps = showMobius 
-        ? [ 
-            { rwOut: 190, rwIn: 114, rbOut: 154, rbIn: 114 }, // Outer Ring
-            { rwOut: 110, rwIn: 35,  rbOut: 110, rbIn: 70 }   // Inner Ring (Inverted)
-          ]
-        : [ 
-            { rwOut: 190, rwIn: 35,  rbOut: 110, rbIn: 35 }   // Standard Mode
-          ];
-
-      for (let ring = 0; ring < numRings; ring++) {
-        // Calculate W and Angle logic per ring to support uneven black key distributions
-        let k_ring = 0;
-        for (let i = 0; i < N; i++) {
-          if (isBlackArr[i + ring * N]) k_ring++;
-        }
-        let W = N - k_ring;
-        let angleW = (Math.PI * 2) / W;
-        let blackWidth = angleW * 0.55;
-        let rotationOffset = -angleW / 2;
-
-        let currentWhite = 0, wIdx = 0, bIdx = 0;
-        let props = ringProps[ring];
-        
-        for (let i = 0; i < N; i++) {
-          let logicalIndex = i + ring * N;
-          let isB = isBlackArr[logicalIndex];
-          let ql = "";
-          
-          if (ring === 0) {
-            ql = standardPianoMap ? standardPianoMap[i] : (isB ? fB_out[bIdx++ % 11] : fW_out[wIdx++ % 11]);
-          } else {
-            ql = isB ? fB_in[bIdx++ % 12] : fW_in[wIdx++ % 10];
-          }
-
-          let labRad;
-          if (isB) {
-            labRad = props.rbOut - 15; 
-          } else {
-            labRad = (ring === 1 && showMobius) ? props.rwIn + 22 : props.rwOut - 22;
-          }
-
-          if (isB) {
-            keys.push({ index: logicalIndex, isBlack: true, center: currentWhite * angleW + rotationOffset, width: blackWidth, rOuter: props.rbOut, rInner: props.rbIn, qwertyLabel: ql, labelRadius: labRad });
-          } else {
-            keys.push({ index: logicalIndex, isBlack: false, start: currentWhite * angleW + rotationOffset, end: (currentWhite + 1) * angleW + rotationOffset, whiteIndex: currentWhite, rOuter: props.rwOut, rInner: props.rwIn, qwertyLabel: ql, labelRadius: labRad });
-            currentWhite++;
-          }
-        }
-      }
       updateMidiStatus();
       draw();
     }
@@ -652,16 +853,60 @@
       }
     }
 
-    function draw() {
+    // Draw one instrument into the currently-selected contexts.
+    function drawInstrument(activeIndices) {
       ctx.clearRect(0, 0, 400, 400);
-      const activeIndices = new Set(Array.from(activeVoices.values()).map(v => v.index));
-      
-      keys.filter(k => !k.isBlack).forEach(k => drawWedge(k.rInner, k.rOuter, k.start, k.end, activeIndices.has(k.index) ? '#FFB81C' : '#fff'));
-      keys.filter(k => k.isBlack).forEach(k => drawWedge(k.rInner, k.rOuter, k.center-k.width/2, k.center+k.width/2, activeIndices.has(k.index) ? '#D49A18' : '#222'));
-      
+      keys.filter(k => !k.isBlack).forEach(k =>
+        drawWedge(k.rInner, k.rOuter, k.start, k.end, activeIndices.has(k.index) ? '#FFB81C' : '#fff'));
+      keys.filter(k => k.isBlack).forEach(k =>
+        drawWedge(k.rInner, k.rOuter, k.center - k.width/2, k.center + k.width/2,
+                  activeIndices.has(k.index) ? '#D49A18' : '#222'));
       drawMobiusArrows();
       if (showQwerty || showInteger) drawLabels();
       drawGraph(activeIndices);
+    }
+
+    /* ---------------------------------------------------------------------
+       Carry a sounding note from one instrument to the other BY FREQUENCY.
+       Key j on an instrument with n notes per octave sounds 261.63*2^(j/n),
+       so the same pitch sits at j' = j * n' / n on the other, rounded to the
+       nearest key and reduced modulo its total.
+
+       In comparison mode the partner shares n, so this reduces to j' = j mod
+       total' — EXACTLY the same pitch, never a retuning.  The cycle's single
+       octave is the Mobius ladder's two octaves folded in half: keys j and
+       j + n of the ladder both land on cycle key j, an octave apart on one
+       instrument and the same key on the other.  The general formula is kept
+       so the function stays correct if the two n ever differ again.
+       --------------------------------------------------------------------- */
+    function carryIndex(j, nFrom, nTo, totalTo) {
+      const t = Math.round(j * nTo / nFrom);
+      return ((t % totalTo) + totalTo) % totalTo;
+    }
+
+    function draw() {
+      const activeIndices = new Set(Array.from(activeVoices.values()).map(v => v.index));
+      drawInstrument(activeIndices);
+
+      if (!showCompare || !compareLayout) return;
+
+      // Render the opposite topology by pointing the drawing code at the
+      // comparison canvases and its layout, then putting everything back.
+      const sN = N, sMobius = showMobius, sKeys = keys, sBlack = isBlackArr;
+      const sCtx2 = ctx, sG = gCtx;
+      const carried = new Set();
+      for (const j of activeIndices)
+        carried.add(carryIndex(j, sN, compareLayout.N, compareLayout.total));
+
+      N = compareLayout.N; showMobius = compareLayout.mobius;
+      keys = compareLayout.keys; isBlackArr = compareLayout.isBlackArr;
+      ctx = ctx2; gCtx = gCtx2;
+      try {
+        drawInstrument(carried);
+      } finally {
+        N = sN; showMobius = sMobius; keys = sKeys; isBlackArr = sBlack;
+        ctx = sCtx2; gCtx = sG;
+      }
     }
 
     // --- Web Audio Synthesis Engine ---
@@ -1161,6 +1406,103 @@
       return DEGREE[pc] + 7 * octave;
     }
 
+    /* Clefs.  Musical Unicode (U+1D11E) is missing from most iOS system
+       fonts, so these are drawn as vector paths and always render.  Both are
+       anchored to the line they name: the G clef spirals on G4 (s = 4), the
+       F clef's two dots straddle F3 (s = -4).                              */
+    function drawTrebleClef(y, g){
+      const x = 62, yG = y(4);              // spiral centre sits on the G line
+      const u = g / 2.15;                   // scale unit
+      sCtx.save();
+      sCtx.translate(x, yG);
+      sCtx.strokeStyle = '#333'; sCtx.lineWidth = 1.9;
+      sCtx.lineCap = 'round'; sCtx.lineJoin = 'round';
+      sCtx.beginPath();
+      sCtx.moveTo(-0.2*u, 1.2*u);                                  // inner spiral
+      sCtx.bezierCurveTo(-2.4*u, 1.6*u, -2.6*u, -1.2*u, -0.3*u, -1.4*u);
+      sCtx.bezierCurveTo( 2.2*u, -1.6*u,  2.6*u,  1.6*u,  0.5*u,  2.6*u);
+      sCtx.bezierCurveTo(-1.9*u,  3.7*u, -3.1*u,  1.2*u, -2.2*u, -1.9*u);
+      sCtx.bezierCurveTo(-1.4*u, -4.6*u,  0.9*u, -6.0*u,  1.0*u, -8.2*u);
+      sCtx.bezierCurveTo( 1.05*u,-9.9*u, -0.5*u,-10.6*u, -1.1*u, -9.2*u);
+      sCtx.bezierCurveTo(-1.9*u, -7.3*u,  0.1*u, -5.2*u,  1.0*u, -3.6*u);
+      sCtx.bezierCurveTo( 2.6*u, -0.8*u,  3.0*u,  2.6*u,  1.2*u,  5.0*u);
+      sCtx.bezierCurveTo( 0.2*u,  6.3*u, -1.6*u,  6.4*u, -2.1*u,  5.2*u);
+      sCtx.stroke();
+      sCtx.beginPath();                                            // tail dot
+      sCtx.arc(-2.3*u, 5.9*u, 0.75*u, 0, Math.PI*2);
+      sCtx.fillStyle = '#333'; sCtx.fill();
+      sCtx.restore();
+    }
+
+    function drawBassClef(y, g){
+      const x = 60, yF = y(-4);             // the F line, between the two dots
+      const u = g / 2.0;
+      sCtx.save();
+      sCtx.translate(x, yF);
+      sCtx.strokeStyle = '#333'; sCtx.lineWidth = 2.2;
+      sCtx.lineCap = 'round';
+      sCtx.beginPath();
+      sCtx.arc(0, 0, 0.95*u, -Math.PI*0.95, Math.PI*0.42);          // head
+      sCtx.bezierCurveTo(0.9*u, 2.1*u, -0.6*u, 3.4*u, -2.0*u, 3.9*u); // tail
+      sCtx.stroke();
+      sCtx.fillStyle = '#333';
+      for (const dy of [-1.0, 1.0]){                                 // the two dots
+        sCtx.beginPath(); sCtx.arc(1.9*u, dy*u, 0.42*u, 0, Math.PI*2); sCtx.fill();
+      }
+      sCtx.restore();
+    }
+
+    /* ---------------------------------------------------------------------
+       A traditional 12-tone keyboard under the staff, for comparison: it
+       shows the piece's ORIGINAL pitches on the instrument it was written
+       for, while the cyclic pianos above show where those pitches land on an
+       n-note keyboard.  Lit keys are the MIDI notes currently sounding.
+       --------------------------------------------------------------------- */
+    const WHITE_PC = [0,2,4,5,7,9,11];
+    function drawLinearKeyboard(){
+      const W = 900, top = 214, h = 96;
+      if (!midi.song) return;
+      let lo = 127, hi = 0;
+      for (const n of midi.song.notes){ if (n.note < lo) lo = n.note; if (n.note > hi) hi = n.note; }
+      lo = Math.floor(lo / 12) * 12;                       // whole octaves
+      hi = Math.ceil((hi + 1) / 12) * 12 - 1;
+      if (hi - lo < 23) hi = lo + 23;                      // at least two octaves
+      if (hi - lo > 71){ hi = lo + 71; }                   // at most six
+
+      const whites = [];
+      for (let m = lo; m <= hi; m++) if (WHITE_PC.includes(m % 12)) whites.push(m);
+      const x0 = 44, wW = (W - x0 - 14) / whites.length;
+
+      const sounding = new Set(midi.live.map(v => v.midiNote));
+
+      // white keys
+      sCtx.strokeStyle = '#333'; sCtx.lineWidth = 1;
+      whites.forEach((m, i) => {
+        const x = x0 + i * wW;
+        sCtx.fillStyle = sounding.has(m) ? '#FFB81C' : '#fff';
+        sCtx.fillRect(x, top, wW, h);
+        sCtx.strokeRect(x + 0.5, top + 0.5, wW, h);
+        if (m % 12 === 0){                                  // label each C
+          sCtx.fillStyle = '#888'; sCtx.font = '9px sans-serif'; sCtx.textAlign = 'center';
+          sCtx.fillText('C' + (Math.floor(m / 12) - 1), x + wW / 2, top + h - 4);
+        }
+      });
+      // black keys sit between their neighbouring whites
+      const bW = wW * 0.62, bH = h * 0.62;
+      whites.forEach((m, i) => {
+        if (![0,2,5,7,9].includes(m % 12)) return;          // C D F G A carry a sharp
+        const sharp = m + 1;
+        if (sharp > hi) return;
+        const x = x0 + (i + 1) * wW - bW / 2;
+        sCtx.fillStyle = sounding.has(sharp) ? '#D49A18' : '#222';
+        sCtx.fillRect(x, top, bW, bH);
+        sCtx.strokeStyle = '#111'; sCtx.strokeRect(x + 0.5, top + 0.5, bW, bH);
+      });
+
+      sCtx.fillStyle = '#888'; sCtx.font = '11px sans-serif'; sCtx.textAlign = 'left';
+      sCtx.fillText('the score on a traditional 12-note keyboard', x0, top - 6);
+    }
+
     function drawStaff(){
       const W = 900, H = 200;
       sCtx.clearRect(0, 0, W, H);
@@ -1183,9 +1525,8 @@
       // brace-ish left edge
       sCtx.lineWidth = 3;
       sCtx.beginPath(); sCtx.moveTo(41, y(10)); sCtx.lineTo(41, y(-10)); sCtx.stroke();
-      sCtx.font = 'bold 13px Georgia, serif'; sCtx.fillStyle = '#333'; sCtx.textAlign = 'right';
-      sCtx.fillText('treble', 36, y(6) + 4);
-      sCtx.fillText('bass', 36, y(-6) + 4);
+      drawTrebleClef(y, g);
+      drawBassClef(y, g);
 
       // current position in the song
       const t = midi.playing ? (audioCtx.currentTime - midi.t0) * midi.rate : 0;
@@ -1211,7 +1552,7 @@
         const idxs = groupIdx.get(gid) || notes.map(n => midiToIndex(n.note));
         notes.forEach((n, j) => {
           const x = xPlay + (n.time - t) * pxPerSec;
-          if (x < 44 || x > W - 6) return;
+          if (x < 88 || x > W - 6) return;   // clear of the clefs (x <= 79)
           const s = staffStep(n.note), ny = y(s);
           const sounding = (t >= n.time && t < n.time + n.dur);
           const past = t >= n.time + n.dur;
@@ -1253,7 +1594,9 @@
 
       sCtx.textAlign = 'left';
       sCtx.fillStyle = '#888'; sCtx.font = '11px sans-serif';
-      sCtx.fillText('numbers = key each note sounds on', 44, H - 6);
+      sCtx.fillText('numbers = key each note sounds on the cyclic piano', 44, 196);
+
+      drawLinearKeyboard();
     }
 
     function staffLoop(){
@@ -1517,6 +1860,7 @@
     autoplayToggle.onchange = (e) => handleAutoplayChange(e.target.checked);
     shepardToggle.onchange = updateKeyboard; 
     balancedToggle.onchange = updateKeyboard;
+    compareToggle.onchange = updateKeyboard;
     
     mobiusToggle.onchange = (e) => {
       if (e.target.checked) {
