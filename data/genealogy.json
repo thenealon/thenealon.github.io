@@ -1,0 +1,4348 @@
+[
+ {
+  "id": "1406",
+  "mgp": 1406,
+  "name": "Shaun Wylie",
+  "inst": "Princeton University",
+  "year": 1937,
+  "mactutor": "Wylie",
+  "advisors": [
+   "7461"
+  ]
+ },
+ {
+  "id": "3294",
+  "mgp": 3294,
+  "name": "Edward Tauscher Dobson",
+  "inst": "Louisiana State University",
+  "year": 1995,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "7451",
+  "mgp": 7451,
+  "name": "William Edward Story",
+  "inst": "Universität Leipzig",
+  "year": 1875,
+  "mactutor": "Story",
+  "advisors": [
+   "32858",
+   "18589"
+  ]
+ },
+ {
+  "id": "7461",
+  "mgp": 7461,
+  "name": "Solomon Lefschetz",
+  "inst": "Clark University",
+  "year": 1911,
+  "mactutor": "Lefschetz",
+  "advisors": [
+   "7451"
+  ]
+ },
+ {
+  "id": "7486",
+  "mgp": 7486,
+  "name": "Karl Theodor Wilhelm Weierstraß",
+  "inst": "Universität Königsberg",
+  "year": 1854,
+  "mactutor": "Weierstrass",
+  "advisors": [
+   "29458"
+  ]
+ },
+ {
+  "id": "7487",
+  "mgp": 7487,
+  "name": "Hermann Amandus Schwarz",
+  "inst": "Universität Berlin",
+  "year": 1864,
+  "mactutor": "Schwarz",
+  "advisors": [
+   "18331",
+   "7486"
+  ]
+ },
+ {
+  "id": "7488",
+  "mgp": 7488,
+  "name": "Leopold (Lipót) Fejér",
+  "inst": "Eötvös Loránd University",
+  "year": 1902,
+  "mactutor": "Fejer",
+  "advisors": [
+   "7487"
+  ]
+ },
+ {
+  "id": "10463",
+  "mgp": 10463,
+  "name": "John Edensor Littlewood",
+  "mactutor": "Littlewood",
+  "advisors": [
+   "12099"
+  ]
+ },
+ {
+  "id": "11294",
+  "mgp": 11294,
+  "name": "Salar Yaseen Alsardary",
+  "inst": "West Virginia University",
+  "year": 1995,
+  "advisors": [
+   "13139"
+  ]
+ },
+ {
+  "id": "12099",
+  "mgp": 12099,
+  "name": "Ernest William Barnes",
+  "inst": "University of Cambridge",
+  "year": 1907,
+  "mactutor": "Barnes",
+  "advisors": [
+   "27230"
+  ]
+ },
+ {
+  "id": "13139",
+  "mgp": 13139,
+  "name": "Jerzy Marian Wojciechowski",
+  "inst": "University of Cambridge",
+  "year": 1990,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "15635",
+  "mgp": 15635,
+  "name": "Carl Gustav Jacob Jacobi",
+  "inst": "Humboldt-Universität zu Berlin",
+  "year": 1825,
+  "mactutor": "Jacobi",
+  "advisors": [
+   "41423"
+  ]
+ },
+ {
+  "id": "18230",
+  "mgp": 18230,
+  "name": "Johann Friedrich Pfaff",
+  "inst": "Georg-August-Universität Göttingen",
+  "year": 1786,
+  "mactutor": "Pfaff",
+  "advisors": [
+   "66476",
+   "127710"
+  ]
+ },
+ {
+  "id": "18231",
+  "mgp": 18231,
+  "name": "Carl Friedrich Gauß",
+  "inst": "Universität Helmstedt",
+  "year": 1799,
+  "mactutor": "Gauss",
+  "advisors": [
+   "18230"
+  ]
+ },
+ {
+  "id": "18241",
+  "mgp": 18241,
+  "name": "Harold Davenport",
+  "mactutor": "Davenport",
+  "advisors": [
+   "10463"
+  ]
+ },
+ {
+  "id": "18331",
+  "mgp": 18331,
+  "name": "Ernst Eduard Kummer",
+  "inst": "Martin-Luther-Universität Halle-Wittenberg",
+  "year": 1831,
+  "mactutor": "Kummer",
+  "advisors": [
+   "25484"
+  ]
+ },
+ {
+  "id": "18589",
+  "mgp": 18589,
+  "name": "Wilhelm Scheibner",
+  "inst": "Martin-Luther-Universität Halle-Wittenberg",
+  "year": 1848,
+  "advisors": [
+   "15635"
+  ]
+ },
+ {
+  "id": "18603",
+  "mgp": 18603,
+  "name": "Friedrich Wilhelm Bessel",
+  "inst": "Georg-August-Universität Göttingen",
+  "year": 1810,
+  "mactutor": "Bessel",
+  "advisors": [
+   "18231"
+  ]
+ },
+ {
+  "id": "19470",
+  "mgp": 19470,
+  "name": "Paul (Pál) Erdős",
+  "inst": "Eötvös Loránd University",
+  "year": 1934,
+  "mactutor": "Erdos",
+  "advisors": [
+   "7488"
+  ]
+ },
+ {
+  "id": "20324",
+  "mgp": 20324,
+  "name": "John Henry Coates",
+  "inst": "University of Cambridge",
+  "year": 1969,
+  "mactutor": "Coates",
+  "advisors": [
+   "22765"
+  ]
+ },
+ {
+  "id": "21235",
+  "mgp": 21235,
+  "name": "Otto Mencke",
+  "inst": "Universität Leipzig",
+  "year": 1665,
+  "advisors": [
+   "137705"
+  ]
+ },
+ {
+  "id": "22719",
+  "mgp": 22719,
+  "name": "Béla Bollobás",
+  "inst": "Eötvös Loránd University",
+  "year": 1967,
+  "mactutor": "Bollobas",
+  "advisors": [
+   "153675",
+   "19470",
+   "24507"
+  ]
+ },
+ {
+  "id": "22765",
+  "mgp": 22765,
+  "name": "Alan Baker",
+  "inst": "University of Cambridge",
+  "year": 1964,
+  "mactutor": "Baker_Alan",
+  "advisors": [
+   "18241"
+  ]
+ },
+ {
+  "id": "23322",
+  "mgp": 23322,
+  "name": "Alice Hubenko",
+  "inst": "The University of Memphis",
+  "year": 2004,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "24507",
+  "mgp": 24507,
+  "name": "J. Frank (John) Adams",
+  "inst": "University of Cambridge",
+  "year": 1956,
+  "mactutor": "Adams_Frank",
+  "advisors": [
+   "1406"
+  ]
+ },
+ {
+  "id": "25484",
+  "mgp": 25484,
+  "name": "Heinrich Ferdinand Scherk",
+  "inst": "Universität Berlin",
+  "year": 1823,
+  "mactutor": "Scherk",
+  "advisors": [
+   "18603",
+   "65162"
+  ]
+ },
+ {
+  "id": "27230",
+  "mgp": 27230,
+  "name": "Walter William Rouse Ball",
+  "mactutor": "Ball",
+  "advisors": []
+ },
+ {
+  "id": "28389",
+  "mgp": 28389,
+  "name": "Balazs Montagh",
+  "inst": "The University of Memphis",
+  "year": 2005,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "29458",
+  "mgp": 29458,
+  "name": "Christoph Gudermann",
+  "mactutor": "Gudermann",
+  "advisors": [
+   "57667"
+  ]
+ },
+ {
+  "id": "32858",
+  "mgp": 32858,
+  "name": "Carl Gottfried Neumann",
+  "inst": "Universität Königsberg",
+  "year": 1856,
+  "mactutor": "Neumann_Carl",
+  "advisors": [
+   "57706",
+   "46967"
+  ]
+ },
+ {
+  "id": "34104",
+  "mgp": 34104,
+  "name": "Jaromy Kuhl",
+  "inst": "University of Mississippi",
+  "year": 2005,
+  "advisors": [
+   "51893"
+  ]
+ },
+ {
+  "id": "38028",
+  "mgp": 38028,
+  "name": "Timothy Kerwin Pollis",
+  "inst": "University of Nebraska-Lincoln",
+  "year": 1999,
+  "advisors": [
+   "38652"
+  ]
+ },
+ {
+  "id": "38508",
+  "mgp": 38508,
+  "name": "Oleg Pikhurko",
+  "inst": "University of Cambridge",
+  "year": 2000,
+  "advisors": [
+   "38524"
+  ]
+ },
+ {
+  "id": "38524",
+  "mgp": 38524,
+  "name": "Andrew Gordon Thomason",
+  "inst": "University of Cambridge",
+  "year": 1980,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "38652",
+  "mgp": 38652,
+  "name": "Andrew John Radcliffe",
+  "inst": "University of Cambridge",
+  "year": 1989,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "39070",
+  "mgp": 39070,
+  "name": "Duncan Christopher Richer",
+  "inst": "University of Cambridge",
+  "year": 2000,
+  "advisors": [
+   "38524"
+  ]
+ },
+ {
+  "id": "41423",
+  "mgp": 41423,
+  "name": "Enno Heeren Dirksen",
+  "inst": "Georg-August-Universität Göttingen",
+  "year": 1820,
+  "mactutor": "Dirksen",
+  "advisors": [
+   "57659",
+   "57667"
+  ]
+ },
+ {
+  "id": "45274",
+  "mgp": 45274,
+  "name": "David E. Weinreich",
+  "inst": "The University of Memphis",
+  "year": 2000,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "46967",
+  "mgp": 46967,
+  "name": "Otto Hesse",
+  "inst": "Universität Königsberg",
+  "year": 1840,
+  "mactutor": "Hesse",
+  "advisors": [
+   "15635"
+  ]
+ },
+ {
+  "id": "48357",
+  "mgp": 48357,
+  "name": "Tamas Szabo",
+  "inst": "The University of Memphis",
+  "year": 1998,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "48453",
+  "mgp": 48453,
+  "name": "Yoshiharu Kohayakawa",
+  "inst": "University of Cambridge",
+  "year": 1990,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "51754",
+  "mgp": 51754,
+  "name": "Paul Neville Balister",
+  "inst": "University of Cambridge",
+  "year": 1992,
+  "advisors": [
+   "20324"
+  ]
+ },
+ {
+  "id": "51893",
+  "mgp": 51893,
+  "name": "Tristan Mark Joseph Denley",
+  "inst": "University of Cambridge",
+  "year": 1993,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "57659",
+  "mgp": 57659,
+  "name": "Johann Tobias Mayer",
+  "inst": "Georg-August-Universität Göttingen",
+  "year": 1773,
+  "advisors": [
+   "66476",
+   "65161"
+  ]
+ },
+ {
+  "id": "57667",
+  "mgp": 57667,
+  "name": "Bernhard Friedrich Thibaut",
+  "advisors": [
+   "66476",
+   "65161"
+  ]
+ },
+ {
+  "id": "57670",
+  "mgp": 57670,
+  "name": "Christian August Hausen",
+  "inst": "Martin-Luther-Universität Halle-Wittenberg",
+  "year": 1713,
+  "advisors": [
+   "72669",
+   "128986"
+  ]
+ },
+ {
+  "id": "57706",
+  "mgp": 57706,
+  "name": "Friedrich Julius Richelot",
+  "inst": "Universität Königsberg",
+  "year": 1831,
+  "advisors": [
+   "15635"
+  ]
+ },
+ {
+  "id": "57951",
+  "mgp": 57951,
+  "name": "Kerstin Waas",
+  "inst": "Universität Bielefeld",
+  "year": 1994,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "58752",
+  "mgp": 58752,
+  "name": "Reinhard Diestel",
+  "inst": "University of Cambridge",
+  "year": 1987,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "59990",
+  "mgp": 59990,
+  "name": "Patricia Fay Nelson",
+  "inst": "University of Nebraska-Lincoln",
+  "year": 2001,
+  "advisors": [
+   "38652"
+  ]
+ },
+ {
+  "id": "60782",
+  "mgp": 60782,
+  "name": "Johann Andreas Segner",
+  "inst": "Friedrich-Schiller-Universität Jena",
+  "year": 1726,
+  "mactutor": "Segner",
+  "advisors": [
+   "125886",
+   "125886",
+   "125971",
+   "125971"
+  ]
+ },
+ {
+  "id": "64978",
+  "mgp": 64978,
+  "name": "Jonathan Richard Partington",
+  "inst": "University of Cambridge",
+  "year": 1980,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "65161",
+  "mgp": 65161,
+  "name": "Georg Christoph Lichtenberg",
+  "inst": "Georg-August-Universität Göttingen",
+  "year": 1765,
+  "advisors": [
+   "66476"
+  ]
+ },
+ {
+  "id": "65162",
+  "mgp": 65162,
+  "name": "Heinrich Wilhelm Brandes",
+  "inst": "Georg-August-Universität Göttingen",
+  "year": 1800,
+  "advisors": [
+   "66476",
+   "65161"
+  ]
+ },
+ {
+  "id": "66476",
+  "mgp": 66476,
+  "name": "Abraham Gotthelf Kästner",
+  "inst": "Universität Leipzig",
+  "year": 1739,
+  "mactutor": "Kaestner",
+  "advisors": [
+   "57670"
+  ]
+ },
+ {
+  "id": "67729",
+  "mgp": 67729,
+  "name": "William Timothy Gowers",
+  "inst": "University of Cambridge",
+  "year": 1990,
+  "mactutor": "Gowers",
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "70015",
+  "mgp": 70015,
+  "name": "András Zsák",
+  "inst": "University of Cambridge",
+  "year": 2000,
+  "advisors": [
+   "67729"
+  ]
+ },
+ {
+  "id": "70023",
+  "mgp": 70023,
+  "name": "Alan Martin Stacey",
+  "inst": "University of Cambridge",
+  "year": 1994,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "70031",
+  "mgp": 70031,
+  "name": "Julie Sarah Haviland",
+  "inst": "University of Cambridge",
+  "year": 1989,
+  "advisors": [
+   "38524"
+  ]
+ },
+ {
+  "id": "70049",
+  "mgp": 70049,
+  "name": "Ian James Holyer",
+  "inst": "University of Cambridge",
+  "year": 1981,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "70071",
+  "mgp": 70071,
+  "name": "Colin Douglas Wright",
+  "inst": "University of Cambridge",
+  "year": 1990,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "70125",
+  "mgp": 70125,
+  "name": "Imre Bennett Leader",
+  "inst": "University of Cambridge",
+  "year": 1989,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "70416",
+  "mgp": 70416,
+  "name": "Penelope Evelyn Haxell",
+  "inst": "University of Cambridge",
+  "year": 1993,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "70422",
+  "mgp": 70422,
+  "name": "Joseph Samuel Myers",
+  "inst": "University of Cambridge",
+  "year": 2003,
+  "advisors": [
+   "38524"
+  ]
+ },
+ {
+  "id": "70423",
+  "mgp": 70423,
+  "name": "Amites Sarkar",
+  "inst": "University of Cambridge",
+  "year": 1998,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "70424",
+  "mgp": 70424,
+  "name": "Guoping Jin",
+  "inst": "University of Cambridge",
+  "year": 1993,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "70426",
+  "mgp": 70426,
+  "name": "Tomaž Slivnik",
+  "inst": "University of Cambridge",
+  "year": 1996,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "70450",
+  "mgp": 70450,
+  "name": "Tom Gamblin",
+  "inst": "University of Cambridge",
+  "year": 1996,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "70811",
+  "mgp": 70811,
+  "name": "Keith Martin Ball",
+  "inst": "University of Cambridge",
+  "year": 1987,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "70964",
+  "mgp": 70964,
+  "name": "Graham Richard Brightwell",
+  "inst": "University of Cambridge",
+  "year": 1988,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "71336",
+  "mgp": 71336,
+  "name": "Stephen Eric Eldridge",
+  "inst": "University of Cambridge",
+  "year": 1977,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "71345",
+  "mgp": 71345,
+  "name": "Andrew James Harris",
+  "inst": "University of Cambridge",
+  "year": 1985,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "71351",
+  "mgp": 71351,
+  "name": "Christopher Neil Jagger",
+  "inst": "University of Cambridge",
+  "year": 1995,
+  "advisors": [
+   "38524"
+  ]
+ },
+ {
+  "id": "71402",
+  "mgp": 71402,
+  "name": "Mark Jon Walters",
+  "inst": "University of Cambridge",
+  "year": 2000,
+  "advisors": [
+   "67729"
+  ]
+ },
+ {
+  "id": "71478",
+  "mgp": 71478,
+  "name": "Hugh Robert Faulkner Hind",
+  "inst": "University of Cambridge",
+  "year": 1988,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "71583",
+  "mgp": 71583,
+  "name": "Charles John Read",
+  "inst": "University of Cambridge",
+  "year": 1984,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "71585",
+  "mgp": 71585,
+  "name": "Gareth John McCaughan",
+  "inst": "University of Cambridge",
+  "year": 1996,
+  "advisors": [
+   "77135"
+  ]
+ },
+ {
+  "id": "72669",
+  "mgp": 72669,
+  "name": "Johann Christoph Wichmannshausen",
+  "advisors": [
+   "21235"
+  ]
+ },
+ {
+  "id": "76481",
+  "mgp": 76481,
+  "name": "Elias Rudolph Camerarius, Sr.",
+  "inst": "Eberhard-Karls-Universität Tübingen",
+  "year": 1663,
+  "advisors": [
+   "123974"
+  ]
+ },
+ {
+  "id": "76812",
+  "mgp": 76812,
+  "name": "J. Robert (John) Johnson",
+  "inst": "University of Cambridge",
+  "year": 2003,
+  "advisors": [
+   "70125"
+  ]
+ },
+ {
+  "id": "76827",
+  "mgp": 76827,
+  "name": "Oliver Maxim Riordan",
+  "inst": "University of Cambridge",
+  "year": 1998,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "76979",
+  "mgp": 76979,
+  "name": "Ben Joseph Green",
+  "inst": "University of Cambridge",
+  "year": 2003,
+  "advisors": [
+   "67729"
+  ]
+ },
+ {
+  "id": "77135",
+  "mgp": 77135,
+  "name": "Thomas Keith Carne",
+  "inst": "University of Cambridge",
+  "year": 1979,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "78181",
+  "mgp": 78181,
+  "name": "Daniela Kühn",
+  "inst": "Universität Hamburg",
+  "year": 2001,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "79346",
+  "mgp": 79346,
+  "name": "Alexander David Scott",
+  "inst": "University of Cambridge",
+  "year": 1995,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "79831",
+  "mgp": 79831,
+  "name": "Jair Donadelli",
+  "inst": "Universidade de São Paulo",
+  "year": 2002,
+  "advisors": [
+   "48453"
+  ]
+ },
+ {
+  "id": "80899",
+  "mgp": 80899,
+  "name": "Jacques Baudouin Alain Verstraete",
+  "inst": "University of Cambridge",
+  "year": 2001,
+  "advisors": [
+   "38524"
+  ]
+ },
+ {
+  "id": "82223",
+  "mgp": 82223,
+  "name": "Namita Das",
+  "inst": "University of Leeds",
+  "year": 1993,
+  "advisors": [
+   "64978"
+  ]
+ },
+ {
+  "id": "82224",
+  "mgp": 82224,
+  "name": "Qinsheng Lai",
+  "inst": "University of Leeds",
+  "year": 1995,
+  "advisors": [
+   "64978"
+  ]
+ },
+ {
+  "id": "82225",
+  "mgp": 82225,
+  "name": "Martin Paul Smith",
+  "inst": "University of Leeds",
+  "year": 2002,
+  "advisors": [
+   "64978"
+  ]
+ },
+ {
+  "id": "82226",
+  "mgp": 82226,
+  "name": "Banu Unalmis",
+  "inst": "University of Leeds",
+  "year": 1999,
+  "advisors": [
+   "64978"
+  ]
+ },
+ {
+  "id": "86706",
+  "mgp": 86706,
+  "name": "Neil James Davies",
+  "inst": "University of Bristol",
+  "year": 1994,
+  "advisors": [
+   "70049"
+  ]
+ },
+ {
+  "id": "86771",
+  "mgp": 86771,
+  "name": "Jonathan Drew Cutler",
+  "inst": "The University of Memphis",
+  "year": 2004,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "86878",
+  "mgp": 86878,
+  "name": "Zen Michael Harper",
+  "inst": "University of Leeds",
+  "year": 2004,
+  "advisors": [
+   "64978"
+  ]
+ },
+ {
+  "id": "88343",
+  "mgp": 88343,
+  "name": "Edward Thomas Crane",
+  "inst": "University of Cambridge",
+  "year": 2004,
+  "advisors": [
+   "77135"
+  ]
+ },
+ {
+  "id": "90924",
+  "mgp": 90924,
+  "name": "Matthew Daws",
+  "inst": "University of Leeds",
+  "year": 2005,
+  "advisors": [
+   "71583"
+  ]
+ },
+ {
+  "id": "93555",
+  "mgp": 93555,
+  "name": "John Mark Talbot",
+  "inst": "University of London",
+  "year": 2001,
+  "advisors": [
+   "70125"
+  ]
+ },
+ {
+  "id": "94771",
+  "mgp": 94771,
+  "name": "Adrian James Sanders",
+  "inst": "University of Cambridge",
+  "year": 2005,
+  "advisors": [
+   "70125"
+  ]
+ },
+ {
+  "id": "97477",
+  "mgp": 97477,
+  "name": "Paul Alexander Russell",
+  "inst": "University of Cambridge",
+  "year": 2005,
+  "advisors": [
+   "70125"
+  ]
+ },
+ {
+  "id": "99671",
+  "mgp": 99671,
+  "name": "Luke Thomas Pebody",
+  "inst": "The University of Memphis",
+  "year": 2002,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "99675",
+  "mgp": 99675,
+  "name": "Peter Wagner",
+  "inst": "University of Cambridge",
+  "year": 2006,
+  "advisors": [
+   "38524"
+  ]
+ },
+ {
+  "id": "101860",
+  "mgp": 101860,
+  "name": "Franciscus de le Boë Sylvius",
+  "inst": "Universiteit Leiden and Universität Basel",
+  "year": 1634,
+  "advisors": [
+   "125023",
+   "125125"
+  ]
+ },
+ {
+  "id": "102855",
+  "mgp": 102855,
+  "name": "Rachael Caroline Smith",
+  "inst": "University of Leeds",
+  "year": 2006,
+  "advisors": [
+   "64978"
+  ]
+ },
+ {
+  "id": "106406",
+  "mgp": 106406,
+  "name": "Jozsef Balogh",
+  "inst": "The University of Memphis",
+  "year": 2001,
+  "advisors": [
+   "22719",
+   "22719"
+  ]
+ },
+ {
+  "id": "108465",
+  "mgp": 108465,
+  "name": "Nicholas Georgiou",
+  "inst": "University of London",
+  "year": 2006,
+  "advisors": [
+   "70964"
+  ]
+ },
+ {
+  "id": "109704",
+  "mgp": 109704,
+  "name": "Henry Liu",
+  "inst": "The University of Memphis",
+  "year": 2006,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "109705",
+  "mgp": 109705,
+  "name": "Robert D. Morris",
+  "inst": "The University of Memphis",
+  "year": 2006,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "112851",
+  "mgp": 112851,
+  "name": "Dominic Luiz Pinto",
+  "inst": "University of Leeds",
+  "year": 2006,
+  "advisors": [
+   "71583"
+  ]
+ },
+ {
+  "id": "113183",
+  "mgp": 113183,
+  "name": "Agelos Georgakopoulos",
+  "inst": "Universität Hamburg",
+  "year": 2007,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "114992",
+  "mgp": 114992,
+  "name": "Gilbert Jacchaeus",
+  "advisors": [
+   "128122",
+   "126489"
+  ]
+ },
+ {
+  "id": "119097",
+  "mgp": 119097,
+  "name": "Gemma (Jemme Reinerszoon) Frisius",
+  "mactutor": "Gemma_Frisius",
+  "advisors": [
+   "125892"
+  ]
+ },
+ {
+  "id": "119159",
+  "mgp": 119159,
+  "name": "Johannes Winter von Andernach",
+  "inst": "Collège de Tréguier",
+  "year": 1532,
+  "advisors": [
+   "126571",
+   "125422"
+  ]
+ },
+ {
+  "id": "119178",
+  "mgp": 119178,
+  "name": "Andreas (Andries van Wesel) Vesalius",
+  "advisors": [
+   "119159",
+   "119097",
+   "152904"
+  ]
+ },
+ {
+  "id": "123525",
+  "mgp": 123525,
+  "name": "Tom Sanders",
+  "inst": "University of Cambridge",
+  "year": 2007,
+  "advisors": [
+   "67729"
+  ]
+ },
+ {
+  "id": "123526",
+  "mgp": 123526,
+  "name": "Julia Wolf",
+  "inst": "University of Cambridge",
+  "year": 2008,
+  "advisors": [
+   "67729"
+  ]
+ },
+ {
+  "id": "123974",
+  "mgp": 123974,
+  "name": "Georg Balthasar Metzger",
+  "advisors": [
+   "182089",
+   "182088"
+  ]
+ },
+ {
+  "id": "124000",
+  "mgp": 124000,
+  "name": "Rudolf Wilhelm Krause",
+  "inst": "Universiteit Leiden",
+  "year": 1671,
+  "advisors": [
+   "208258",
+   "101860"
+  ]
+ },
+ {
+  "id": "125006",
+  "mgp": 125006,
+  "name": "Adriaan van den Spieghel",
+  "inst": "Università degli Studi di Padova and Université Catholique de Louvain",
+  "year": 1603,
+  "advisors": [
+   "125109"
+  ]
+ },
+ {
+  "id": "125023",
+  "mgp": 125023,
+  "name": "Adolph Vorstius",
+  "inst": "Universiteit Leiden",
+  "year": 1619,
+  "advisors": [
+   "114992",
+   "125006"
+  ]
+ },
+ {
+  "id": "125047",
+  "mgp": 125047,
+  "name": "Petrus (Pierre de La Ramée) Ramus",
+  "mactutor": "Ramus",
+  "advisors": [
+   "125665",
+   "131546"
+  ]
+ },
+ {
+  "id": "125048",
+  "mgp": 125048,
+  "name": "Johannes Nicolaus Stupanus",
+  "inst": "Universität Basel",
+  "year": 1569,
+  "advisors": [
+   "125148"
+  ]
+ },
+ {
+  "id": "125109",
+  "mgp": 125109,
+  "name": "Hieronymus (Girolamo Fabrici d'Acquapendente) Fabricius",
+  "inst": "Università degli Studi di Padova",
+  "year": 1559,
+  "advisors": [
+   "125142"
+  ]
+ },
+ {
+  "id": "125125",
+  "mgp": 125125,
+  "name": "Emmanuel Stupanus",
+  "inst": "Universität Basel",
+  "year": 1613,
+  "advisors": [
+   "130248"
+  ]
+ },
+ {
+  "id": "125142",
+  "mgp": 125142,
+  "name": "Gabriele Falloppio",
+  "inst": "Università degli Studi di Padova and Università degli Studi di Ferrara",
+  "year": 1547,
+  "advisors": [
+   "127245",
+   "125303"
+  ]
+ },
+ {
+  "id": "125148",
+  "mgp": 125148,
+  "name": "Theodor Zwinger",
+  "inst": "Università degli Studi di Padova",
+  "year": 1559,
+  "advisors": [
+   "125047",
+   "152906",
+   "152905"
+  ]
+ },
+ {
+  "id": "125154",
+  "mgp": 125154,
+  "name": "Werner Rolfinck",
+  "inst": "Martin-Luther-Universität Halle-Wittenberg",
+  "year": 1618,
+  "advisors": [
+   "126111",
+   "125006"
+  ]
+ },
+ {
+  "id": "125159",
+  "mgp": 125159,
+  "name": "Immanuel Tremellius",
+  "inst": "University of Cambridge",
+  "year": 1549,
+  "advisors": [
+   "141571"
+  ]
+ },
+ {
+  "id": "125160",
+  "mgp": 125160,
+  "name": "Valentine Naibod",
+  "advisors": [
+   "126736"
+  ]
+ },
+ {
+  "id": "125181",
+  "mgp": 125181,
+  "name": "Rudolph (Snel van Royen) Snellius",
+  "advisors": [
+   "125160",
+   "125159"
+  ]
+ },
+ {
+  "id": "125232",
+  "mgp": 125232,
+  "name": "Ludolph van Ceulen",
+  "mactutor": "Van_Ceulen",
+  "advisors": []
+ },
+ {
+  "id": "125302",
+  "mgp": 125302,
+  "name": "Willebrord (Snel van Royen) Snellius",
+  "mactutor": "Snell",
+  "advisors": [
+   "125232",
+   "125181"
+  ]
+ },
+ {
+  "id": "125303",
+  "mgp": 125303,
+  "name": "Matteo Realdo (Renaldus Columbus) Colombo",
+  "inst": "Università degli Studi di Padova",
+  "year": 1544,
+  "advisors": [
+   "119178"
+  ]
+ },
+ {
+  "id": "125378",
+  "mgp": 125378,
+  "name": "Thomas Erpenius",
+  "advisors": [
+   "131577"
+  ]
+ },
+ {
+  "id": "125402",
+  "mgp": 125402,
+  "name": "Steven Barclay",
+  "inst": "University of Leeds",
+  "year": 2008,
+  "advisors": [
+   "64978"
+  ]
+ },
+ {
+  "id": "125408",
+  "mgp": 125408,
+  "name": "Jacobus Golius",
+  "advisors": [
+   "125302",
+   "125378"
+  ]
+ },
+ {
+  "id": "125422",
+  "mgp": 125422,
+  "name": "Jacobus (Jacques Dubois) Sylvius",
+  "inst": "Université de Montpellier",
+  "year": 1530,
+  "advisors": [
+   "128987",
+   "128921"
+  ]
+ },
+ {
+  "id": "125488",
+  "mgp": 125488,
+  "name": "Georg Wolffgang Wedel",
+  "inst": "Friedrich-Schiller-Universität Jena and Universiteit Leiden",
+  "year": 1667,
+  "advisors": [
+   "125154",
+   "101860"
+  ]
+ },
+ {
+  "id": "125658",
+  "mgp": 125658,
+  "name": "Nicolas (Nicolaes Cleynaerts) Clénard",
+  "inst": "Université Catholique de Louvain",
+  "year": 1515,
+  "advisors": [
+   "125681",
+   "125682"
+  ]
+ },
+ {
+  "id": "125665",
+  "mgp": 125665,
+  "name": "Johannes (Johann Sturm) Sturmius",
+  "advisors": [
+   "125658",
+   "119159"
+  ]
+ },
+ {
+  "id": "125681",
+  "mgp": 125681,
+  "name": "Jacobus (Jacques Masson) Latomus",
+  "inst": "Katholieke Universiteit Leuven",
+  "year": 1519,
+  "advisors": [
+   "125888"
+  ]
+ },
+ {
+  "id": "125682",
+  "mgp": 125682,
+  "name": "Jan (Johannes Campensis) van Campen",
+  "advisors": [
+   "125760",
+   "125794"
+  ]
+ },
+ {
+  "id": "125755",
+  "mgp": 125755,
+  "name": "Jacob ben Jehiel Loans",
+  "advisors": []
+ },
+ {
+  "id": "125760",
+  "mgp": 125760,
+  "name": "Johann (Johannes Kapnion) Reuchlin",
+  "advisors": [
+   "131444",
+   "125755"
+  ]
+ },
+ {
+  "id": "125794",
+  "mgp": 125794,
+  "name": "Matthaeus Adrianus",
+  "advisors": []
+ },
+ {
+  "id": "125846",
+  "mgp": 125846,
+  "name": "Johann Adolph Wedel",
+  "inst": "Friedrich-Schiller-Universität Jena",
+  "year": 1694,
+  "advisors": [
+   "125488"
+  ]
+ },
+ {
+  "id": "125886",
+  "mgp": 125886,
+  "name": "Georg Erhard Hamberger",
+  "inst": "Friedrich-Schiller-Universität Jena",
+  "year": 1716,
+  "advisors": [
+   "191279",
+   "125846"
+  ]
+ },
+ {
+  "id": "125888",
+  "mgp": 125888,
+  "name": "Jan Standonck",
+  "inst": "Collège de Montaigu",
+  "year": 1490,
+  "advisors": []
+ },
+ {
+  "id": "125892",
+  "mgp": 125892,
+  "name": "Petrus (Pieter de Corte) Curtius",
+  "inst": "Université Catholique de Louvain",
+  "year": 1513,
+  "advisors": [
+   "125894"
+  ]
+ },
+ {
+  "id": "125894",
+  "mgp": 125894,
+  "name": "Maarten (Martinus Dorpius) van Dorp",
+  "inst": "Université Catholique de Louvain",
+  "year": 1504,
+  "advisors": [
+   "125897"
+  ]
+ },
+ {
+  "id": "125897",
+  "mgp": 125897,
+  "name": "Leo Outers",
+  "inst": "Université Catholique de Louvain",
+  "year": 1485,
+  "advisors": []
+ },
+ {
+  "id": "125898",
+  "mgp": 125898,
+  "name": "Alexander Hegius",
+  "advisors": [
+   "128012",
+   "140181"
+  ]
+ },
+ {
+  "id": "125938",
+  "mgp": 125938,
+  "name": "Desiderius Erasmus",
+  "advisors": [
+   "125888",
+   "125898"
+  ]
+ },
+ {
+  "id": "125971",
+  "mgp": 125971,
+  "name": "Simon Paul Hilscher",
+  "inst": "Friedrich-Schiller-Universität Jena",
+  "year": 1704,
+  "advisors": [
+   "124000"
+  ]
+ },
+ {
+  "id": "126087",
+  "mgp": 126087,
+  "name": "Georg von Peuerbach",
+  "mactutor": "Peurbach",
+  "advisors": [
+   "126887"
+  ]
+ },
+ {
+  "id": "126109",
+  "mgp": 126109,
+  "name": "Johannes Müller Regiomontanus",
+  "mactutor": "Regiomontanus",
+  "advisors": [
+   "126087",
+   "131561"
+  ]
+ },
+ {
+  "id": "126111",
+  "mgp": 126111,
+  "name": "Daniel Sennert",
+  "inst": "Martin-Luther-Universität Halle-Wittenberg",
+  "year": 1594,
+  "advisors": [
+   "127848",
+   "127278"
+  ]
+ },
+ {
+  "id": "126112",
+  "mgp": 126112,
+  "name": "Domenico Maria Novara da Ferrara",
+  "advisors": [
+   "126109",
+   "126888"
+  ]
+ },
+ {
+  "id": "126113",
+  "mgp": 126113,
+  "name": "Leonhard (Leonard Vitreatoris z Dobczyc) von Dobschütz",
+  "advisors": []
+ },
+ {
+  "id": "126177",
+  "mgp": 126177,
+  "name": "Nicolaus (Mikołaj Kopernik) Copernicus",
+  "mactutor": "Copernicus",
+  "advisors": [
+   "126113",
+   "126112"
+  ]
+ },
+ {
+  "id": "126489",
+  "mgp": 126489,
+  "name": "Jacobus (Jacob Harmensz.) Arminius",
+  "inst": "Philipps-Universität Marburg and Universiteit Leiden",
+  "year": 1582,
+  "advisors": [
+   "125181"
+  ]
+ },
+ {
+  "id": "126571",
+  "mgp": 126571,
+  "name": "Rutger Rescius",
+  "advisors": [
+   "127181"
+  ]
+ },
+ {
+  "id": "126659",
+  "mgp": 126659,
+  "name": "Ulrich Zasius",
+  "advisors": []
+ },
+ {
+  "id": "126667",
+  "mgp": 126667,
+  "name": "Jakob Milich",
+  "inst": "Universität Wien",
+  "year": 1524,
+  "advisors": [
+   "125938",
+   "126659"
+  ]
+ },
+ {
+  "id": "126724",
+  "mgp": 126724,
+  "name": "Bonifazius Erasmi",
+  "advisors": []
+ },
+ {
+  "id": "126730",
+  "mgp": 126730,
+  "name": "Johannes Volmar",
+  "advisors": [
+   "126724"
+  ]
+ },
+ {
+  "id": "126736",
+  "mgp": 126736,
+  "name": "Erasmus Reinhold",
+  "advisors": [
+   "126667"
+  ]
+ },
+ {
+  "id": "126827",
+  "mgp": 126827,
+  "name": "Georg Joachim von Leuchen Rheticus",
+  "mactutor": "Rheticus",
+  "advisors": [
+   "126730",
+   "126177"
+  ]
+ },
+ {
+  "id": "126887",
+  "mgp": 126887,
+  "name": "Johannes von Gmunden",
+  "advisors": [
+   "127264"
+  ]
+ },
+ {
+  "id": "126888",
+  "mgp": 126888,
+  "name": "Luca Pacioli",
+  "mactutor": "Pacioli",
+  "advisors": []
+ },
+ {
+  "id": "126956",
+  "mgp": 126956,
+  "name": "Philipp Melanchthon",
+  "advisors": [
+   "127107",
+   "125760"
+  ]
+ },
+ {
+  "id": "127011",
+  "mgp": 127011,
+  "name": "Johannes Hommel",
+  "advisors": [
+   "126736",
+   "126956"
+  ]
+ },
+ {
+  "id": "127092",
+  "mgp": 127092,
+  "name": "Valentin Thau",
+  "advisors": [
+   "127011"
+  ]
+ },
+ {
+  "id": "127107",
+  "mgp": 127107,
+  "name": "Johannes Stöffler",
+  "advisors": []
+ },
+ {
+  "id": "127144",
+  "mgp": 127144,
+  "name": "Pelope",
+  "advisors": []
+ },
+ {
+  "id": "127166",
+  "mgp": 127166,
+  "name": "Niccolò Leoniceno",
+  "inst": "Università degli Studi di Padova",
+  "year": 1453,
+  "advisors": [
+   "149192",
+   "127144",
+   "136726"
+  ]
+ },
+ {
+  "id": "127181",
+  "mgp": 127181,
+  "name": "Girolamo (Hieronymus Aleander) Aleandro",
+  "inst": "Università degli Studi di Padova",
+  "year": 1499,
+  "advisors": [
+   "131446",
+   "131447"
+  ]
+ },
+ {
+  "id": "127245",
+  "mgp": 127245,
+  "name": "Antonio Musa Brasavola",
+  "inst": "Università degli Studi di Ferrara",
+  "year": 1520,
+  "advisors": [
+   "127166"
+  ]
+ },
+ {
+  "id": "127264",
+  "mgp": 127264,
+  "name": "Heinrich von Langenstein",
+  "inst": "Université de Paris",
+  "year": 1375,
+  "advisors": [
+   "199357"
+  ]
+ },
+ {
+  "id": "127278",
+  "mgp": 127278,
+  "name": "Jan Jessenius",
+  "inst": "Università degli Studi di Padova",
+  "year": 1591,
+  "advisors": [
+   "125109"
+  ]
+ },
+ {
+  "id": "127424",
+  "mgp": 127424,
+  "name": "Erasmus Schmidt",
+  "advisors": [
+   "127898",
+   "127942"
+  ]
+ },
+ {
+  "id": "127668",
+  "mgp": 127668,
+  "name": "Johann Georg Büsch",
+  "advisors": [
+   "60782",
+   "208259"
+  ]
+ },
+ {
+  "id": "127710",
+  "mgp": 127710,
+  "name": "Johann Elert Bode",
+  "advisors": [
+   "127668"
+  ]
+ },
+ {
+  "id": "127734",
+  "mgp": 127734,
+  "name": "Nicolaus Zapf",
+  "inst": "Martin-Luther-Universität Halle-Wittenberg",
+  "year": 1625,
+  "advisors": [
+   "127424",
+   "189659",
+   "127848"
+  ]
+ },
+ {
+  "id": "127790",
+  "mgp": 127790,
+  "name": "Moritz Valentin Steinmetz",
+  "inst": "Universität Leipzig",
+  "year": 1550,
+  "advisors": [
+   "126827",
+   "184935"
+  ]
+ },
+ {
+  "id": "127801",
+  "mgp": 127801,
+  "name": "Aegidius Strauch",
+  "advisors": [
+   "127734"
+  ]
+ },
+ {
+  "id": "127848",
+  "mgp": 127848,
+  "name": "Jacobus Martini",
+  "advisors": [
+   "128105"
+  ]
+ },
+ {
+  "id": "127864",
+  "mgp": 127864,
+  "name": "Nikolaus Selnecker",
+  "inst": "Martin-Luther-Universität Halle-Wittenberg",
+  "year": 1570,
+  "advisors": []
+ },
+ {
+  "id": "127898",
+  "mgp": 127898,
+  "name": "Sethus Calvisius",
+  "advisors": [
+   "127864",
+   "127790"
+  ]
+ },
+ {
+  "id": "127942",
+  "mgp": 127942,
+  "name": "Petrus Otto",
+  "advisors": []
+ },
+ {
+  "id": "127962",
+  "mgp": 127962,
+  "name": "Michael d. J. Walther",
+  "inst": "Martin-Luther-Universität Halle-Wittenberg",
+  "year": 1660,
+  "advisors": [
+   "127801",
+   "230796"
+  ]
+ },
+ {
+  "id": "128012",
+  "mgp": 128012,
+  "name": "Rudolf Agricola",
+  "advisors": [
+   "131584"
+  ]
+ },
+ {
+  "id": "128046",
+  "mgp": 128046,
+  "name": "Johann Pasch",
+  "advisors": [
+   "127962"
+  ]
+ },
+ {
+  "id": "128105",
+  "mgp": 128105,
+  "name": "Cornelius Martini",
+  "inst": "Universität Helmstedt",
+  "year": 1591,
+  "advisors": [
+   "200006",
+   "128122"
+  ]
+ },
+ {
+  "id": "128122",
+  "mgp": 128122,
+  "name": "Duncan Liddel",
+  "inst": "Universität Helmstedt",
+  "year": 1596,
+  "mactutor": "Liddel/",
+  "advisors": [
+   "128305",
+   "128348"
+  ]
+ },
+ {
+  "id": "128305",
+  "mgp": 128305,
+  "name": "John Craig",
+  "inst": "Universität Basel",
+  "year": 1580,
+  "advisors": [
+   "125148"
+  ]
+ },
+ {
+  "id": "128348",
+  "mgp": 128348,
+  "name": "Paul Wittich",
+  "mactutor": "Wittich",
+  "advisors": [
+   "127092"
+  ]
+ },
+ {
+  "id": "128921",
+  "mgp": 128921,
+  "name": "Jean Tagault",
+  "advisors": []
+ },
+ {
+  "id": "128938",
+  "mgp": 128938,
+  "name": "Rudolf Jakob Camerarius",
+  "inst": "Eberhard-Karls-Universität Tübingen",
+  "year": 1684,
+  "advisors": [
+   "123974",
+   "76481"
+  ]
+ },
+ {
+  "id": "128986",
+  "mgp": 128986,
+  "name": "Johann Andreas Planer",
+  "inst": "Eberhard-Karls-Universität Tübingen",
+  "year": 1709,
+  "advisors": [
+   "128046",
+   "128938"
+  ]
+ },
+ {
+  "id": "128987",
+  "mgp": 128987,
+  "name": "François Dubois",
+  "advisors": []
+ },
+ {
+  "id": "130248",
+  "mgp": 130248,
+  "name": "Petrus Ryff",
+  "inst": "Universität Basel",
+  "year": 1584,
+  "advisors": [
+   "182090"
+  ]
+ },
+ {
+  "id": "130913",
+  "mgp": 130913,
+  "name": "Johannes (van den Driesche) Drusius",
+  "advisors": [
+   "130995"
+  ]
+ },
+ {
+  "id": "130995",
+  "mgp": 130995,
+  "name": "Raoul (Rodolphus Cavellerius) le Chevalier",
+  "advisors": [
+   "131235",
+   "131236"
+  ]
+ },
+ {
+  "id": "131163",
+  "mgp": 131163,
+  "name": "Rudini Menezes Sampaio",
+  "inst": "Universidade de São Paulo",
+  "year": 2008,
+  "advisors": [
+   "48453"
+  ]
+ },
+ {
+  "id": "131235",
+  "mgp": 131235,
+  "name": "François Vatable",
+  "advisors": [
+   "127181",
+   "131398"
+  ]
+ },
+ {
+  "id": "131236",
+  "mgp": 131236,
+  "name": "Paul (Paul Büchlein) Fagius",
+  "advisors": [
+   "131399",
+   "131400"
+  ]
+ },
+ {
+  "id": "131348",
+  "mgp": 131348,
+  "name": "Zsuzsanna Szaniszlo",
+  "inst": "University of Nebraska-Lincoln",
+  "year": 1996,
+  "advisors": [
+   "38652"
+  ]
+ },
+ {
+  "id": "131398",
+  "mgp": 131398,
+  "name": "Jacques (Jacobus Faber) Lefèvre d'Étaples",
+  "advisors": [
+   "131443",
+   "131444"
+  ]
+ },
+ {
+  "id": "131399",
+  "mgp": 131399,
+  "name": "Wolfgang Fabricius Capito",
+  "inst": "Albert-Ludwigs-Universität Freiburg im Breisgau",
+  "year": 1515,
+  "advisors": [
+   "126659",
+   "125938"
+  ]
+ },
+ {
+  "id": "131400",
+  "mgp": 131400,
+  "name": "Elijah ben Asher Levita",
+  "advisors": []
+ },
+ {
+  "id": "131443",
+  "mgp": 131443,
+  "name": "Georgius Hermonymus",
+  "advisors": []
+ },
+ {
+  "id": "131444",
+  "mgp": 131444,
+  "name": "Johannes Argyropoulos",
+  "inst": "Università degli Studi di Padova",
+  "year": 1444,
+  "advisors": [
+   "131561"
+  ]
+ },
+ {
+  "id": "131446",
+  "mgp": 131446,
+  "name": "Moses Perez",
+  "advisors": []
+ },
+ {
+  "id": "131447",
+  "mgp": 131447,
+  "name": "Scipione Fortiguerra",
+  "advisors": [
+   "131535"
+  ]
+ },
+ {
+  "id": "131517",
+  "mgp": 131517,
+  "name": "Guillaume Budé",
+  "advisors": [
+   "131443",
+   "131541"
+  ]
+ },
+ {
+  "id": "131535",
+  "mgp": 131535,
+  "name": "Angelo Poliziano",
+  "advisors": [
+   "131539",
+   "131540"
+  ]
+ },
+ {
+  "id": "131539",
+  "mgp": 131539,
+  "name": "Marsilio Ficino",
+  "advisors": [
+   "131444"
+  ]
+ },
+ {
+  "id": "131540",
+  "mgp": 131540,
+  "name": "Cristoforo Landino",
+  "advisors": [
+   "298288"
+  ]
+ },
+ {
+  "id": "131541",
+  "mgp": 131541,
+  "name": "Janus Lascaris",
+  "advisors": [
+   "131561",
+   "131576"
+  ]
+ },
+ {
+  "id": "131546",
+  "mgp": 131546,
+  "name": "Jacques Toussain",
+  "advisors": [
+   "131517"
+  ]
+ },
+ {
+  "id": "131561",
+  "mgp": 131561,
+  "name": "Basilios Bessarion",
+  "advisors": [
+   "131575"
+  ]
+ },
+ {
+  "id": "131575",
+  "mgp": 131575,
+  "name": "Georgios Plethon Gemistos",
+  "advisors": [
+   "134780",
+   "134781"
+  ]
+ },
+ {
+  "id": "131576",
+  "mgp": 131576,
+  "name": "Demetrios Chalcocondyles",
+  "advisors": [
+   "131584"
+  ]
+ },
+ {
+  "id": "131577",
+  "mgp": 131577,
+  "name": "Joseph Justus Scaliger",
+  "advisors": [
+   "131606"
+  ]
+ },
+ {
+  "id": "131584",
+  "mgp": 131584,
+  "name": "Theodoros Gazes",
+  "advisors": [
+   "134873"
+  ]
+ },
+ {
+  "id": "131606",
+  "mgp": 131606,
+  "name": "Adrien Turnèbe",
+  "advisors": [
+   "131546"
+  ]
+ },
+ {
+  "id": "131743",
+  "mgp": 131743,
+  "name": "Pari Leigh Ford",
+  "inst": "University of Nebraska-Lincoln",
+  "year": 2008,
+  "advisors": [
+   "38652"
+  ]
+ },
+ {
+  "id": "131744",
+  "mgp": 131744,
+  "name": "Joshua Martin Brown Kramer",
+  "inst": "University of Nebraska-Lincoln",
+  "year": 2007,
+  "advisors": [
+   "38652"
+  ]
+ },
+ {
+  "id": "132249",
+  "mgp": 132249,
+  "name": "Peter Allen",
+  "inst": "University of London",
+  "year": 2008,
+  "advisors": [
+   "70964"
+  ]
+ },
+ {
+  "id": "133388",
+  "mgp": 133388,
+  "name": "Renato Carmo",
+  "inst": "Universidade de São Paulo",
+  "year": 2005,
+  "advisors": [
+   "48453"
+  ]
+ },
+ {
+  "id": "133865",
+  "mgp": 133865,
+  "name": "Martin Pei",
+  "inst": "University of Waterloo",
+  "year": 2008,
+  "advisors": [
+   "70416"
+  ]
+ },
+ {
+  "id": "134780",
+  "mgp": 134780,
+  "name": "Demetrios Kydones",
+  "advisors": [
+   "146365"
+  ]
+ },
+ {
+  "id": "134781",
+  "mgp": 134781,
+  "name": "Elissaeus Judaeus",
+  "advisors": []
+ },
+ {
+  "id": "134873",
+  "mgp": 134873,
+  "name": "Vittorino da Feltre",
+  "advisors": [
+   "298290",
+   "298304",
+   "134931"
+  ]
+ },
+ {
+  "id": "134931",
+  "mgp": 134931,
+  "name": "Guarino da Verona",
+  "advisors": [
+   "135185",
+   "298304"
+  ]
+ },
+ {
+  "id": "135185",
+  "mgp": 135185,
+  "name": "Manuel Chrysoloras",
+  "advisors": [
+   "134780"
+  ]
+ },
+ {
+  "id": "136726",
+  "mgp": 136726,
+  "name": "Pietro Roccabonella",
+  "advisors": [
+   "148882",
+   "164338"
+  ]
+ },
+ {
+  "id": "137594",
+  "mgp": 137594,
+  "name": "Manuel De la Rosa",
+  "advisors": [
+   "71583"
+  ]
+ },
+ {
+  "id": "137705",
+  "mgp": 137705,
+  "name": "Jakob Thomasius",
+  "advisors": [
+   "143630"
+  ]
+ },
+ {
+  "id": "138270",
+  "mgp": 138270,
+  "name": "David Conlon",
+  "advisors": [
+   "67729"
+  ]
+ },
+ {
+  "id": "139640",
+  "mgp": 139640,
+  "name": "Melanie Win Myint",
+  "inst": "Universität Hamburg",
+  "year": 2009,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "139641",
+  "mgp": 139641,
+  "name": "Christoph Rempel",
+  "inst": "Universität Hamburg",
+  "year": 2001,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "140181",
+  "mgp": 140181,
+  "name": "Thomas von Kempen à Kempis",
+  "advisors": [
+   "179836",
+   "179837"
+  ]
+ },
+ {
+  "id": "141192",
+  "mgp": 141192,
+  "name": "Noah Prince",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2008,
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "141571",
+  "mgp": 141571,
+  "name": "Thomas Cranmer",
+  "inst": "University of Cambridge",
+  "year": 1526,
+  "advisors": []
+ },
+ {
+  "id": "143630",
+  "mgp": 143630,
+  "name": "Friedrich Leibniz",
+  "advisors": []
+ },
+ {
+  "id": "144780",
+  "mgp": 144780,
+  "name": "Suman Balasubramanian",
+  "inst": "Mississippi State University",
+  "year": 2009,
+  "advisors": [
+   "3294"
+  ]
+ },
+ {
+  "id": "144918",
+  "mgp": 144918,
+  "name": "Jessica McDonald",
+  "inst": "University of Waterloo",
+  "year": 2009,
+  "advisors": [
+   "70416"
+  ]
+ },
+ {
+  "id": "145707",
+  "mgp": 145707,
+  "name": "Constantijn l’Empereur van Oppyck",
+  "advisors": [
+   "130913"
+  ]
+ },
+ {
+  "id": "145708",
+  "mgp": 145708,
+  "name": "Hiob Ludolf",
+  "inst": "Universität Erfurt",
+  "year": 1645,
+  "advisors": [
+   "146374",
+   "125408",
+   "145707"
+  ]
+ },
+ {
+  "id": "145770",
+  "mgp": 145770,
+  "name": "Johann Heinrich Michaelis",
+  "advisors": [
+   "146034",
+   "145708"
+  ]
+ },
+ {
+  "id": "146034",
+  "mgp": 146034,
+  "name": "August Hermann Francke",
+  "advisors": []
+ },
+ {
+  "id": "146035",
+  "mgp": 146035,
+  "name": "Christian Benedict Michaelis",
+  "advisors": [
+   "145770"
+  ]
+ },
+ {
+  "id": "146213",
+  "mgp": 146213,
+  "name": "Viresh Patel",
+  "inst": "London School of Economics and Political Science",
+  "year": 2009,
+  "advisors": [
+   "70964"
+  ]
+ },
+ {
+  "id": "146365",
+  "mgp": 146365,
+  "name": "Nilos Kabasilas",
+  "advisors": [
+   "176844"
+  ]
+ },
+ {
+  "id": "146374",
+  "mgp": 146374,
+  "name": "Johann Möller",
+  "advisors": []
+ },
+ {
+  "id": "147633",
+  "mgp": 147633,
+  "name": "Gergely Ambrus",
+  "inst": "University College London",
+  "year": 2009,
+  "advisors": [
+   "70811"
+  ]
+ },
+ {
+  "id": "148882",
+  "mgp": 148882,
+  "name": "Gaetano da Thiene",
+  "advisors": [
+   "232227"
+  ]
+ },
+ {
+  "id": "148988",
+  "mgp": 148988,
+  "name": "Sam Elliott",
+  "inst": "University of Leeds",
+  "year": 2010,
+  "advisors": [
+   "64978"
+  ]
+ },
+ {
+  "id": "149192",
+  "mgp": 149192,
+  "name": "Ognibene (Omnibonus Leonicenus) Bonisoli da Lonigo",
+  "advisors": [
+   "134873"
+  ]
+ },
+ {
+  "id": "149337",
+  "mgp": 149337,
+  "name": "Wojciech Samotij",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2010,
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "152901",
+  "mgp": 152901,
+  "name": "Marco Musuro",
+  "advisors": [
+   "131541"
+  ]
+ },
+ {
+  "id": "152902",
+  "mgp": 152902,
+  "name": "Nicoletto Vernia",
+  "advisors": [
+   "148882",
+   "232228"
+  ]
+ },
+ {
+  "id": "152903",
+  "mgp": 152903,
+  "name": "Pietro Pomponazzi",
+  "advisors": [
+   "152902",
+   "136726"
+  ]
+ },
+ {
+  "id": "152904",
+  "mgp": 152904,
+  "name": "Giovanni Battista della Monte",
+  "advisors": [
+   "127166",
+   "152901",
+   "152903"
+  ]
+ },
+ {
+  "id": "152905",
+  "mgp": 152905,
+  "name": "Vittore Trincavelli",
+  "advisors": [
+   "152903"
+  ]
+ },
+ {
+  "id": "152906",
+  "mgp": 152906,
+  "name": "Bassiano Landi",
+  "inst": "Università degli Studi di Padova",
+  "year": 1542,
+  "advisors": [
+   "152904",
+   "152905"
+  ]
+ },
+ {
+  "id": "153536",
+  "mgp": 153536,
+  "name": "Karen Johannson",
+  "inst": "The University of Memphis",
+  "year": 2011,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "153537",
+  "mgp": 153537,
+  "name": "Fabricio Benevides",
+  "inst": "The University of Memphis",
+  "year": 2011,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "153538",
+  "mgp": 153538,
+  "name": "Mykhaylo Tyomkyn",
+  "inst": "University of Cambridge",
+  "year": 2010,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "153539",
+  "mgp": 153539,
+  "name": "Bryn Garrod",
+  "inst": "University of Cambridge",
+  "year": 2011,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "153675",
+  "mgp": 153675,
+  "name": "László Fejes Tóth",
+  "inst": "Eötvös Loránd University",
+  "year": 1938,
+  "advisors": [
+   "7488"
+  ]
+ },
+ {
+  "id": "153934",
+  "mgp": 153934,
+  "name": "Alexis Papioannou",
+  "inst": "National Technical University of Athens",
+  "year": 1984,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "155305",
+  "mgp": 155305,
+  "name": "Demetres Christofides",
+  "inst": "University of Cambridge",
+  "year": 2008,
+  "advisors": [
+   "70125"
+  ]
+ },
+ {
+  "id": "155306",
+  "mgp": 155306,
+  "name": "Simon Richard Griffiths",
+  "inst": "University of Cambridge",
+  "year": 2009,
+  "advisors": [
+   "70125"
+  ]
+ },
+ {
+  "id": "155307",
+  "mgp": 155307,
+  "name": "David Christopher Ellis",
+  "inst": "University of Cambridge",
+  "year": 2010,
+  "advisors": [
+   "70125"
+  ]
+ },
+ {
+  "id": "158329",
+  "mgp": 158329,
+  "name": "Guillaume Rondelet",
+  "advisors": [
+   "119159"
+  ]
+ },
+ {
+  "id": "161832",
+  "mgp": 161832,
+  "name": "John Haslegrave",
+  "inst": "University of Cambridge",
+  "year": 2011,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "163160",
+  "mgp": 163160,
+  "name": "Maya Stein",
+  "inst": "Universität Hamburg",
+  "year": 2005,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "163162",
+  "mgp": 163162,
+  "name": "Philipp Sprüssel",
+  "inst": "Universität Hamburg",
+  "year": 2010,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "163164",
+  "mgp": 163164,
+  "name": "Matthias Hamann",
+  "inst": "Universität Hamburg",
+  "year": 2011,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "163297",
+  "mgp": 163297,
+  "name": "Neal Owen Bushaw",
+  "inst": "The University of Memphis",
+  "year": 2012,
+  "advisors": [
+   "22719",
+   "51754"
+  ]
+ },
+ {
+  "id": "163437",
+  "mgp": 163437,
+  "name": "Henning Bruhn",
+  "inst": "Universität Hamburg",
+  "year": 2005,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "164338",
+  "mgp": 164338,
+  "name": "Sigismondo Polcastro",
+  "advisors": []
+ },
+ {
+  "id": "165705",
+  "mgp": 165705,
+  "name": "Katherine Victoria Johnson",
+  "inst": "University of Nebraska-Lincoln",
+  "year": 2012,
+  "advisors": [
+   "38652"
+  ]
+ },
+ {
+  "id": "165805",
+  "mgp": 165805,
+  "name": "Andrew James Uzzell",
+  "inst": "The University of Memphis",
+  "year": 2012,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "166430",
+  "mgp": 166430,
+  "name": "Jane Victoria Butterfield",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2012,
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "166980",
+  "mgp": 166980,
+  "name": "Paul Smith",
+  "inst": "University of Cambridge",
+  "year": 2012,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "168714",
+  "mgp": 168714,
+  "name": "Tom Coker",
+  "inst": "University of Cambridge",
+  "year": 2012,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "175358",
+  "mgp": 175358,
+  "name": "Lutz Peter Warnke",
+  "inst": "University of Oxford",
+  "year": 2012,
+  "advisors": [
+   "76827"
+  ]
+ },
+ {
+  "id": "175570",
+  "mgp": 175570,
+  "name": "Giorgis George Petridis",
+  "inst": "University of Cambridge",
+  "year": 2011,
+  "advisors": [
+   "67729"
+  ]
+ },
+ {
+  "id": "175572",
+  "mgp": 175572,
+  "name": "Gonzalo Fiz Pontiveros",
+  "inst": "University of Cambridge",
+  "year": 2013,
+  "advisors": [
+   "67729"
+  ]
+ },
+ {
+  "id": "175722",
+  "mgp": 175722,
+  "name": "Pablo Candela",
+  "inst": "University of Cambridge",
+  "year": 2009,
+  "advisors": [
+   "67729"
+  ]
+ },
+ {
+  "id": "176844",
+  "mgp": 176844,
+  "name": "Gregory Palamas",
+  "advisors": [
+   "184631"
+  ]
+ },
+ {
+  "id": "178569",
+  "mgp": 178569,
+  "name": "Puck Michaela Rombach",
+  "advisors": [
+   "79346"
+  ]
+ },
+ {
+  "id": "179836",
+  "mgp": 179836,
+  "name": "Geert (Gerardus Magnus) Groote",
+  "advisors": []
+ },
+ {
+  "id": "179837",
+  "mgp": 179837,
+  "name": "Florens (Florentius Radwyn) Radewyns",
+  "advisors": []
+ },
+ {
+  "id": "180122",
+  "mgp": 180122,
+  "name": "Michał Jan Przykucki",
+  "inst": "University of Cambridge",
+  "year": 2013,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "182088",
+  "mgp": 182088,
+  "name": "Johann Jakob von Brunn",
+  "inst": "Universität Basel",
+  "year": 1615,
+  "advisors": [
+   "125048"
+  ]
+ },
+ {
+  "id": "182089",
+  "mgp": 182089,
+  "name": "Gottfried Möbius",
+  "inst": "Friedrich-Schiller-Universität Jena",
+  "year": 1640,
+  "advisors": [
+   "125154"
+  ]
+ },
+ {
+  "id": "182090",
+  "mgp": 182090,
+  "name": "Felix Plater",
+  "advisors": [
+   "158329"
+  ]
+ },
+ {
+  "id": "182105",
+  "mgp": 182105,
+  "name": "Derek Yiu-Chung Wan",
+  "inst": "London School of Economics and Political Science",
+  "year": 2012,
+  "advisors": [
+   "70964"
+  ]
+ },
+ {
+  "id": "183045",
+  "mgp": 183045,
+  "name": "Nazar Miheisi",
+  "inst": "University of Leeds",
+  "year": 2012,
+  "advisors": [
+   "64978"
+  ]
+ },
+ {
+  "id": "184631",
+  "mgp": 184631,
+  "name": "Theodore Metochites",
+  "advisors": [
+   "184632"
+  ]
+ },
+ {
+  "id": "184632",
+  "mgp": 184632,
+  "name": "Manuel Bryennios",
+  "advisors": [
+   "201288"
+  ]
+ },
+ {
+  "id": "184935",
+  "mgp": 184935,
+  "name": "Johann Hoffmann",
+  "advisors": []
+ },
+ {
+  "id": "185884",
+  "mgp": 185884,
+  "name": "Pablo Soberón Bravo",
+  "inst": "University College London",
+  "year": 2013,
+  "advisors": [
+   "70811"
+  ]
+ },
+ {
+  "id": "186283",
+  "mgp": 186283,
+  "name": "Ago-Erik Riet",
+  "inst": "The University of Memphis",
+  "year": 2012,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "186722",
+  "mgp": 186722,
+  "name": "Allan Lo",
+  "inst": "University of Cambridge",
+  "year": 2010,
+  "advisors": [
+   "38524"
+  ]
+ },
+ {
+  "id": "188837",
+  "mgp": 188837,
+  "name": "Hussein Mohamed Ghlaio",
+  "inst": "University of Leeds",
+  "year": 2012,
+  "advisors": [
+   "71583"
+  ]
+ },
+ {
+  "id": "189659",
+  "mgp": 189659,
+  "name": "Abraham Heinecke",
+  "advisors": []
+ },
+ {
+  "id": "190168",
+  "mgp": 190168,
+  "name": "Eoin Patrick Long",
+  "inst": "University of Cambridge",
+  "year": 2012,
+  "advisors": [
+   "70125"
+  ]
+ },
+ {
+  "id": "190703",
+  "mgp": 190703,
+  "name": "Jan-Oliver Fröhlich",
+  "inst": "Universität Hamburg",
+  "year": 2014,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "191279",
+  "mgp": 191279,
+  "name": "Anton Bernhard Lauterbach",
+  "inst": "Friedrich-Schiller-Universität Jena",
+  "year": 1716,
+  "advisors": []
+ },
+ {
+  "id": "192373",
+  "mgp": 192373,
+  "name": "Fidel Barrera-Cruz",
+  "inst": "University of Waterloo",
+  "year": 2014,
+  "advisors": [
+   "70416"
+  ]
+ },
+ {
+  "id": "192497",
+  "mgp": 192497,
+  "name": "John Lenz",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2011,
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "196954",
+  "mgp": 196954,
+  "name": "Lauren Keough",
+  "inst": "University of Nebraska-Lincoln",
+  "year": 2015,
+  "advisors": [
+   "38652"
+  ]
+ },
+ {
+  "id": "196955",
+  "mgp": 196955,
+  "name": "Derek Boeckner",
+  "inst": "University of Nebraska-Lincoln",
+  "year": 2013,
+  "advisors": [
+   "38652"
+  ]
+ },
+ {
+  "id": "197178",
+  "mgp": 197178,
+  "name": "Tomasz Tkocz",
+  "inst": "University of Warwick",
+  "year": 2015,
+  "advisors": [
+   "70811"
+  ]
+ },
+ {
+  "id": "197222",
+  "mgp": 197222,
+  "name": "Richard Alexander Beckwith Johnson",
+  "inst": "The University of Memphis",
+  "year": 2015,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "197232",
+  "mgp": 197232,
+  "name": "Tomas Juskevicius",
+  "inst": "The University of Memphis",
+  "year": 2015,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "197233",
+  "mgp": 197233,
+  "name": "Teeradej Kittipassorn",
+  "inst": "The University of Memphis",
+  "year": 2015,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "197456",
+  "mgp": 197456,
+  "name": "Dominik Vu",
+  "inst": "The University of Memphis",
+  "year": 2014,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "199357",
+  "mgp": 199357,
+  "name": "Nicole Oresme",
+  "mactutor": "Oresme",
+  "advisors": []
+ },
+ {
+  "id": "199665",
+  "mgp": 199665,
+  "name": "Malte Müller",
+  "inst": "Universität Hamburg",
+  "year": 2014,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "199666",
+  "mgp": 199666,
+  "name": "Hadi Afzali",
+  "inst": "Universität Hamburg",
+  "year": 2014,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "199667",
+  "mgp": 199667,
+  "name": "Julian Pott",
+  "inst": "Universität Hamburg",
+  "year": 2015,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "199668",
+  "mgp": 199668,
+  "name": "Johannes Carmesin",
+  "inst": "Universität Hamburg",
+  "year": 2015,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "199862",
+  "mgp": 199862,
+  "name": "Aolo Bashar Abusaksaka",
+  "inst": "University of Leeds",
+  "year": 2015,
+  "advisors": [
+   "64978"
+  ]
+ },
+ {
+  "id": "199863",
+  "mgp": 199863,
+  "name": "Joshua Malcolm Tattersall",
+  "inst": "University of Leeds",
+  "year": 2015,
+  "advisors": [
+   "64978"
+  ]
+ },
+ {
+  "id": "200006",
+  "mgp": 200006,
+  "name": "Albert Clampius",
+  "advisors": [
+   "224249"
+  ]
+ },
+ {
+  "id": "200203",
+  "mgp": 200203,
+  "name": "Fabian Hundertmark",
+  "inst": "Universität Hamburg",
+  "year": 2012,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "200205",
+  "mgp": 200205,
+  "name": "Theodor Müller",
+  "inst": "Universität Hamburg",
+  "year": 2014,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "200206",
+  "mgp": 200206,
+  "name": "Seyed Hadi Afzali Borujeni",
+  "inst": "Universität Hamburg",
+  "year": 2014,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "201288",
+  "mgp": 201288,
+  "name": "Gregory Chioniadis",
+  "advisors": [
+   "204293"
+  ]
+ },
+ {
+  "id": "203852",
+  "mgp": 203852,
+  "name": "Kitty Meeks",
+  "advisors": [
+   "79346"
+  ]
+ },
+ {
+  "id": "204293",
+  "mgp": 204293,
+  "name": "Shams al‐Dīn al‐Bukhārī",
+  "advisors": [
+   "217509"
+  ]
+ },
+ {
+  "id": "206511",
+  "mgp": 206511,
+  "name": "Jonathan Andrew Noel",
+  "advisors": [
+   "79346"
+  ]
+ },
+ {
+  "id": "208258",
+  "mgp": 208258,
+  "name": "Gerardus Leonardus Blasius",
+  "inst": "Universiteit Leiden",
+  "year": 1648,
+  "advisors": []
+ },
+ {
+  "id": "208259",
+  "mgp": 208259,
+  "name": "Siegmund Jakob Baumgarten",
+  "inst": "Martin-Luther-Universität Halle-Wittenberg",
+  "year": 1726,
+  "advisors": [
+   "146035"
+  ]
+ },
+ {
+  "id": "211078",
+  "mgp": 211078,
+  "name": "Irini Perissinaki",
+  "inst": "University College London",
+  "year": 1998,
+  "advisors": [
+   "70811"
+  ]
+ },
+ {
+  "id": "212136",
+  "mgp": 212136,
+  "name": "Michael Szestopalow",
+  "inst": "University of Waterloo",
+  "year": 2016,
+  "advisors": [
+   "70416"
+  ]
+ },
+ {
+  "id": "215023",
+  "mgp": 215023,
+  "name": "Matthew Christopher Ashford",
+  "advisors": [
+   "76827"
+  ]
+ },
+ {
+  "id": "215039",
+  "mgp": 215039,
+  "name": "Annika Heckel",
+  "advisors": [
+   "76827"
+  ]
+ },
+ {
+  "id": "215301",
+  "mgp": 215301,
+  "name": "Steven Trotter",
+  "inst": "University of Leeds",
+  "year": 2016,
+  "advisors": [
+   "90924",
+   "71583"
+  ]
+ },
+ {
+  "id": "217509",
+  "mgp": 217509,
+  "name": "Nasir al-Dīn al-Ṭūsī",
+  "mactutor": "Al-Tusi_Nasir/",
+  "advisors": [
+   "223724",
+   "287480"
+  ]
+ },
+ {
+  "id": "220996",
+  "mgp": 220996,
+  "name": "Ping Hu",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2014,
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "221000",
+  "mgp": 221000,
+  "name": "Michelle Delcourt",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2017,
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "221476",
+  "mgp": 221476,
+  "name": "Shadisadat Ghaderi",
+  "inst": "West Virginia University",
+  "year": 2017,
+  "advisors": [
+   "13139"
+  ]
+ },
+ {
+  "id": "222301",
+  "mgp": 222301,
+  "name": "Ben Andrew Barber",
+  "inst": "University of Cambridge",
+  "year": 2013,
+  "advisors": [
+   "70125"
+  ]
+ },
+ {
+  "id": "222846",
+  "mgp": 222846,
+  "name": "Amy Shaw",
+  "inst": "The University of Memphis",
+  "year": 2017,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "222847",
+  "mgp": 222847,
+  "name": "Julian Sahasrabudhe",
+  "inst": "The University of Memphis",
+  "year": 2017,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "222910",
+  "mgp": 222910,
+  "name": "Bhargav Narayanan",
+  "inst": "University of Cambridge",
+  "year": 2015,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "222913",
+  "mgp": 222913,
+  "name": "Shoham Letzter",
+  "inst": "University of Cambridge",
+  "year": 2015,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "222914",
+  "mgp": 222914,
+  "name": "Jonathan Lee",
+  "inst": "University of Cambridge",
+  "year": 2015,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "222915",
+  "mgp": 222915,
+  "name": "Sebastian Koch",
+  "inst": "University of Cambridge",
+  "year": 2015,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "222916",
+  "mgp": 222916,
+  "name": "Istvan Tomon",
+  "inst": "University of Cambridge",
+  "year": 2016,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "223084",
+  "mgp": 223084,
+  "name": "Nathan Kettle",
+  "inst": "University of Cambridge",
+  "year": 2013,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "223085",
+  "mgp": 223085,
+  "name": "Tom Eccles",
+  "inst": "University of Cambridge",
+  "year": 2013,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "223724",
+  "mgp": 223724,
+  "name": "Kamāl al-Dīn Ibn Yūnus",
+  "mactutor": "Yunus/",
+  "advisors": [
+   "230926",
+   "287466"
+  ]
+ },
+ {
+  "id": "223961",
+  "mgp": 223961,
+  "name": "Tze Lung Chan",
+  "inst": "Universität Hamburg",
+  "year": 2016,
+  "advisors": [
+   "58752",
+   "163437"
+  ]
+ },
+ {
+  "id": "224249",
+  "mgp": 224249,
+  "name": "Reinhard Bachoff von Echt",
+  "inst": "Ruprecht-Karls-Universität Heidelberg",
+  "year": 1598,
+  "advisors": []
+ },
+ {
+  "id": "228736",
+  "mgp": 228736,
+  "name": "Jonathan Tsai",
+  "inst": "University of Cambridge",
+  "year": 2008,
+  "advisors": [
+   "77135"
+  ]
+ },
+ {
+  "id": "230796",
+  "mgp": 230796,
+  "name": "Constantin Ziegra",
+  "advisors": []
+ },
+ {
+  "id": "230926",
+  "mgp": 230926,
+  "name": "Sharaf al-Dīn al-Ṭūsī",
+  "mactutor": "Al-Tusi_Sharaf/",
+  "advisors": []
+ },
+ {
+  "id": "232227",
+  "mgp": 232227,
+  "name": "Paolo (Nicoletti) da Venezia",
+  "advisors": []
+ },
+ {
+  "id": "232228",
+  "mgp": 232228,
+  "name": "Paolo da Pergola",
+  "advisors": [
+   "232227"
+  ]
+ },
+ {
+  "id": "233778",
+  "mgp": 233778,
+  "name": "Rachel Kirsch",
+  "inst": "University of Nebraska-Lincoln",
+  "year": 2018,
+  "advisors": [
+   "38652"
+  ]
+ },
+ {
+  "id": "234928",
+  "mgp": 234928,
+  "name": "Natasha Morrison",
+  "advisors": [
+   "79346"
+  ]
+ },
+ {
+  "id": "238538",
+  "mgp": 238538,
+  "name": "Corbin Groothuis",
+  "inst": "University of Nebraska-Lincoln",
+  "year": 2018,
+  "advisors": [
+   "38652"
+  ]
+ },
+ {
+  "id": "240188",
+  "mgp": 240188,
+  "name": "Daniel Weissauer",
+  "inst": "Universität Hamburg",
+  "year": 2018,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "240189",
+  "mgp": 240189,
+  "name": "Karl Heuer",
+  "inst": "Universität Hamburg",
+  "year": 2018,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "241401",
+  "mgp": 241401,
+  "name": "Andrzej Stanislaw Kucik",
+  "inst": "University of Leeds",
+  "year": 2017,
+  "advisors": [
+   "64978"
+  ]
+ },
+ {
+  "id": "253503",
+  "mgp": 253503,
+  "name": "Babak Miraftab",
+  "inst": "Universität Hamburg",
+  "year": 2019,
+  "advisors": [
+   "58752",
+   "163164"
+  ]
+ },
+ {
+  "id": "253572",
+  "mgp": 253572,
+  "name": "Stephen G. Z. Smith",
+  "inst": "The University of Memphis",
+  "year": 2019,
+  "advisors": [
+   "22719",
+   "51754"
+  ]
+ },
+ {
+  "id": "257169",
+  "mgp": 257169,
+  "name": "Joshua Erde",
+  "inst": "University of Cambridge",
+  "year": 2014,
+  "advisors": [
+   "70125"
+  ]
+ },
+ {
+  "id": "257911",
+  "mgp": 257911,
+  "name": "Jochen Pascal Gollin",
+  "inst": "Universität Hamburg",
+  "year": 2019,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "259126",
+  "mgp": 259126,
+  "name": "Brent McKain",
+  "inst": "University of Nebraska-Lincoln",
+  "year": 2017,
+  "advisors": [
+   "38652"
+  ]
+ },
+ {
+  "id": "259757",
+  "mgp": 259757,
+  "name": "Stefan David",
+  "inst": "University of Cambridge",
+  "year": 2018,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "260105",
+  "mgp": 260105,
+  "name": "António Girão",
+  "inst": "University of Cambridge",
+  "year": 2019,
+  "advisors": [
+   "22719",
+   "38524"
+  ]
+ },
+ {
+  "id": "260951",
+  "mgp": 260951,
+  "name": "Maurício Collares",
+  "inst": "Instituto de Matemática Pura e Aplicada",
+  "year": 2015,
+  "advisors": [
+   "109705"
+  ]
+ },
+ {
+  "id": "261671",
+  "mgp": 261671,
+  "name": "Kamil Popielarz",
+  "inst": "The University of Memphis",
+  "year": 2018,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "264639",
+  "mgp": 264639,
+  "name": "Rebekah Herrman",
+  "inst": "The University of Memphis",
+  "year": 2020,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "265419",
+  "mgp": 265419,
+  "name": "Hong Liu",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2015,
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "265420",
+  "mgp": 265420,
+  "name": "Maryam Sharifzadeh",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2016,
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "265421",
+  "mgp": 265421,
+  "name": "Zsolt Adam Wagner",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2018,
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "265691",
+  "mgp": 265691,
+  "name": "Hunter Spink",
+  "inst": "Harvard University",
+  "year": 2020,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "267151",
+  "mgp": 267151,
+  "name": "Richard Snyder",
+  "inst": "The University of Memphis",
+  "year": 2018,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "268248",
+  "mgp": 268248,
+  "name": "Sophia Maria Franziska Saller",
+  "advisors": [
+   "76827"
+  ]
+ },
+ {
+  "id": "269670",
+  "mgp": 269670,
+  "name": "Carl Bürger",
+  "year": 2020,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "269671",
+  "mgp": 269671,
+  "name": "Jan Kurkofka",
+  "year": 2020,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "269672",
+  "mgp": 269672,
+  "name": "Jakob Kneip",
+  "inst": "Universität Hamburg",
+  "year": 2020,
+  "advisors": [
+   "58752"
+  ]
+ },
+ {
+  "id": "269986",
+  "mgp": 269986,
+  "name": "Lina Li",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2020,
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "275707",
+  "mgp": 275707,
+  "name": "Sarka Petrickova",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2017,
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "276824",
+  "mgp": 276824,
+  "name": "Emily Heath",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2021,
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "277121",
+  "mgp": 277121,
+  "name": "George D. Nasr",
+  "inst": "University of Nebraska-Lincoln",
+  "year": 2021,
+  "advisors": [
+   "38652"
+  ]
+ },
+ {
+  "id": "277474",
+  "mgp": 277474,
+  "name": "Yifan Jing",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2021,
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "278144",
+  "mgp": 278144,
+  "name": "Anaam Mutar Bidhan",
+  "inst": "West Virginia University",
+  "year": 2018,
+  "advisors": [
+   "13139"
+  ]
+ },
+ {
+  "id": "278145",
+  "mgp": 278145,
+  "name": "Martin Andrew Storm",
+  "inst": "West Virginia University",
+  "year": 2019,
+  "advisors": [
+   "13139"
+  ]
+ },
+ {
+  "id": "282809",
+  "mgp": 282809,
+  "name": "Oliver Janzer",
+  "inst": "University of Cambridge",
+  "year": 2020,
+  "advisors": [
+   "67729"
+  ]
+ },
+ {
+  "id": "282810",
+  "mgp": 282810,
+  "name": "Jason Long",
+  "inst": "University of Cambridge",
+  "year": 2019,
+  "advisors": [
+   "67729"
+  ]
+ },
+ {
+  "id": "282812",
+  "mgp": 282812,
+  "name": "Omid Hatami",
+  "inst": "University of Cambridge",
+  "year": 2016,
+  "advisors": [
+   "67729"
+  ]
+ },
+ {
+  "id": "282818",
+  "mgp": 282818,
+  "name": "Katarzyna Wyczesany",
+  "inst": "University of Cambridge",
+  "year": 2021,
+  "advisors": [
+   "67729"
+  ]
+ },
+ {
+  "id": "282878",
+  "mgp": 282878,
+  "name": "Sopon Boriboon",
+  "inst": "Chulalongkorn University",
+  "year": 2021,
+  "advisors": [
+   "197233"
+  ]
+ },
+ {
+  "id": "283012",
+  "mgp": 283012,
+  "name": "Rachel Barber",
+  "inst": "Mississippi State University",
+  "year": 2021,
+  "advisors": [
+   "3294"
+  ]
+ },
+ {
+  "id": "283117",
+  "mgp": 283117,
+  "name": "Asmahan Alajyan",
+  "inst": "University of Leeds",
+  "year": 2021,
+  "advisors": [
+   "64978"
+  ]
+ },
+ {
+  "id": "283118",
+  "mgp": 283118,
+  "name": "Ryan O'Loughlin",
+  "inst": "University of Leeds",
+  "year": 2021,
+  "advisors": [
+   "64978"
+  ]
+ },
+ {
+  "id": "284502",
+  "mgp": 284502,
+  "name": "Arès Méroueh",
+  "inst": "University of Cambridge",
+  "year": 2016,
+  "advisors": [
+   "38524"
+  ]
+ },
+ {
+  "id": "284503",
+  "mgp": 284503,
+  "name": "Richard Montgomery",
+  "inst": "University of Cambridge",
+  "year": 2015,
+  "advisors": [
+   "38524"
+  ]
+ },
+ {
+  "id": "284504",
+  "mgp": 284504,
+  "name": "David Saxton",
+  "inst": "University of Cambridge",
+  "year": 2012,
+  "advisors": [
+   "38524"
+  ]
+ },
+ {
+  "id": "284505",
+  "mgp": 284505,
+  "name": "Edward Marchant",
+  "inst": "University of Cambridge",
+  "year": 2010,
+  "advisors": [
+   "38524"
+  ]
+ },
+ {
+  "id": "284506",
+  "mgp": 284506,
+  "name": "Frederick Charles Illingworth",
+  "inst": "University of Cambridge",
+  "year": 2021,
+  "advisors": [
+   "38524"
+  ]
+ },
+ {
+  "id": "286244",
+  "mgp": 286244,
+  "name": "Matthew Daniel Wales",
+  "inst": "University of Cambridge",
+  "year": 2022,
+  "advisors": [
+   "38524"
+  ]
+ },
+ {
+  "id": "287466",
+  "mgp": 287466,
+  "name": "Saraf al-Dīn Muhammad al-Masʿūdī al-Marwazī",
+  "advisors": [
+   "295739"
+  ]
+ },
+ {
+  "id": "287468",
+  "mgp": 287468,
+  "name": "Bahmanyār ibn al-Marzubān",
+  "advisors": [
+   "298616"
+  ]
+ },
+ {
+  "id": "287478",
+  "mgp": 287478,
+  "name": "Fakhr al-Dīn Muhammad al-Rēzī",
+  "advisors": [
+   "287466"
+  ]
+ },
+ {
+  "id": "287479",
+  "mgp": 287479,
+  "name": "Qutb al-Dīn Ibrāhīm al-Mīṣrī",
+  "advisors": [
+   "287478"
+  ]
+ },
+ {
+  "id": "287480",
+  "mgp": 287480,
+  "name": "Athīr al-Dīn al-Mufaḍḍal al-Abharī",
+  "advisors": [
+   "223724",
+   "287479"
+  ]
+ },
+ {
+  "id": "287727",
+  "mgp": 287727,
+  "name": "Felix Christian Clemen",
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "290650",
+  "mgp": 290650,
+  "name": "Tom Johnston",
+  "advisors": [
+   "79346"
+  ]
+ },
+ {
+  "id": "290651",
+  "mgp": 290651,
+  "name": "Alexander Roberts",
+  "advisors": [
+   "79346"
+  ]
+ },
+ {
+  "id": "290652",
+  "mgp": 290652,
+  "name": "Hannah Guggiari",
+  "advisors": [
+   "79346"
+  ]
+ },
+ {
+  "id": "290653",
+  "mgp": 290653,
+  "name": "Carla Groenland",
+  "advisors": [
+   "79346"
+  ]
+ },
+ {
+  "id": "294355",
+  "mgp": 294355,
+  "name": "William Linz",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2022,
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "295127",
+  "mgp": 295127,
+  "name": "Marius Tiba",
+  "inst": "University of Cambridge",
+  "year": 2022,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "295128",
+  "mgp": 295128,
+  "name": "Peter Laurens Leonard van Hintum",
+  "inst": "University of Cambridge",
+  "year": 2022,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "295739",
+  "mgp": 295739,
+  "name": "Ghiyāth al-Dīn Abū al-Fatḥ ʿUmar ibn Ibrāhīm al-Khayyām al-Nīsābūrī",
+  "advisors": [
+   "287468"
+  ]
+ },
+ {
+  "id": "297022",
+  "mgp": 297022,
+  "name": "Souktik Roy",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2023,
+  "advisors": [
+   "106406"
+  ]
+ },
+ {
+  "id": "297352",
+  "mgp": 297352,
+  "name": "Walner Mendonça",
+  "inst": "Instituto de Matemática Pura e Aplicada",
+  "year": 2020,
+  "advisors": [
+   "109705"
+  ]
+ },
+ {
+  "id": "297903",
+  "mgp": 297903,
+  "name": "Vojtech Dvorak",
+  "inst": "University of Cambridge",
+  "year": 2022,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "298288",
+  "mgp": 298288,
+  "name": "George of Trebizond",
+  "advisors": [
+   "134873"
+  ]
+ },
+ {
+  "id": "298290",
+  "mgp": 298290,
+  "name": "Gasparino da Barzizza",
+  "advisors": []
+ },
+ {
+  "id": "298292",
+  "mgp": 298292,
+  "name": "Corrine Yap",
+  "inst": "Rutgers University, New Brunswick",
+  "year": 2023,
+  "advisors": [
+   "222910"
+  ]
+ },
+ {
+  "id": "298304",
+  "mgp": 298304,
+  "name": "Giovanni Conversini",
+  "advisors": []
+ },
+ {
+  "id": "298389",
+  "mgp": 298389,
+  "name": "Maria-Romina Ivan",
+  "inst": "University of Cambridge",
+  "year": 2023,
+  "advisors": [
+   "70125"
+  ]
+ },
+ {
+  "id": "298616",
+  "mgp": 298616,
+  "name": "Abu ʿAli al-Husayn (Avicenna) ibn Sina",
+  "advisors": [
+   "316872",
+   "310782",
+   "316873"
+  ]
+ },
+ {
+  "id": "300223",
+  "mgp": 300223,
+  "name": "Luka Milićević",
+  "inst": "University of Cambridge",
+  "year": 2018,
+  "advisors": [
+   "70125"
+  ]
+ },
+ {
+  "id": "300224",
+  "mgp": 300224,
+  "name": "Eero Räty",
+  "inst": "University of Cambridge",
+  "year": 2021,
+  "advisors": [
+   "70125"
+  ]
+ },
+ {
+  "id": "305640",
+  "mgp": 305640,
+  "name": "Fatimah Abdullah A Alabbad",
+  "inst": "University of Leeds",
+  "year": 2023,
+  "advisors": [
+   "64978"
+  ]
+ },
+ {
+  "id": "310782",
+  "mgp": 310782,
+  "name": "Abu Sahl 'Isa ibn Yahya al-Masihi",
+  "advisors": []
+ },
+ {
+  "id": "316872",
+  "mgp": 316872,
+  "name": "Abu Abdallah Al-Husayn ibn Ibrahim al-Natili",
+  "advisors": []
+ },
+ {
+  "id": "316873",
+  "mgp": 316873,
+  "name": "Abu Mansur al-Hasan ibn Nuh al-Qumri",
+  "advisors": []
+ },
+ {
+  "id": "319303",
+  "mgp": 319303,
+  "name": "Oleksiy Al-saadi",
+  "inst": "University of Nebraska-Lincoln",
+  "year": 2024,
+  "advisors": [
+   "38652"
+  ]
+ },
+ {
+  "id": "321860",
+  "mgp": 321860,
+  "name": "Marcelo Campos",
+  "inst": "Instituto de Matemática Pura e Aplicada",
+  "year": 2023,
+  "advisors": [
+   "109705"
+  ]
+ },
+ {
+  "id": "321861",
+  "mgp": 321861,
+  "name": "Daniel Blanquicett",
+  "inst": "Instituto de Matemática Pura e Aplicada",
+  "year": 2019,
+  "advisors": [
+   "109705"
+  ]
+ },
+ {
+  "id": "321935",
+  "mgp": 321935,
+  "name": "Lucas Aragão",
+  "inst": "Instituto de Matemática Pura e Aplicada",
+  "year": 2024,
+  "advisors": [
+   "109705"
+  ]
+ },
+ {
+  "id": "321936",
+  "mgp": 321936,
+  "name": "Luiz Moreira",
+  "inst": "Instituto de Matemática Pura e Aplicada",
+  "year": 2020,
+  "advisors": [
+   "109705"
+  ]
+ },
+ {
+  "id": "321937",
+  "mgp": 321937,
+  "name": "Letícia Mattos",
+  "inst": "Instituto de Matemática Pura e Aplicada",
+  "year": 2021,
+  "advisors": [
+   "109705"
+  ]
+ },
+ {
+  "id": "321938",
+  "mgp": 321938,
+  "name": "Pedro Araújo",
+  "inst": "Instituto de Matemática Pura e Aplicada",
+  "year": 2021,
+  "advisors": [
+   "109705"
+  ]
+ },
+ {
+  "id": "325090",
+  "mgp": 325090,
+  "name": "Nikola Kuzmanovski",
+  "inst": "University of Nebraska-Lincoln",
+  "year": 2024,
+  "advisors": [
+   "38652"
+  ]
+ },
+ {
+  "id": "325461",
+  "mgp": 325461,
+  "name": "Oscar Ortega Moreno",
+  "inst": "University of Warwick",
+  "year": 2020,
+  "advisors": [
+   "70811"
+  ]
+ },
+ {
+  "id": "327399",
+  "mgp": 327399,
+  "name": "Thanaporn Sumalroj",
+  "inst": "Chulalongkorn University",
+  "year": 2024,
+  "advisors": [
+   "197233"
+  ]
+ },
+ {
+  "id": "327946",
+  "mgp": 327946,
+  "name": "Junming Ke",
+  "inst": "University of Tartu",
+  "year": 2024,
+  "advisors": [
+   "186283"
+  ]
+ },
+ {
+  "id": "328923",
+  "mgp": 328923,
+  "name": "Ronen Wdowinski",
+  "inst": "University of Waterloo",
+  "year": 2024,
+  "advisors": [
+   "70416"
+  ]
+ },
+ {
+  "id": "334342",
+  "mgp": 334342,
+  "name": "Adva Mond",
+  "inst": "University of Cambridge",
+  "year": 2024,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "334344",
+  "mgp": 334344,
+  "name": "Julien Portier",
+  "year": 2024,
+  "advisors": [
+   "22719"
+  ]
+ },
+ {
+  "id": "337943",
+  "mgp": 337943,
+  "name": "Bernardo Ameneyro Rodriguez",
+  "inst": "University of Tennessee - Knoxville",
+  "year": 2025,
+  "advisors": [
+   "264639"
+  ]
+ },
+ {
+  "id": "347579",
+  "mgp": 347579,
+  "name": "Haoran Luo",
+  "inst": "University of Illinois at Urbana-Champaign",
+  "year": 2025,
+  "advisors": [
+   "106406"
+  ]
+ }
+]

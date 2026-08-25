@@ -1,0 +1,207 @@
+{
+ "current": {
+  "term": "Fall 2026",
+  "note": "",
+  "courses": [
+   {
+    "number": "MATH 300",
+    "title": "Introduction to Mathematical Reasoning",
+    "detail": "Section 004 (CRN 39277)"
+   },
+   {
+    "number": "MATH 350",
+    "title": "Introductory Combinatorics",
+    "detail": "Section 001 (CRN 44237)"
+   }
+  ]
+ },
+ "institutions": [
+  {
+   "name": "Virginia Commonwealth University",
+   "courses": [
+    {
+     "number": "MATH 200",
+     "title": "Calculus with Analytic Geometry I",
+     "terms": "Spring 2020, Spring 2022, Fall 2025",
+     "desc": "Limits, continuity, derivatives, differentials, antiderivatives and definite integrals."
+    },
+    {
+     "number": "MATH 300",
+     "title": "Introduction to Mathematical Reasoning",
+     "terms": "Fall 2017, Fall 2018, Fall 2019, Fall 2020, Fall 2021, Fall 2022, Spring 2023, Fall 2025, Fall 2026",
+     "desc": "An introduction to basic concepts of mathematical reasoning and the writing of proofs in an elementary setting. Direct, indirect and induction proofs. Illustrations of the concepts include basic proofs from mathematical logic, elementary set theory, elementary number theory, number systems, foundations of calculus, relations, equivalence relations, functions and counting with emphasis on combinatorial proofs."
+    },
+    {
+     "number": "MATH 310",
+     "title": "Linear Algebra",
+     "terms": "Spring 2026",
+     "desc": "Systems of linear equations, vector spaces, linear dependence, bases, dimensions, linear mappings, matrices, determinants, quadratic forms, orthogonal reduction to diagonal form, eigenvalues and geometric applications."
+    },
+    {
+     "number": "MATH 350",
+     "title": "Introductory Combinatorics",
+     "terms": "Fall 2017, Fall 2022, Fall 2026",
+     "desc": "An introduction to basic combinatorial concepts such as combinations, permutations, binomial coefficients, Fibonacci numbers and Pascal's triangle; basic theorems such as the pigeonhole principle and Newton's binomial theorem; algorithms such as bubble sort and quicksort; and discussion of basic applications such as chessboard problems, combinatorial games, magic squares and Latin squares."
+    },
+    {
+     "number": "MATH 356",
+     "title": "Graphs and Algorithms",
+     "terms": "Spring 2019, Spring 2020",
+     "desc": "An introduction to basic graph theoretic concepts such as trees, colorings and matchings; basic theorems such as the handshaking lemma and the Gallai identities; algorithms such as Dijkstra's and Kruskal's; and discussion of famous open problems such as finding shortest tours for a traveling salesman."
+    },
+    {
+     "number": "MATH 490",
+     "title": "Mathematical Expositions",
+     "terms": "Spring 2019",
+     "desc": "A senior capstone course in the major designed to help students attain proficiency in expository mathematical writing and oral presentation, which require the efficient and effective use of mathematics and the English language. Students will learn a variety of topics in mathematics, write reviews of selected award-winning mathematics papers and write a senior paper."
+    },
+    {
+     "number": "MATH 556",
+     "title": "Graph Theory",
+     "terms": "Fall 2018, Fall 2021, Fall 2023",
+     "desc": "Introduction to graph classes, graph invariants, graph algorithms, graph theoretic proof techniques and applications."
+    },
+    {
+     "number": "MATH 650",
+     "title": "Advanced Combinatorics",
+     "terms": "Fall 2019, Fall 2023",
+     "desc": "Topics include advanced applications of the pigeonhole principle and inclusion&ndash;exclusion principle, recurrence relations, generating functions, special counting sequences, Ramsey theory, and combinatorial designs and codes."
+    },
+    {
+     "number": "MATH 656",
+     "title": "Advanced Graph Theory",
+     "terms": "Spring 2018, Spring 2023, Spring 2026",
+     "desc": "This course lays a rigorous theoretical foundation for further advanced study in graph theory. Topics may include connectivity, matching, planarity, coloring, Hamiltonian cycles and topological graph theory, as well as further advanced material."
+    },
+    {
+     "number": "MATH 756",
+     "title": "Topics in Graph Theory",
+     "terms": "Fall 2020",
+     "desc": "A detailed study of selected topics, which may include extremal graph theory, spectral graph theory, infinite graphs, random graphs and graph minors. Fall 2020 focus: extremal graph theory."
+    }
+   ]
+  },
+  {
+   "name": "University of Vermont",
+   "courses": [
+    {
+     "number": "MATH 3230",
+     "title": "Ordinary Differential Equations",
+     "terms": "Spring 2025",
+     "desc": "Solutions of linear ordinary differential equations, the Laplace transformation, and series solutions of differential equations."
+    },
+    {
+     "number": "MATH 6678",
+     "title": "Topics in Combinatorics",
+     "terms": "Spring 2025",
+     "desc": "Topics will vary each semester and may include combinatorial designs, coding theory, topological graph theory, cryptography."
+    }
+   ]
+  },
+  {
+   "name": "Arizona State University",
+   "courses": [
+    {
+     "number": "MAT 194",
+     "title": "CLAS Early Start Program Mathematics",
+     "terms": "Summer/Fall 2016",
+     "desc": "Intensive two-week program for incoming mathematics majors. Focuses on building problem solving skills and mathematical background, as well as tools to help ensure academic success and to ease the transition to college life."
+    },
+    {
+     "number": "MAT 210",
+     "title": "Business Calculus",
+     "terms": "Online, Spring 2017",
+     "desc": ""
+    },
+    {
+     "number": "MAT 243",
+     "title": "Discrete Mathematical Structures",
+     "terms": "Fall 2016",
+     "desc": "Logic, sets, functions, elementary number theory and combinatorics, recursive algorithms, and mathematical reasoning, including induction. Emphasizes connections to computer science."
+    },
+    {
+     "number": "MAT 265",
+     "title": "Calculus for Engineers I",
+     "terms": "Fall 2016",
+     "desc": "Limits and continuity, differential calculus of functions of one variable, introduction to integration."
+    },
+    {
+     "number": "MAT 266",
+     "title": "Calculus for Engineers II",
+     "terms": "Fall 2016",
+     "desc": "Methods of integration, applications of calculus, elements of analytic geometry, improper integrals, Taylor series."
+    },
+    {
+     "number": "MAT 275",
+     "title": "Modern Differential Equations",
+     "terms": "Fall 2013 (2 sections)",
+     "desc": "Introduces differential equations, theoretical and practical solution techniques. Applications. Problem solving using MATLAB."
+    },
+    {
+     "number": "MAT 300",
+     "title": "Mathematical Structures",
+     "terms": "Fall 2014, Fall 2015",
+     "desc": "Logic and set theory, induction, functions, order and equivalence relations, cardinality. Emphasizes writing proofs."
+    },
+    {
+     "number": "MAT 416/513",
+     "title": "Introduction to Graph Theory",
+     "terms": "Spring 2017",
+     "desc": ""
+    },
+    {
+     "number": "MAT 516",
+     "title": "Graph Theory I",
+     "terms": "Fall 2014, Fall 2015",
+     "desc": "First semester of a systematic development of graph theory, including matchings, connectivity, arboricity, planarity, coloring, network flows."
+    },
+    {
+     "number": "MAT 517",
+     "title": "Graph Theory II",
+     "terms": "Spring 2015, Spring 2016",
+     "desc": "Second semester of a systematic development of graph theory, including dense and sparse graphs, Ramsey theory, hamiltonicity, random graphs, minors."
+    }
+   ]
+  },
+  {
+   "name": "University of Memphis",
+   "courses": [
+    {
+     "number": "MATH 1710",
+     "title": "College Algebra",
+     "terms": "Spring 2011 (2 sections)",
+     "desc": "Analysis of functions (linear, quadratic, polynomial, root, rational, exponential, logarithmic) using graphing calculators; partial fractions; synthetic division; conic sections; theory of equations; inequalities; applications."
+    }
+   ]
+  },
+  {
+   "name": "Western Washington University",
+   "courses": [
+    {
+     "number": "MATH 112",
+     "title": "Functions and Algebraic Methods",
+     "terms": "Fall 2006",
+     "desc": "Pattern recognition and generalization, building mathematical models and problem solving are emphasized. Supporting topics include polynomials, linear and quadratic equations, inequalities, graphs, rational expressions, radicals and functions."
+    },
+    {
+     "number": "MATH 114",
+     "title": "Precalculus I",
+     "terms": "Winter 2007, Spring 2007, Fall 2008",
+     "desc": "Data analysis, functions as mathematical models, functions and their graphs."
+    },
+    {
+     "number": "MATH 115",
+     "title": "Precalculus II",
+     "terms": "Winter 2008",
+     "desc": "Data analysis, modeling, trigonometry, inverse functions."
+    },
+    {
+     "number": "MATH 157",
+     "title": "Business Calculus",
+     "terms": "Spring 2008",
+     "desc": "Limits, rates of change, differentiation, graphing and optimization, integration, business applications, partial differentiation."
+    }
+   ]
+  }
+ ]
+}

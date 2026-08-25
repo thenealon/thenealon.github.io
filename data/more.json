@@ -1,0 +1,123 @@
+[
+ {
+  "kind": "demo",
+  "name": "Cyclic Pianos",
+  "href": "bridges26.html",
+  "when": "2026",
+  "meta": "Browser · no dependencies · works offline",
+  "what": "A playable keyboard whose keys are the vertices of a cycle or of a Möbius ladder, with anywhere up to 24 notes to the octave. The black-key set is chosen to minimise energy on the underlying graph, and the geometry of whatever you are playing is drawn live beside the keys. It will also read a MIDI file and play it back on the current tuning, naming the chords and scrolling the score as it goes."
+ },
+ {
+  "kind": "demo",
+  "name": "Cyclic Sequences",
+  "href": "seq.html",
+  "when": "2026",
+  "meta": "Browser · no dependencies",
+  "what": "Companion page to the Bridges 2026 work: minimum-energy sets on cycles and Möbius ladders, and the sequences the keyboards are built from."
+ },
+ {
+  "kind": "demo",
+  "name": "Mathematical genealogy",
+  "href": "genealogy.html",
+  "when": "2026",
+  "meta": "Browser · portraits from Wikipedia",
+  "what": "My advisor graph, back through Bollobás, Erdős, Fejér, Weierstraß and Gauß to seventeenth-century Leipzig. Click anyone to light up every path from them down to me. It is a graph and not a tree, which is the fun of it."
+ },
+ {
+  "kind": "demo",
+  "draft": true,
+  "name": "Möbius piano strips",
+  "href": "",
+  "when": "2026",
+  "meta": "LaTeX / TikZ · printable",
+  "what": "Two-sided printable Möbius band keyboards with duplex registration and parameterised key layouts, including an all-white version for students to fill in themselves."
+ },
+ {
+  "kind": "exhibit",
+  "name": "Cyclic and Möbius Pianos",
+  "href": "https://gallery.bridgesmathart.org/exhibitions/bridges-2026-exhibition-of-mathematical-art/neal-bushaw",
+  "when": "2026",
+  "meta": "Bridges 2026 Exhibition of Mathematical Art, Craft, and Design · University of Galway, Ireland",
+  "what": "3D-printed keyboards laid out on cycles and Möbius ladders."
+ },
+ {
+  "kind": "exhibit",
+  "name": "Alternative Pianos",
+  "href": "https://gallery.bridgesmathart.org/exhibitions/bridges-2024-exhibition-of-mathematical-art",
+  "when": "2024",
+  "meta": "Bridges 2024 Exhibition of Mathematical Art, Craft, and Design · Richmond VA",
+  "what": "3D-printed keyboards built on cycles and Möbius ladders."
+ },
+ {
+  "kind": "outreach",
+  "name": "Mathematical Rhythms",
+  "href": "https://www.bridgesmathart.org/b2026/bridges-2026-program/",
+  "when": "Aug 2026",
+  "meta": "Bridges 2026 Family Day · University of Galway, Ireland",
+  "what": "Four floating percussion panels, each playing the minimum-energy onset set on a cycle or a Möbius ladder. Drag the graph to change the number of pulses and strikes; pull the centre arc to rotate. Runs offline on a tablet."
+ },
+ {
+  "kind": "outreach",
+  "name": "VCU Math Circle",
+  "href": "",
+  "when": "2018–2022",
+  "meta": "Virginia Commonwealth University, Richmond VA",
+  "what": "Run for high school students. Sessions on percolation among zombies, and on mathematical music theory."
+ },
+ {
+  "kind": "outreach",
+  "name": "ASU Math Circle",
+  "href": "",
+  "when": "2015–2016",
+  "meta": "Arizona State University, Tempe AZ",
+  "what": "Run for high school students. Sessions on winning strategies, and on mad scientists, permutations and combinatorics."
+ },
+ {
+  "kind": "outreach",
+  "name": "Sonya Kovalevsky Girls in Math Day",
+  "href": "",
+  "when": "2017, 2018",
+  "meta": "Virginia Commonwealth University, Richmond VA",
+  "what": "Conway's rational tangles, for junior high and middle school students."
+ },
+ {
+  "kind": "outreach",
+  "name": "Mathematics Awareness Day",
+  "href": "",
+  "when": "2015, 2016",
+  "meta": "Arizona State University, Tempe AZ",
+  "what": "Workshops for high school students on the mathematics of billiards and reflections, and on Conway's rational tangles."
+ },
+ {
+  "kind": "session",
+  "name": "Coloring Problems in Combinatorics",
+  "when": "Jan 2025",
+  "href": "https://jointmathematicsmeetings.org/meetings/national/jmm2025/2314_program_ss28.html#title",
+  "meta": "AMS Special Session · Joint Mathematics Meetings, Seattle WA",
+  "what": ""
+ },
+ {
+  "kind": "session",
+  "name": "Topics in Combinatorics and Graph Theory",
+  "when": "Jan 2024",
+  "href": "https://jointmathematicsmeetings.org/meetings/national/jmm2024/2300_special.html",
+  "meta": "AMS Special Session · Joint Mathematics Meetings, San Francisco CA · with Cory Palmer and Anastasia Halfpap",
+  "what": ""
+ },
+ {
+  "kind": "session",
+  "name": "Extremal Graph Theory",
+  "when": "Apr 2023",
+  "href": "https://www.ams.org/meetings/sectional/2308_special.html",
+  "meta": "AMS Special Session · Spring Central Sectional Meeting, University of Cincinnati · with Puck Rombach, Calum Buchanan and Victoria Bednar",
+  "what": ""
+ },
+ {
+  "kind": "press",
+  "name": "Meet a student",
+  "href": "https://math.vcu.edu/programs/undergraduate/meet-a-student/",
+  "when": "2023",
+  "meta": "VCU Department of Mathematics and Statistics",
+  "what": "Somebody says something kind. Scroll down."
+ }
+]

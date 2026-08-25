@@ -1,0 +1,234 @@
+[
+ {
+  "key": "bushaw-clifton-3nbr",
+  "status": "preprint",
+  "year": 2026,
+  "authors": "N. Bushaw and A. Clifton",
+  "title": "3-neighbor bootstrap percolation on two-dimensional grids",
+  "venue": "Preprint.",
+  "arxiv": "2608.06133"
+ },
+ {
+  "key": "bushaw-cyclic-mobius-pianos",
+  "status": "published",
+  "year": 2026,
+  "authors": "N. Bushaw",
+  "title": "Cyclic and Möbius pianos",
+  "venue": "Bridges 2026 Conference Proceedings, 591–594.",
+  "oa": "https://archive.bridgesmathart.org/2026/",
+  "oa_label": "Bridges archive"
+ },
+ {
+  "key": "bushaw-danielsson-hurlbert-ekr",
+  "status": "preprint",
+  "year": 2025,
+  "authors": "N. Bushaw, J. Danielsson and G. Hurlbert",
+  "title": "Erdős–Ko–Rado theorems for paths in graphs",
+  "venue": "Submitted.",
+  "arxiv": "2504.05406"
+ },
+ {
+  "key": "bardenova-etal-wiener",
+  "status": "preprint",
+  "year": 2025,
+  "authors": "V. Bardenova, N. Bushaw, B. Cody, P. Fay and M. Tennant",
+  "title": "The Wiener index of vertex colorings",
+  "venue": "Submitted.",
+  "arxiv": "2503.18920"
+ },
+ {
+  "key": "bushaw-etal-berge-stars",
+  "status": "preprint",
+  "year": 2025,
+  "authors": "N. Bushaw, S. English, E. Heath, D. P. Johnston and P. Rombach",
+  "title": "The saturation spectrum of Berge stars",
+  "venue": "Submitted.",
+  "arxiv": "2502.17686"
+ },
+ {
+  "key": "bednar-bushaw-rainbow-turan",
+  "status": "published",
+  "year": 2025,
+  "authors": "V. Bednar and N. Bushaw",
+  "title": "Rainbow Turán methods for trees",
+  "venue": "Australasian Journal of Combinatorics <b>91</b> (2025), 266–281.",
+  "arxiv": "2203.13765",
+  "oa": "http://ajc.maths.uq.edu.au/pdf/91/ajc_v91_p266.pdf",
+  "oa_label": "Australasian J. Combinatorics"
+ },
+ {
+  "key": "bushaw-cody-leffler-energy",
+  "status": "published",
+  "year": 2025,
+  "authors": "N. Bushaw, B. Cody and C. Leffler",
+  "title": "Sets of vertices with extremal energy",
+  "venue": "Discrete Mathematics <b>348</b> (8) (2025), 114466.",
+  "arxiv": "2407.18785",
+  "note": "Circulated in earlier versions as <i>Maximal evenness in graphs</i>."
+ },
+ {
+  "key": "bushaw-kettle-pebbling",
+  "status": "published",
+  "year": 2025,
+  "authors": "N. Bushaw and N. Kettle",
+  "title": "Thresholds for pebbling on grids",
+  "venue": "Discrete Mathematics <b>348</b> (10) (2025), 114519.",
+  "arxiv": "2309.01762"
+ },
+ {
+  "key": "bushaw-larson-vancleemput-primus",
+  "status": "published",
+  "year": 2025,
+  "authors": "N. Bushaw, C. E. Larson and N. Van Cleemput",
+  "title": "Automated conjecturing for mathematics teaching and research projects",
+  "venue": "PRIMUS <b>35</b> (6) (2025), 636–653."
+ },
+ {
+  "key": "bushaw-etal-hamiltonicity",
+  "status": "published",
+  "year": 2025,
+  "authors": "N. Bushaw, V. Gupta, C. E. Larson, S. Loeb, M. Norge, J. Parrish, N. Van Cleemput, J. Yirka and G. Wu",
+  "title": "Automated conjectures for graph Hamiltonicity",
+  "venue": "Involve <b>18</b> (1) (2025), 79–89."
+ },
+ {
+  "key": "bushaw-hurlbert-crossnumber",
+  "status": "published",
+  "year": 2024,
+  "authors": "N. Bushaw and G. Hurlbert",
+  "title": "Thresholds for zero-sums with small cross numbers in abelian groups",
+  "venue": "INTEGERS <b>24</b> (2024), #A93, 12 pp.",
+  "arxiv": "2309.03455",
+  "oa": "https://math.colgate.edu/~integers/vol24.html",
+  "oa_label": "INTEGERS"
+ },
+ {
+  "key": "bushaw-etal-bridges-evenness",
+  "status": "published",
+  "year": 2024,
+  "authors": "N. Bushaw, B. Cody, L. Freeman and T. Whitaker",
+  "title": "The music and mathematics of maximal evenness in graphs",
+  "venue": "Bridges 2024 Conference Proceedings, 61–68.",
+  "arxiv": "2407.18768",
+  "oa": "https://archive.bridgesmathart.org/2024/bridges2024-61.pdf",
+  "oa_label": "Bridges archive"
+ },
+ {
+  "key": "bushaw-etal-bootstrap-conjecturing",
+  "status": "published",
+  "year": 2023,
+  "authors": "N. Bushaw, B. Conka, V. Gupta, A. Kierans, H. LaFayette, C. E. Larson, K. McCall, A. Mulyar, C. Sullivan, S. Taylor, E. Wainright, E. Wilson, G. Wu and S. Loeb",
+  "title": "Bootstrap percolation via automated conjecturing",
+  "venue": "Ars Mathematica Contemporanea <b>23</b> (3) (2023)."
+ },
+ {
+  "key": "bushaw-johnston-rombach-rainbow-sat",
+  "status": "published",
+  "year": 2022,
+  "authors": "N. Bushaw, D. Johnston and P. Rombach",
+  "title": "Rainbow saturation",
+  "venue": "Graphs and Combinatorics <b>38</b> (5) (2022), article 166.",
+  "arxiv": "2003.13200"
+ },
+ {
+  "key": "bushaw-kettle-forestable",
+  "status": "published",
+  "year": 2020,
+  "authors": "N. Bushaw and N. Kettle",
+  "title": "Forbidding multiple copies of forestable graphs",
+  "venue": "Graphs and Combinatorics <b>36</b> (3) (2020), 459–467."
+ },
+ {
+  "key": "bushaw-cranston-tilings",
+  "status": "published",
+  "year": 2019,
+  "authors": "N. Bushaw and D. W. Cranston",
+  "title": "A note on bootstrap percolation thresholds in plane tilings using regular polygons",
+  "venue": "Australasian Journal of Combinatorics <b>74</b> (3) (2019), 486–497.",
+  "arxiv": "1803.09056",
+  "oa": "http://ajc.maths.uq.edu.au/pdf/74/ajc_v74_p486.pdf",
+  "oa_label": "Australasian J. Combinatorics"
+ },
+ {
+  "key": "bushaw-larson-vancleemput-acvii",
+  "status": "preprint",
+  "year": 2018,
+  "authors": "N. Bushaw, C. E. Larson and N. Van Cleemput",
+  "title": "Automated conjecturing VII: the graph brain project &amp; big mathematics",
+  "venue": "Preprint.",
+  "arxiv": "1801.01814"
+ },
+ {
+  "key": "bushaw-czygrinow-yie-even-cycles",
+  "status": "preprint",
+  "year": 2018,
+  "authors": "N. Bushaw, A. Czygrinow and J. Yie",
+  "title": "Even cycles in dense graphs",
+  "venue": "Preprint.",
+  "arxiv": "1806.09651"
+ },
+ {
+  "key": "balogh-etal-typical-structure",
+  "status": "published",
+  "year": 2017,
+  "authors": "J. Balogh, N. Bushaw, M. Collares, H. Liu, R. Morris and M. Sharifzadeh",
+  "title": "The typical structure of graphs with no large cliques",
+  "venue": "Combinatorica <b>37</b> (4) (2017), 617–632.",
+  "arxiv": "1406.6961"
+ },
+ {
+  "key": "bushaw-gunderson-kalikow-markov",
+  "status": "published",
+  "year": 2016,
+  "authors": "N. Bushaw, K. Gunderson and S. Kalikow",
+  "title": "Random-step Markov processes",
+  "venue": "Israel Journal of Mathematics <b>216</b> (1) (2016), 181–214.",
+  "arxiv": "1410.1457"
+ },
+ {
+  "key": "bushaw-etal-sumfree",
+  "status": "published",
+  "year": 2015,
+  "authors": "N. Bushaw, M. Collares, R. Morris and P. Smith",
+  "title": "The sharp threshold for maximum-size sum-free subsets in even-order abelian groups",
+  "venue": "Combinatorics, Probability and Computing <b>24</b> (4) (2015), 609–640.",
+  "arxiv": "1310.3236"
+ },
+ {
+  "key": "bushaw-kettle-hypergraph-paths",
+  "status": "published",
+  "year": 2014,
+  "authors": "N. Bushaw and N. Kettle",
+  "title": "Turán numbers for forests of paths in hypergraphs",
+  "venue": "SIAM Journal on Discrete Mathematics <b>28</b> (2) (2014), 711–721.",
+  "arxiv": "1303.5022"
+ },
+ {
+  "key": "bushaw-thesis",
+  "status": "thesis",
+  "year": 2012,
+  "authors": "N. Bushaw",
+  "title": "Problems in extremal combinatorics",
+  "venue": "PhD dissertation, University of Memphis, May 2012. Advisor: Béla Bollobás.",
+  "oa": "https://digitalcommons.memphis.edu/etd/417/",
+  "oa_label": "Memphis repository"
+ },
+ {
+  "key": "bushaw-etal-large-matchings",
+  "status": "preprint",
+  "year": 2012,
+  "authors": "N. Bushaw, P. Csorba, L. Erickson, D. Gerbner, D. Piguet, A. Riet, T. Terpai and D. K. Vu",
+  "title": "Large matchings with few colors",
+  "venue": "Preprint.",
+  "arxiv": "1209.2033"
+ },
+ {
+  "key": "bushaw-kettle-multiple-paths",
+  "status": "published",
+  "year": 2011,
+  "authors": "N. Bushaw and N. Kettle",
+  "title": "Turán numbers of multiple paths and equibipartite forests",
+  "venue": "Combinatorics, Probability and Computing <b>20</b> (6) (2011), 837–853.",
+  "arxiv": "1106.5904"
+ }
+]

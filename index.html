@@ -1,139 +1,492 @@
-<!DOCTYPE HTML>
-<!--
-	TXT 2.5 by HTML5 UP
-	html5up.net | @n33co
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
+<!DOCTYPE html>
+<html lang="en" data-bg="graph">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neal Bushaw</title>
+<meta name="description" content="Neal Bushaw, Associate Professor of Mathematics at Virginia Commonwealth University: combinatorics, graph theory, publications, teaching.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/paper.css">
+<script>try{var g=localStorage.getItem('nb-bg');if(g){document.documentElement.setAttribute('data-bg',g);}}catch(e){}</script>
+<noscript><style>.controls{display:none}</style></noscript>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<canvas id="tidal-graph" aria-hidden="true"></canvas>
 
-<html>
-	<head>
-<script type="text/javascript">
-  //<![CDATA[
-  function getQuote(){
-    quotes = new Array(
-       "To Thales the primary question was not what do we know, but how do we know it.",
-      " Neglect of mathematics works injury to all knowledge, since he who is ignorant of it cannot know the other sciences or the things of the world.",
-      "No matter how correct a mathematical theorem may appear to be, one ought never to be satisfied that there was not something imperfect about it until it also gives the impression of being beautiful.",
-      "In mathematics the art of proposing a question must be held of higher value than solving it. ",
-      "I have had my results for a long time: but I do not yet know how I am to arrive at them.",
-	"What we know is not much. What we do not know is immense.",
-	"We must regard classical mathematics as a combinatorial game played with symbols.",
-	"Wherever there is number, there is beauty.",
-	"If only I had the theorems! Then I should find the proofs easily enough. ",
-	"Let us grant that the pursuit of mathematics is a divine madness of the human spirit.",
-	"Logic is the hygiene the mathematician practices to keep his ideas healthy and strong."
-    );
-    authors = new Array(
-	"-- Aristotle (384-322 BCE)",
-	"-- Roger Bacon (1214-1294)",
-	"-- George Boole (1815-1869)",
-	"-- George Cantor (1845-1918)",
- 	"-- Carl Friedrich Gauss (1777-1855)",
-	"-- Pierre-Simon Laplace (1749-1827)",
-	"-- John Von Neumann (1903-1957)",
-	"-- Diadochus Proclus (410-485)",
-	"-- Bernard Riemann (1826-1866)",
-	"-- Alfred North Whitehead (1861-1947)",
-	"-- Hermann Klaus Hugo Weyl (1885-1955)"
-	);
-    //generate a random number between zero and the number of quotes
-    numQuotes = quotes.length;
+<div class="shell">
 
-    quoteID = parseInt(Math.random() * numQuotes);
+<nav class="rail" aria-label="Contents">
+  <div class="rail-inner">
+    <p class="who"><a href="index.html">Neal Bushaw</a></p>
+    <p class="where"><a href="http://math.vcu.edu">Department of Mathematics and Statistics</a><br><a href="https://chs.vcu.edu">College of Humanities and Sciences</a><br><a href="http://www.vcu.edu">Virginia Commonwealth University</a></p>
+    <img class="plate" src="assets/portrait.jpg" alt="Neal Bushaw, holding a large tuxedo cat" width="400" height="300"
+         loading="lazy" decoding="async">
 
-    //get the outputQuote div
-    var outputQuote = document.getElementById("outputQuote");
-    var outputAuthor = document.getElementById("outputAuthor");
-    //copy the appropriate quote to the output element
-    outputQuote.innerHTML = quotes[quoteID];
-    outputAuthor.innerHTML = authors[quoteID];
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#teaching">Teaching</a></li>
+      <li><a href="#who">Who?</a></li>
+    </ol>
+    <div class="jump-wrap"><p class="jump"><a href="more.html">The extras &rarr;</a><span class="gloss">Demos, exhibits, outreach, genealogy</span></p></div>
+  </div>
+</nav>
 
-  } // end getQuote
+<main id="main" class="column">
+  <header class="masthead">
+    <h1>Neal Bushaw</h1>
+    <p class="role">Associate Professor of Mathematics</p>
+    <p class="affil"><a href="http://math.vcu.edu">Department of Mathematics and Statistics</a></p>
+    <p class="affil"><a href="https://chs.vcu.edu">College of Humanities and Sciences</a></p>
+    <p class="affil"><a href="http://www.vcu.edu">Virginia Commonwealth University</a></p>
 
-  //]]>
-  </script>
+    <p class="stamp">Last revised August 2026</p>
+  </header>
 
-		<title>N. Bushaw</title>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<meta name="description" content="" />
-		<meta name="keywords" content="" />
-		<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,700|Open+Sans+Condensed:700" rel="stylesheet" />
-		<script src="js/jquery.min.js"></script>
-		<script src="js/config.js"></script>
-		<script src="js/skel.min.js"></script>
-		<script src="js/skel-panels.min.js"></script>
-		<noscript>
-			<link rel="stylesheet" href="css/skel-noscript.css" />
-			<link rel="stylesheet" href="css/style.css" />
-			<link rel="stylesheet" href="css/style-desktop.css" />
-		</noscript>
-		<!--[if lte IE 9]><link rel="stylesheet" href="css/ie9.css" /><![endif]-->
-		<!--[if lte IE 8]><script src="js/html5shiv.js"></script><link rel="stylesheet" href="css/ie8.css" /><![endif]-->
-		<!--[if lte IE 7]><link rel="stylesheet" href="css/ie7.css" /><![endif]-->
-	</head>
-	<body class="homepage"><body onload = "getQuote()">
+  <section class="section" id="overview" aria-labelledby="h-overview">
+    <h2 id="h-overview">Overview</h2>
+    <ul class="entries">
+      <li><span class="when">Teaching</span>MATH 300 and MATH 350, Fall 2026.</li>
+      <li><span class="when">Bridges 2026</span><a href="bridges26.html">Cyclic Pianos</a> and <a href="seq.html">Cyclic Sequences</a>.</li>
+      <li><span class="when">Seminar</span><a href="http://www.people.vcu.edu/~dcranston/DM-seminar/">VCU Discrete Math Seminar</a>.</li>
+      <li><span class="when">Email</span>nobushaw (at) vcu (dot) edu</li>
+      <li><span class="when">Office</span><a href="https://maps.vcu.edu/monroepark/harrishall/">Grace E. Harris Hall</a> 4107</li>
+      <li><span class="when">Mail</span>Department of Mathematics and Statistics<br>Box 842014, 1015 Floyd Avenue<br>Richmond, Virginia 23284</li>
+    </ul>
+  </section>
 
-		<!-- Header -->
-			<header id="header">
-				<div class="logo">
-					<div>
-						<h2><a href="#" id="logo">Neal Bushaw</a>
-						</h2>
-						<h1><span class="byline"><a href="http://math.vcu.edu/">Associate Professor<br>Department of Mathematics and Applied Mathematics</a><br><a href="http://www.vcu.edu/">Virginia Commonwealth University</a></span></h0>
-						<br><br><a href="http://thenealon.github.io/bridges26.html">Bridges 2026: Cyclic Pianos</a>
-						<a href="http://thenealon.github.io/seq.html/">Bridges 2026: Cyclic Seq</a>
-					</div>
-				</div>
-			</header>
-		<!-- /Header -->
+  <section class="section" id="research" aria-labelledby="h-research">
+    <h2 id="h-research">Research</h2>
+    <p class="lede">My interests lie primarily within combinatorics, the area of mathematics which studies finite discrete structures. Recently, my research has focused on new aspects of the forbidden subgraph problem. However, I am also very interested in the use of probability in deterministic settings, as well as a wide variety of probabilistic and extremal questions on sets, graphs, and hypergraphs.</p>
+    <h3>Upcoming</h3>
+    <ul class="entries">
+      <li><span class="when">Sep–Oct 2026</span>Bridging Theoretical Discrete Math Advancements with Open Source Resource Development. <a href="https://www.birs.ca/events/2026/5-day-workshops/26w5649">BIRS workshop 26w5649</a>, Banff International Research Station, Alberta.</li>
+      <li><span class="when">Anytime</span>I'm always looking for invitations to speak, at any level &mdash; seminar, colloquium, math circle, undergraduate club, outreach. Write to me.</li>
+    </ul>
+    <h3>Publications and preprints</h3>
+    <ul class="biblio">
+      <li>
+      <span class="authors">N. Bushaw and A. Clifton.</span> <span class="title">3-neighbor bootstrap percolation on two-dimensional grids.</span> <span class="venue">Preprint.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/2608.06133">arXiv</a>
+        <button type="button" class="tag" data-abstract="bushaw-clifton-3nbr" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw.</span> <span class="title">Cyclic and Möbius pianos.</span> <span class="venue">Bridges 2026 Conference Proceedings, 591–594.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://archive.bridgesmathart.org/2026/">Bridges archive</a>
+        <button type="button" class="tag" data-abstract="bushaw-cyclic-mobius-pianos" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw, J. Danielsson and G. Hurlbert.</span> <span class="title">Erdős–Ko–Rado theorems for paths in graphs.</span> <span class="venue">Submitted.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/2504.05406">arXiv</a>
+        <button type="button" class="tag" data-abstract="bushaw-danielsson-hurlbert-ekr" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">V. Bardenova, N. Bushaw, B. Cody, P. Fay and M. Tennant.</span> <span class="title">The Wiener index of vertex colorings.</span> <span class="venue">Submitted.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/2503.18920">arXiv</a>
+        <button type="button" class="tag" data-abstract="bardenova-etal-wiener" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw, S. English, E. Heath, D. P. Johnston and P. Rombach.</span> <span class="title">The saturation spectrum of Berge stars.</span> <span class="venue">Submitted.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/2502.17686">arXiv</a>
+        <button type="button" class="tag" data-abstract="bushaw-etal-berge-stars" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">V. Bednar and N. Bushaw.</span> <span class="title">Rainbow Turán methods for trees.</span> <span class="venue">Australasian Journal of Combinatorics <b>91</b> (2025), 266–281.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/2203.13765">arXiv</a>
+        <a class="tag tag--src" href="http://ajc.maths.uq.edu.au/pdf/91/ajc_v91_p266.pdf">Australasian J. Combinatorics</a>
+        <button type="button" class="tag" data-abstract="bednar-bushaw-rainbow-turan" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw, B. Cody and C. Leffler.</span> <span class="title">Sets of vertices with extremal energy.</span> <span class="venue">Discrete Mathematics <b>348</b> (8) (2025), 114466.</span> <span class="remark">Circulated in earlier versions as <i>Maximal evenness in graphs</i>.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/2407.18785">arXiv</a>
+        <button type="button" class="tag" data-abstract="bushaw-cody-leffler-energy" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw and N. Kettle.</span> <span class="title">Thresholds for pebbling on grids.</span> <span class="venue">Discrete Mathematics <b>348</b> (10) (2025), 114519.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/2309.01762">arXiv</a>
+        <button type="button" class="tag" data-abstract="bushaw-kettle-pebbling" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw, C. E. Larson and N. Van Cleemput.</span> <span class="title">Automated conjecturing for mathematics teaching and research projects.</span> <span class="venue">PRIMUS <b>35</b> (6) (2025), 636–653.</span>
+      <div class="linkrow">
+        <button type="button" class="tag" data-abstract="bushaw-larson-vancleemput-primus" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw, V. Gupta, C. E. Larson, S. Loeb, M. Norge, J. Parrish, N. Van Cleemput, J. Yirka and G. Wu.</span> <span class="title">Automated conjectures for graph Hamiltonicity.</span> <span class="venue">Involve <b>18</b> (1) (2025), 79–89.</span>
+      <div class="linkrow">
+        <button type="button" class="tag" data-abstract="bushaw-etal-hamiltonicity" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw and G. Hurlbert.</span> <span class="title">Thresholds for zero-sums with small cross numbers in abelian groups.</span> <span class="venue">INTEGERS <b>24</b> (2024), #A93, 12 pp.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/2309.03455">arXiv</a>
+        <a class="tag tag--src" href="https://math.colgate.edu/~integers/vol24.html">INTEGERS</a>
+        <button type="button" class="tag" data-abstract="bushaw-hurlbert-crossnumber" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw, B. Cody, L. Freeman and T. Whitaker.</span> <span class="title">The music and mathematics of maximal evenness in graphs.</span> <span class="venue">Bridges 2024 Conference Proceedings, 61–68.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/2407.18768">arXiv</a>
+        <a class="tag tag--src" href="https://archive.bridgesmathart.org/2024/bridges2024-61.pdf">Bridges archive</a>
+        <button type="button" class="tag" data-abstract="bushaw-etal-bridges-evenness" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw, B. Conka, V. Gupta, A. Kierans, H. LaFayette, C. E. Larson, K. McCall, A. Mulyar, C. Sullivan, S. Taylor, E. Wainright, E. Wilson, G. Wu and S. Loeb.</span> <span class="title">Bootstrap percolation via automated conjecturing.</span> <span class="venue">Ars Mathematica Contemporanea <b>23</b> (3) (2023).</span>
+      <div class="linkrow">
+        <button type="button" class="tag" data-abstract="bushaw-etal-bootstrap-conjecturing" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw, D. Johnston and P. Rombach.</span> <span class="title">Rainbow saturation.</span> <span class="venue">Graphs and Combinatorics <b>38</b> (5) (2022), article 166.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/2003.13200">arXiv</a>
+        <button type="button" class="tag" data-abstract="bushaw-johnston-rombach-rainbow-sat" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw and N. Kettle.</span> <span class="title">Forbidding multiple copies of forestable graphs.</span> <span class="venue">Graphs and Combinatorics <b>36</b> (3) (2020), 459–467.</span>
+      <div class="linkrow">
+        <button type="button" class="tag" data-abstract="bushaw-kettle-forestable" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw and D. W. Cranston.</span> <span class="title">A note on bootstrap percolation thresholds in plane tilings using regular polygons.</span> <span class="venue">Australasian Journal of Combinatorics <b>74</b> (3) (2019), 486–497.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/1803.09056">arXiv</a>
+        <a class="tag tag--src" href="http://ajc.maths.uq.edu.au/pdf/74/ajc_v74_p486.pdf">Australasian J. Combinatorics</a>
+        <button type="button" class="tag" data-abstract="bushaw-cranston-tilings" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw, C. E. Larson and N. Van Cleemput.</span> <span class="title">Automated conjecturing VII: the graph brain project &amp; big mathematics.</span> <span class="venue">Preprint.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/1801.01814">arXiv</a>
+        <button type="button" class="tag" data-abstract="bushaw-larson-vancleemput-acvii" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw, A. Czygrinow and J. Yie.</span> <span class="title">Even cycles in dense graphs.</span> <span class="venue">Preprint.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/1806.09651">arXiv</a>
+        <button type="button" class="tag" data-abstract="bushaw-czygrinow-yie-even-cycles" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">J. Balogh, N. Bushaw, M. Collares, H. Liu, R. Morris and M. Sharifzadeh.</span> <span class="title">The typical structure of graphs with no large cliques.</span> <span class="venue">Combinatorica <b>37</b> (4) (2017), 617–632.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/1406.6961">arXiv</a>
+        <button type="button" class="tag" data-abstract="balogh-etal-typical-structure" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw, K. Gunderson and S. Kalikow.</span> <span class="title">Random-step Markov processes.</span> <span class="venue">Israel Journal of Mathematics <b>216</b> (1) (2016), 181–214.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/1410.1457">arXiv</a>
+        <button type="button" class="tag" data-abstract="bushaw-gunderson-kalikow-markov" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw, M. Collares, R. Morris and P. Smith.</span> <span class="title">The sharp threshold for maximum-size sum-free subsets in even-order abelian groups.</span> <span class="venue">Combinatorics, Probability and Computing <b>24</b> (4) (2015), 609–640.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/1310.3236">arXiv</a>
+        <button type="button" class="tag" data-abstract="bushaw-etal-sumfree" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw and N. Kettle.</span> <span class="title">Turán numbers for forests of paths in hypergraphs.</span> <span class="venue">SIAM Journal on Discrete Mathematics <b>28</b> (2) (2014), 711–721.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/1303.5022">arXiv</a>
+        <button type="button" class="tag" data-abstract="bushaw-kettle-hypergraph-paths" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw.</span> <span class="title">Problems in extremal combinatorics.</span> <span class="venue">PhD dissertation, University of Memphis, May 2012. Advisor: Béla Bollobás.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://digitalcommons.memphis.edu/etd/417/">Memphis repository</a>
+        <button type="button" class="tag" data-abstract="bushaw-thesis" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw, P. Csorba, L. Erickson, D. Gerbner, D. Piguet, A. Riet, T. Terpai and D. K. Vu.</span> <span class="title">Large matchings with few colors.</span> <span class="venue">Preprint.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/1209.2033">arXiv</a>
+        <button type="button" class="tag" data-abstract="bushaw-etal-large-matchings" hidden>abstract</button>
+      </div>
+      </li>
+      <li>
+      <span class="authors">N. Bushaw and N. Kettle.</span> <span class="title">Turán numbers of multiple paths and equibipartite forests.</span> <span class="venue">Combinatorics, Probability and Computing <b>20</b> (6) (2011), 837–853.</span>
+      <div class="linkrow">
+        <a class="tag tag--src" href="https://arxiv.org/abs/1106.5904">arXiv</a>
+        <button type="button" class="tag" data-abstract="bushaw-kettle-multiple-paths" hidden>abstract</button>
+      </div>
+      </li>
+    </ul>
+    <h3>Talks</h3>
+    <details class="fold">
+      <summary>Research talks</summary>
+    <p class="note">In August 2022 this was declared a &ldquo;highlights&rdquo; section, and is no longer guaranteed to be exhaustive. There are talks which are lost to the sands of time &mdash; if you have a hint of a memory of a vision of seeing me give a talk somewhere and it isn't in this list, it is best to assume it probably happened. Or you could invite me for a repeat.</p>
+    <ul class="entries">
+      <li><span class="when">Aug 2026</span>&ldquo;Cyclic and M&ouml;bius Pianos&rdquo;. <a href="https://www.bridgesmathart.org/b2026/">Bridges 2026</a>, University of Galway, Ireland.</li>
+      <li><span class="when">Mar 2026</span>&ldquo;The Saturation Spectrum of Berge Stars&rdquo;. <a href="https://vcumath.github.io/Seminar/spring26.html">VCU Discrete Math Seminar</a>, Richmond VA.</li>
+      <li><span class="when">Nov 2025</span>&ldquo;I heard there was a secret chord&hellip;&rdquo;. Shenandoah Undergraduate Mathematics and Statistics Conference, <a href="https://www.jmu.edu/mathstat/">James Madison University</a>, Harrisonburg VA. (Plenary.)</li>
+      <li><span class="when">Oct 2025</span>&ldquo;Bootstrap Percolation on Grids and Tori&rdquo;. <a href="https://www.ams.org/meetings/sectional/sectional.html">AMS Special Session</a> on Recent Trends in Graph Theory (virtual).</li>
+      <li><span class="when">Oct 2025</span>&ldquo;Bootstrap Percolation on Grids and Tori&rdquo;. VCU Discrete Math Seminar, Richmond VA. <a href="https://vcumath.github.io/Seminar/2025-seminar-bushaw-2.pdf">Abstract</a>.</li>
+      <li><span class="when">Oct 2025</span>&ldquo;The Hypergraph Saturation Spectrum for Berge Stars&rdquo;. <a href="https://www.ams.org/meetings/sectional/sectional.html">AMS Special Session</a> on Recent Trends in Graph Theory, New Orleans LA.</li>
+      <li><span class="when">Apr 2025</span>&ldquo;Maximally Even Sets&rdquo;. <a href="https://www.uvm.edu/cems/mathstat">UVm&ndash;Dartmouth Discrete Math Day</a>, Burlington VT.</li>
+      <li><span class="when">Apr 2025</span>&ldquo;I Heard There Was a Secret Chord&rdquo;. Colloquium, <a href="https://www.uvm.edu/cems/mathstat">University of Vermont</a>, Burlington VT.</li>
+      <li><span class="when">Feb 2025</span>&ldquo;Intersecting Families of Paths&rdquo;. VCU Discrete Math Seminar, Richmond VA. <a href="https://vcumath.github.io/Seminar/2025-seminar-bushaw.pdf">Abstract</a>.</li>
+      <li><span class="when">Dec 2024</span>&ldquo;Intersecting Families of Graphs&rdquo;. Discrete Mathematics Seminar, <a href="https://www.cmm.uchile.cl/">Centre for Mathematical Modeling</a>, Santiago, Chile.</li>
+      <li><span class="when">Sep 2024</span>&ldquo;Combinatorial Music Theory&rdquo;. DIMAG Lunch Seminar, <a href="https://dimag.ibs.re.kr/">Institute for Basic Science</a>, Daejeon, Korea.</li>
+      <li><span class="when">Sep 2024</span>&ldquo;Edge-Colored Extremal Problems&rdquo;. <a href="https://dimag.ibs.re.kr/event/2024-09-06/">Discrete Mathematics Seminar</a>, Institute for Basic Science, Daejeon, Korea.</li>
+      <li><span class="when">Aug 2024</span>&ldquo;The Music and Mathematics of Maximal Evenness in Graphs&rdquo; (presented by co-author Brent Cody). <a href="https://www.bridgesmathart.org/b2024/">Bridges Conference 2024</a>, Richmond VA.</li>
+      <li><span class="when">Aug 2024</span>&ldquo;Coloring with Forbidden Subgraphs&rdquo;. <a href="https://maa.org/event/mathfest/">MAA MathFest</a>, Indianapolis IN.</li>
+      <li><span class="when">Apr 2024</span>&ldquo;I heard there was a secret chord&hellip;&rdquo;. <a href="https://vcumath.github.io/Seminar/spring24.html">VCU Discrete Math Seminar</a>, Richmond VA.</li>
+      <li><span class="when">Oct 2023</span>&ldquo;Thresholds for Zero-Sums&rdquo;. <a href="https://www.ams.org/meetings/sectional/sectional.html">AMS Special Session</a> on Extremal and Probabilistic Combinatorics, Fall Sectional Meeting, Mobile AL.</li>
+      <li><span class="when">Sep 2023</span>&ldquo;Combinatorial Music Theory&rdquo;. <a href="https://vcumath.github.io/Seminar/dms.html">VCU Discrete Math Seminar</a>, Richmond VA.</li>
+      <li><span class="when">Mar 2023</span>&ldquo;Even vs. Odd Independent Sets&rdquo;. <a href="https://www.ams.org/meetings/sectional/sectional.html">AMS Special Session</a> on Recent Trends in Structural and Extremal Graph Theory, Atlanta GA.</li>
+      <li><span class="when">Mar 2023</span>&ldquo;Extremal Problems with Forbidden Color Classes&rdquo;. 54th <a href="https://www.math.fau.edu/combinatorics/index.php">Southeastern International Conference</a> on Combinatorics, Graph Theory and Computing, Boca Raton FL.</li>
+      <li><span class="when">Oct 2022</span>&ldquo;Rainbow Saturated Graphs&rdquo;. Discrete Math Seminar, <a href="https://www.auburn.edu/cosam/departments/math/">Auburn University</a>, Auburn AL.</li>
+      <li><span class="when">Sep 2022</span>&ldquo;Threshold Pebbling&rdquo;. <a href="https://vcumath.github.io/Seminar/dms.html">VCU Discrete Math Seminar</a>, Richmond VA.</li>
+      <li><span class="when">Jun 2022</span>&ldquo;Partial Rainbows&rdquo;. <a href="https://www.siam.org/conferences-events/">SIAM</a> Conference on Discrete Mathematics.</li>
+      <li><span class="when">Apr 2022</span>&ldquo;Bridging the Gap Between Monochrome and Rainbow&rdquo;. AMS Special Session on Topics in Extremal Combinatorics, <a href="https://jointmathematicsmeetings.org/">Joint Mathematics Meetings</a>.</li>
+      <li><span class="when">Nov 2021</span>&ldquo;Rainbow Saturation&rdquo;. Combinatorics Seminar, <a href="https://sci.umanitoba.ca/math/">University of Manitoba</a>, Winnipeg, Canada.</li>
+      <li><span class="when">Sep 2021</span>&ldquo;One of My Favorites: The Sandglass Conjecture via Entropy&rdquo;. <a href="https://vcumath.github.io/Seminar/dms.html">VCU Discrete Math Seminar</a>, Richmond VA.</li>
+      <li><span class="when">Jun 2021</span>&ldquo;Rainbow Saturation&rdquo;. <a href="https://www.siam.org/conferences-events/">SIAM</a> Conference on Discrete Mathematics, mini-symposium on Ramsey, Anti-Ramsey and Extremal Problems.</li>
+      <li><span class="when">Mar 2021</span>&ldquo;Bootstrap Percolation and Automated Conjecturing&rdquo;. 52nd <a href="https://www.math.fau.edu/combinatorics/index.php">Southeastern International Conference</a> on Combinatorics, Graph Theory and Computing, Boca Raton FL.</li>
+      <li><span class="when">Feb 2021</span>&ldquo;A Gentle Introduction to Extremal Graph Theory&rdquo;. <a href="https://vcumath.github.io/Seminar/dms.html">VCU Discrete Math Seminar</a>, Richmond VA.</li>
+      <li><span class="when">Mar 2020</span>&ldquo;Rainbow Saturation&rdquo;. 51st <a href="https://www.math.fau.edu/combinatorics/index.php">Southeastern International Conference</a> on Combinatorics, Graph Theory and Computing, Boca Raton FL.</li>
+      <li><span class="when">Jan 2020</span>&ldquo;What is Additive Combinatorics?&rdquo;. <a href="https://vcumath.github.io/Seminar/dms.html">VCU Discrete Math Seminar</a>, Richmond VA.</li>
+      <li><span class="when">Nov 2019</span>&ldquo;Musical Mathematics&rdquo;. <a href="https://vcumath.github.io/Seminar/dms.html">VCU Discrete Math Seminar</a>, Richmond VA.</li>
+      <li><span class="when">Oct 2019</span>&ldquo;Variations on a Theme of Tur&aacute;n&rdquo;. <a href="https://math.olemiss.edu/">Mississippi</a> Discrete Math Workshop, Oxford MS.</li>
+      <li><span class="when">Oct 2019</span>&ldquo;Small Percolating Sets&rdquo;. Mathematics Colloquium, <a href="https://www.umt.edu/mathematical-sciences/">University of Montana</a>, Missoula MT.</li>
+      <li><span class="when">Aug 2019</span>&ldquo;Small Percolating Sets&rdquo;. <a href="https://vcumath.github.io/Seminar/dms.html">VCU Discrete Math Seminar</a>, Richmond VA.</li>
+      <li><span class="when">Mar 2019</span>&ldquo;Even Cycles in Dense Graphs&rdquo;. 50th <a href="https://www.math.fau.edu/combinatorics/index.php">Southeastern International Conference</a> on Combinatorics, Graph Theory and Computing, Boca Raton FL.</li>
+      <li><span class="when">Feb 2019</span>&ldquo;The Taming of the Hypergraph&rdquo;. <a href="https://vcumath.github.io/Seminar/dms.html">VCU Discrete Math Seminar</a>, Richmond VA.</li>
+      <li><span class="when">Nov 2018</span>&ldquo;Extremal Graph Theory&rdquo;. Colloquium, <a href="https://math.richmond.edu/">University of Richmond</a>, Richmond VA.</li>
+      <li><span class="when">Nov 2018</span>&ldquo;Automated Conjecturing and Hamiltonian Graphs&rdquo;. MAA <a href="https://www.ams.org/meetings/sectional/sectional.html">Sectional Meeting</a>, University of Mary Washington, Fredericksburg VA.</li>
+      <li><span class="when">Oct 2018</span>&ldquo;Bootstrap Percolation on Infinite Graphs&rdquo;. Mathematics Colloquium, <a href="https://www.vsu.edu/">Virginia State University</a>, Petersburg VA.</li>
+      <li><span class="when">Oct 2018</span>&ldquo;Extremal Graph Theory&rdquo;. Mathematics Colloquium, <a href="https://www.rmc.edu/">Randolph-Macon</a> College, Ashland VA.</li>
+      <li><span class="when">Oct 2018</span>&ldquo;Bootstrap Percolation on Planar Tilings&rdquo;. Mathematics Colloquium, <a href="https://www.jmu.edu/mathstat/">James Madison University</a>, Harrisonburg VA.</li>
+      <li><span class="when">Sep 2018</span>&ldquo;Bootstrap Percolation on Planar Tilings&rdquo;. Mathematics Colloquium, <a href="https://www.wm.edu/as/mathematics/">College of William</a> &amp; Mary, Williamsburg VA.</li>
+      <li><span class="when">Sep 2018</span>&ldquo;Hypergraph Containers, or: How I Learned to Stop Worrying and Love Independent Sets&rdquo;. <a href="https://vcumath.github.io/Seminar/dms.html">VCU Discrete Math Seminar</a>, Richmond VA.</li>
+      <li><span class="when">Jul 2018</span>&ldquo;The Even Cycle Spectrum of Dense Graphs&rdquo;. 10th International Colloquium on Graph Theory and Combinatorics, <a href="https://math.univ-lyon1.fr/">Universit&eacute; Lyon 1</a>, La Doua, Lyon, France.</li>
+      <li><span class="when">Jun 2018</span>&ldquo;Thresholds for Random Pebbling&rdquo;. SIAM Discrete Math, <a href="https://www.colorado.edu/math/">University of Colorado</a> at Denver, Denver CO.</li>
+      <li><span class="when">Apr 2018</span>&ldquo;Bootstrap Percolation on Polygonal Tilings&rdquo;. MAA <a href="https://www.ams.org/meetings/sectional/sectional.html">Sectional Meeting</a>, Virginia Military Institute, Lexington VA.</li>
+      <li><span class="when">Mar 2018</span>&ldquo;Automated Conjecturing and Collaborative Mathematics&rdquo;. 49th <a href="https://www.math.fau.edu/combinatorics/index.php">Southeastern International Conference</a> on Combinatorics, Graph Theory and Computing, Boca Raton FL.</li>
+      <li><span class="when">Jan 2018</span>&ldquo;2-Connected Graphs Have Many Cycle Lengths&rdquo;. <a href="https://vcumath.github.io/Seminar/dms.html">Discrete Math Seminar, Virginia Commonwealth</a> University, Richmond VA.</li>
+      <li><span class="when">Sep 2017</span>&ldquo;Tur&aacute;n Numbers and Their Variants&rdquo;. <a href="https://vcumath.github.io/Seminar/dms.html">Discrete Math Seminar, Virginia Commonwealth</a> University, Richmond VA.</li>
+      <li><span class="when">Apr 2017</span>&ldquo;The Even Cycle Spectrum of Dense Graphs&rdquo;. <a href="https://www.ams.org/meetings/sectional/sectional.html">AMS Special Session</a> on Extremal Problems in Graphs, Hypergraphs and Other Combinatorial Structures, Spring Central Sectional Meeting, Indiana University, Bloomington IN.</li>
+      <li><span class="when">Jan 2017</span>&ldquo;Variations on a Theme: The Forbidden Subgraph Problem&rdquo;. <a href="https://math.vcu.edu/events/">Mathematics Colloquium, Virginia Commonwealth University</a>, Richmond VA.</li>
+      <li><span class="when">Apr 2016</span>&ldquo;Minimum Codegree Conditions for Tiling by Tight Cycles&rdquo;. <a href="https://www.ams.org/meetings/sectional/sectional.html">AMS Special Session</a> on Probabilistic and Extremal Combinatorics, Spring North Sectional Meeting, North Dakota State University, Fargo ND. (Invited)</li>
+      <li><span class="when">Jan 2016</span>&ldquo;Extremal Numbers for Forestable Graphs&rdquo;. <a href="https://jointmathematicsmeetings.org/">AMS&ndash;MAA Joint Meetings</a>, Seattle WA.</li>
+      <li><span class="when">Nov 2015</span>&ldquo;The Forbidden Subgraph Problem and Its Variants&rdquo;. Postdoc Lunch Seminar Series, <a href="https://math.asu.edu/">Arizona State University</a>, Tempe AZ.</li>
+      <li><span class="when">Oct 2015</span>&ldquo;Threshold Pebbling on Grids of Arbitrary Dimension&rdquo;. AMS Special Session on Probabilistic Combinatorics, Fall Southeastern Sectional Meeting, <a href="https://www.memphis.edu/msci/">University of Memphis</a>, Memphis TN. (Invited)</li>
+      <li><span class="when">Sep 2015</span>&ldquo;Pebbling Problems on Graphs&rdquo;. Discrete Math Seminar, <a href="https://math.asu.edu/">Arizona State University</a>, Tempe AZ.</li>
+      <li><span class="when">Jun 2015</span>&ldquo;Threshold Pebbling for Grids&rdquo;. Connections in Discrete Mathematics, <a href="https://www.sfu.ca/math.html">Simon Fraser University</a>, Burnaby BC, Canada.</li>
+      <li><span class="when">Mar 2015</span>&ldquo;Introduction to Hypergraph Containers&rdquo;. Discrete Math Seminar, <a href="https://math.asu.edu/">Arizona State University</a>, Tempe AZ.</li>
+      <li><span class="when">Jan 2015</span>&ldquo;Supersaturation Theorems, Hypergraph Containers, and Typical Structures&rdquo;. Discrete Math Seminar, <a href="https://math.asu.edu/">Arizona State University</a>, Tempe AZ.</li>
+      <li><span class="when">Oct 2014</span>&ldquo;Typical Structure of Graphs with No Large Clique&rdquo;. Postdoc Lunch Seminar Series, <a href="https://math.asu.edu/">Arizona State University</a>, Tempe AZ.</li>
+      <li><span class="when">Jan 2014</span>&ldquo;Random Markov Processes&rdquo;. Mathematics and Computer Science Seminar, <a href="http://www.mat.ufc.br/">Universidade Federal do Cear</a>&aacute;, Fortaleza, Brazil.</li>
+      <li><span class="when">Nov 2013</span>&ldquo;Random Markov Processes&rdquo;. Probability Seminar, <a href="https://math.asu.edu/">Arizona State University</a>, Tempe AZ.</li>
+      <li><span class="when">Oct 2013</span>&ldquo;The Sharp Threshold for Maximum-Size Sum-Free Subsets in Even-Order Abelian Groups&rdquo;. Discrete Math Seminar, <a href="https://math.asu.edu/">Arizona State University</a>, Tempe AZ.</li>
+      <li><span class="when">Sep 2013</span>&ldquo;Tur&aacute;n Numbers of Linear and Equibipartite Forests&rdquo;. Discrete Math Seminar, <a href="https://math.asu.edu/">Arizona State University</a>, Tempe AZ.</li>
+      <li><span class="when">Dec 2012</span>&ldquo;Tur&aacute;n Numbers of Equibipartite Forests and Forests of Hyperpaths&rdquo;. Theoretical Computer Science and Combinatorics Seminar, <a href="https://www.ime.usp.br/">Universidade de S&atilde;o Paulo</a>, S&atilde;o Paulo, Brazil.</li>
+      <li><span class="when">Dec 2012</span>&ldquo;Tur&aacute;n Numbers of Linear and Equibipartite Forests&rdquo;. Mathematics and Computer Science Seminar, <a href="http://www.mat.ufc.br/">Universidade Federal do Cear</a>&aacute;, Fortaleza, Brazil.</li>
+      <li><span class="when">Nov 2011</span>&ldquo;Tur&aacute;n Numbers for Multiple Paths&rdquo;. Atlanta Lecture Series in Combinatorics and Graph Theory IV, <a href="https://mathstat.gsu.edu/">Georgia State University</a>, Atlanta GA.</li>
+      <li><span class="when">Oct 2011</span>&ldquo;Tur&aacute;n Numbers for Multiple Paths and Some Forests&rdquo;. Discrete Mathematics Seminar, <a href="https://math.unl.edu/">University of Nebraska</a>, Lincoln NE.</li>
+      <li><span class="when">Aug 2011</span>&ldquo;Tur&aacute;n Numbers for Multiple Paths and Equibipartite Trees&rdquo;. <a href="https://www.renyi.hu/">Paul Tur&aacute;n Memorial Conference</a>, R&eacute;nyi Institute of Mathematics, Budapest, Hungary.</li>
+      <li><span class="when">Apr 2011</span>&ldquo;Tur&aacute;n Numbers for Multiple Paths and Equibipartite Trees&rdquo;. Combinatorics Seminar, <a href="https://www.memphis.edu/msci/">University of Memphis</a>, Memphis TN.</li>
+      <li><span class="when">May 2008</span>&ldquo;Ramsey Theory and Applications&rdquo;. Mathematics Colloquium, <a href="https://math.wwu.edu/">Western Washington University</a>, Bellingham WA.</li>
+    </ul>
+    </details>
+    <details class="fold">
+      <summary>Outreach talks</summary>
+    <ul class="entries">
+      <li><span class="when">Feb 2022</span>&ldquo;Mathematical Music Theory&rdquo;. <a href="https://math.vcu.edu/outreach/">VCU Math Circle</a>, Virginia Commonwealth University, Richmond VA. <span class="venue">(High school students.)</span></li>
+      <li><span class="when">Nov 2019</span>&ldquo;Musical Mathematics&rdquo;. <a href="https://www.uvm.edu/cems/mathstat">University of Vermont</a> Mathematics Colloquium, Burlington VT.</li>
+      <li><span class="when">Apr 2019</span>&ldquo;Pizza Problems&rdquo;. <a href="https://math.vcu.edu/">VCU Math Club</a>, Virginia Commonwealth University, Richmond VA.</li>
+      <li><span class="when">Dec 2018</span>&ldquo;Conway's Rational Tangles&rdquo;. <a href="https://math.vcu.edu/outreach/">Sonya Kovalevsky</a> Girls in Math Day, Virginia Commonwealth University, Richmond VA. <span class="venue">(Junior high / middle school students.)</span></li>
+      <li><span class="when">May 2018</span>&ldquo;Percolation Among Zombies&rdquo;. <a href="https://math.vcu.edu/outreach/">VCU Math Circle</a>, Virginia Commonwealth University, Richmond VA. <span class="venue">(High school students.)</span></li>
+      <li><span class="when">Apr 2018</span>&ldquo;Bootstrap Percolation&rdquo;. <a href="https://www.spsnational.org/">Society of Physics Students</a>, Virginia Commonwealth University, Richmond VA. <span class="venue">(Physics majors and graduate students.)</span></li>
+      <li><span class="when">Dec 2017</span>&ldquo;Conway's Rational Tangles&rdquo;. <a href="https://math.vcu.edu/outreach/">Sonya Kovalevsky</a> Girls in Math Day, Virginia Commonwealth University, Richmond VA. <span class="venue">(Junior high / middle school students.)</span></li>
+      <li><span class="when">Apr 2016</span>&ldquo;Mad Scientists, Permutations, and Combinatorics&rdquo;. ASU Math Circle, <a href="https://math.asu.edu/">Arizona State University</a>, Tempe AZ. <span class="venue">(High school students.)</span></li>
+      <li><span class="when">Apr 2016</span>&ldquo;Conway's Rational Tangles&rdquo;. Mathematics Awareness Day Workshop, <a href="https://math.asu.edu/">Arizona State University</a>, Tempe AZ. <span class="venue">(High school students.)</span></li>
+      <li><span class="when">Sep 2015</span>&ldquo;Winning Strategies&rdquo;. ASU Math Circle, <a href="https://math.asu.edu/">Arizona State University</a>, Tempe AZ. <span class="venue">(High school students.)</span></li>
+      <li><span class="when">Sep 2015</span>&ldquo;Intro to Extremal Graph Theory&rdquo;. ASU Math Club, <a href="https://math.asu.edu/">Arizona State University</a>, Tempe AZ. <span class="venue">(Undergraduate mathematics majors.)</span></li>
+      <li><span class="when">Apr 2015</span>&ldquo;The Mathematics of Billiards and Reflections&rdquo;. Mathematics Awareness Day Workshop, <a href="https://math.asu.edu/">Arizona State University</a>, Tempe AZ. <span class="venue">(High school students. Joint with T. Stepien and M. Kawski.)</span></li>
+      <li><span class="when">Nov 2011</span>&ldquo;Voting Theory: Why It Isn't Fair&rdquo;. Cantor Sect Undergraduate Mathematics Club, <a href="https://www.memphis.edu/msci/">University of Memphis</a>, Memphis TN.</li>
+    </ul>
+    </details>
+  </section>
 
-		<!-- Nav -->
-			<nav id="nav" class="skel-panels-fixed">
-				<ul>
-					<li class="current_page_item"><a href="index.html">Home</a></li>
-					<li><a href="research.html">Research</a></li>
-					<li><a href="teaching.html">Teaching</a></li>
-					<li><a href="whois.html">Who?</a></li>
-					<li><a href="links.html">Links</a></li>
-				</ul>
-			</nav>
-		<!-- /Nav -->
+  <section class="section" id="teaching" aria-labelledby="h-teaching">
+    <h2 id="h-teaching">Teaching</h2>
+    <p class="lede">I work from the axioms of Federico Ardila-Mantilla, as set
+    out in <a href="https://dept.math.lsa.umich.edu/~glarose/dept/teaching/resources/ardila_federico_todos_cuentan.pdf"><i>Todos
+    Cuentan</i></a>, Notices of the AMS <b>63</b> (2016), 1164&ndash;1170.</p>
+    <ol class="axioms">
+      <li>Mathematical talent is distributed equally among different groups,
+      irrespective of geographic, demographic, and economic boundaries.</li>
+      <li>Everyone can have joyful, meaningful, and empowering mathematical
+      experiences.</li>
+      <li>Mathematics is a powerful, malleable tool that can be shaped and used
+      differently by various communities to serve their needs.</li>
+      <li>Every student deserves to be treated with dignity and respect.</li>
+    </ol>
+    <p class="note">If you are in one of my classes, my office, or a seminar I
+    am running, those four lines are the whole of the house style. Anyone who
+    wants to do mathematics is welcome to do mathematics with me.</p>
+    <h3>Fall 2026</h3>
+    <ul class="courses">
+      <li><span class="cnum">MATH 300</span> <span class="ctitle">Introduction to Mathematical Reasoning</span><br><span class="cterms">Section 004 (CRN 39277)</span></li>
+      <li><span class="cnum">MATH 350</span> <span class="ctitle">Introductory Combinatorics</span><br><span class="cterms">Section 001 (CRN 44237)</span></li>
+    </ul>
+    <details class="fold">
+      <summary>Courses Taught</summary>
+    <h3>Virginia Commonwealth University</h3>
+    <ul class="courses">
+      <li><span class="cnum">MATH 200</span> <span class="ctitle">Calculus with Analytic Geometry I</span><br><span class="cterms">Spring 2020, Spring 2022, Fall 2025</span><div class="cdesc">Limits, continuity, derivatives, differentials, antiderivatives and definite integrals.</div></li>
+      <li><span class="cnum">MATH 300</span> <span class="ctitle">Introduction to Mathematical Reasoning</span><br><span class="cterms">Fall 2017, Fall 2018, Fall 2019, Fall 2020, Fall 2021, Fall 2022, Spring 2023, Fall 2025, Fall 2026</span><div class="cdesc">An introduction to basic concepts of mathematical reasoning and the writing of proofs in an elementary setting. Direct, indirect and induction proofs. Illustrations of the concepts include basic proofs from mathematical logic, elementary set theory, elementary number theory, number systems, foundations of calculus, relations, equivalence relations, functions and counting with emphasis on combinatorial proofs.</div></li>
+      <li><span class="cnum">MATH 310</span> <span class="ctitle">Linear Algebra</span><br><span class="cterms">Spring 2026</span><div class="cdesc">Systems of linear equations, vector spaces, linear dependence, bases, dimensions, linear mappings, matrices, determinants, quadratic forms, orthogonal reduction to diagonal form, eigenvalues and geometric applications.</div></li>
+      <li><span class="cnum">MATH 350</span> <span class="ctitle">Introductory Combinatorics</span><br><span class="cterms">Fall 2017, Fall 2022, Fall 2026</span><div class="cdesc">An introduction to basic combinatorial concepts such as combinations, permutations, binomial coefficients, Fibonacci numbers and Pascal's triangle; basic theorems such as the pigeonhole principle and Newton's binomial theorem; algorithms such as bubble sort and quicksort; and discussion of basic applications such as chessboard problems, combinatorial games, magic squares and Latin squares.</div></li>
+      <li><span class="cnum">MATH 356</span> <span class="ctitle">Graphs and Algorithms</span><br><span class="cterms">Spring 2019, Spring 2020</span><div class="cdesc">An introduction to basic graph theoretic concepts such as trees, colorings and matchings; basic theorems such as the handshaking lemma and the Gallai identities; algorithms such as Dijkstra's and Kruskal's; and discussion of famous open problems such as finding shortest tours for a traveling salesman.</div></li>
+      <li><span class="cnum">MATH 490</span> <span class="ctitle">Mathematical Expositions</span><br><span class="cterms">Spring 2019</span><div class="cdesc">A senior capstone course in the major designed to help students attain proficiency in expository mathematical writing and oral presentation, which require the efficient and effective use of mathematics and the English language. Students will learn a variety of topics in mathematics, write reviews of selected award-winning mathematics papers and write a senior paper.</div></li>
+      <li><span class="cnum">MATH 556</span> <span class="ctitle">Graph Theory</span><br><span class="cterms">Fall 2018, Fall 2021, Fall 2023</span><div class="cdesc">Introduction to graph classes, graph invariants, graph algorithms, graph theoretic proof techniques and applications.</div></li>
+      <li><span class="cnum">MATH 650</span> <span class="ctitle">Advanced Combinatorics</span><br><span class="cterms">Fall 2019, Fall 2023</span><div class="cdesc">Topics include advanced applications of the pigeonhole principle and inclusion&ndash;exclusion principle, recurrence relations, generating functions, special counting sequences, Ramsey theory, and combinatorial designs and codes.</div></li>
+      <li><span class="cnum">MATH 656</span> <span class="ctitle">Advanced Graph Theory</span><br><span class="cterms">Spring 2018, Spring 2023, Spring 2026</span><div class="cdesc">This course lays a rigorous theoretical foundation for further advanced study in graph theory. Topics may include connectivity, matching, planarity, coloring, Hamiltonian cycles and topological graph theory, as well as further advanced material.</div></li>
+      <li><span class="cnum">MATH 756</span> <span class="ctitle">Topics in Graph Theory</span><br><span class="cterms">Fall 2020</span><div class="cdesc">A detailed study of selected topics, which may include extremal graph theory, spectral graph theory, infinite graphs, random graphs and graph minors. Fall 2020 focus: extremal graph theory.</div></li>
+    </ul>
+    <h3>University of Vermont</h3>
+    <ul class="courses">
+      <li><span class="cnum">MATH 3230</span> <span class="ctitle">Ordinary Differential Equations</span><br><span class="cterms">Spring 2025</span><div class="cdesc">Solutions of linear ordinary differential equations, the Laplace transformation, and series solutions of differential equations.</div></li>
+      <li><span class="cnum">MATH 6678</span> <span class="ctitle">Topics in Combinatorics</span><br><span class="cterms">Spring 2025</span><div class="cdesc">Topics will vary each semester and may include combinatorial designs, coding theory, topological graph theory, cryptography.</div></li>
+    </ul>
+    <h3>Arizona State University</h3>
+    <ul class="courses">
+      <li><span class="cnum">MAT 194</span> <span class="ctitle">CLAS Early Start Program Mathematics</span><br><span class="cterms">Summer/Fall 2016</span><div class="cdesc">Intensive two-week program for incoming mathematics majors. Focuses on building problem solving skills and mathematical background, as well as tools to help ensure academic success and to ease the transition to college life.</div></li>
+      <li><span class="cnum">MAT 210</span> <span class="ctitle">Business Calculus</span><br><span class="cterms">Online, Spring 2017</span></li>
+      <li><span class="cnum">MAT 243</span> <span class="ctitle">Discrete Mathematical Structures</span><br><span class="cterms">Fall 2016</span><div class="cdesc">Logic, sets, functions, elementary number theory and combinatorics, recursive algorithms, and mathematical reasoning, including induction. Emphasizes connections to computer science.</div></li>
+      <li><span class="cnum">MAT 265</span> <span class="ctitle">Calculus for Engineers I</span><br><span class="cterms">Fall 2016</span><div class="cdesc">Limits and continuity, differential calculus of functions of one variable, introduction to integration.</div></li>
+      <li><span class="cnum">MAT 266</span> <span class="ctitle">Calculus for Engineers II</span><br><span class="cterms">Fall 2016</span><div class="cdesc">Methods of integration, applications of calculus, elements of analytic geometry, improper integrals, Taylor series.</div></li>
+      <li><span class="cnum">MAT 275</span> <span class="ctitle">Modern Differential Equations</span><br><span class="cterms">Fall 2013 (2 sections)</span><div class="cdesc">Introduces differential equations, theoretical and practical solution techniques. Applications. Problem solving using MATLAB.</div></li>
+      <li><span class="cnum">MAT 300</span> <span class="ctitle">Mathematical Structures</span><br><span class="cterms">Fall 2014, Fall 2015</span><div class="cdesc">Logic and set theory, induction, functions, order and equivalence relations, cardinality. Emphasizes writing proofs.</div></li>
+      <li><span class="cnum">MAT 416/513</span> <span class="ctitle">Introduction to Graph Theory</span><br><span class="cterms">Spring 2017</span></li>
+      <li><span class="cnum">MAT 516</span> <span class="ctitle">Graph Theory I</span><br><span class="cterms">Fall 2014, Fall 2015</span><div class="cdesc">First semester of a systematic development of graph theory, including matchings, connectivity, arboricity, planarity, coloring, network flows.</div></li>
+      <li><span class="cnum">MAT 517</span> <span class="ctitle">Graph Theory II</span><br><span class="cterms">Spring 2015, Spring 2016</span><div class="cdesc">Second semester of a systematic development of graph theory, including dense and sparse graphs, Ramsey theory, hamiltonicity, random graphs, minors.</div></li>
+    </ul>
+    <h3>University of Memphis</h3>
+    <ul class="courses">
+      <li><span class="cnum">MATH 1710</span> <span class="ctitle">College Algebra</span><br><span class="cterms">Spring 2011 (2 sections)</span><div class="cdesc">Analysis of functions (linear, quadratic, polynomial, root, rational, exponential, logarithmic) using graphing calculators; partial fractions; synthetic division; conic sections; theory of equations; inequalities; applications.</div></li>
+    </ul>
+    <h3>Western Washington University</h3>
+    <ul class="courses">
+      <li><span class="cnum">MATH 112</span> <span class="ctitle">Functions and Algebraic Methods</span><br><span class="cterms">Fall 2006</span><div class="cdesc">Pattern recognition and generalization, building mathematical models and problem solving are emphasized. Supporting topics include polynomials, linear and quadratic equations, inequalities, graphs, rational expressions, radicals and functions.</div></li>
+      <li><span class="cnum">MATH 114</span> <span class="ctitle">Precalculus I</span><br><span class="cterms">Winter 2007, Spring 2007, Fall 2008</span><div class="cdesc">Data analysis, functions as mathematical models, functions and their graphs.</div></li>
+      <li><span class="cnum">MATH 115</span> <span class="ctitle">Precalculus II</span><br><span class="cterms">Winter 2008</span><div class="cdesc">Data analysis, modeling, trigonometry, inverse functions.</div></li>
+      <li><span class="cnum">MATH 157</span> <span class="ctitle">Business Calculus</span><br><span class="cterms">Spring 2008</span><div class="cdesc">Limits, rates of change, differentiation, graphing and optimization, integration, business applications, partial differentiation.</div></li>
+    </ul>
+    </details>
+  </section>
 
-		<!-- Banner -->
-			<div id="banner-wrapper">
-				<section id="banner">
-					<h2 id="outputQuote">
-</h2>
-					<span class="byline" id="outputAuthor"></span>
-                    <span class="byline"><br><hr><br><br></span><h2>
-<a href="http://sysm.vcu.edu">SYSM Affiliated Faculty, Systems Modeling and Analysis Program</a><br><br>
-<a href="http://www.people.vcu.edu/~dcranston/DM-seminar/">Biggest Fan, Frequent Speaker, VCU Discrete Math Seminar</a><br><br><hr></h2>
-						</section>
-			</div>
-		<!-- /Banner -->
+  <section class="section" id="who" aria-labelledby="h-who">
+    <h2 id="h-who">Who?</h2>
+    <p class="lede">I'm an Associate Professor in the
+    <a href="http://math.vcu.edu">Department of Mathematics and Statistics</a>
+    at <a href="http://www.vcu.edu">Virginia Commonwealth University</a>.</p>
+    <p>Before that, I was a Visiting Assistant Professor at
+    <a href="http://www.asu.edu">Arizona State University</a>, and a research
+    postdoc at <a href="http://www.impa.br">Instituto Nacional de
+    Matem&aacute;tica Pura e Aplicada</a> in Rio de Janeiro. I completed my
+    doctorate under the supervision of Prof. B&eacute;la Bollob&aacute;s at the
+    <a href="http://www.memphis.edu">University of Memphis</a> in May 2012;
+    this followed an M.S. at
+    <a href="http://math.wwu.edu/">Western Washington University</a> under the
+    supervision of Dr. Amites Sarkar, and a B.A. at
+    <a href="http://www.colorado.edu">the University of Colorado</a>. I am
+    greatly indebted to all my teachers and to those around me who have helped
+    me throughout my academic career, although I attempt no comprehensive list
+    here. The <a href="more.html#genealogy">advisor graph</a> is the closest
+    thing to one.</p>
+    <p>My academic interests lie primarily in the mysteries and details of
+    mathematics, particularly extremal and probabilistic combinatorics. Outside
+    academia, I enjoy <a href="http://en.wikipedia.org/wiki/Avant-garde_jazz">weird</a>
+    <a href="http://en.wikipedia.org/wiki/Eric_Dolphy">jazz</a>,
+    <a href="http://en.wikipedia.org/wiki/Hardcore_punk">loud</a>
+    <a href="http://en.wikipedia.org/wiki/Skate_punk">punk</a>
+    <a href="http://en.wikipedia.org/wiki/Refused">rock</a>,
+    <a href="http://www.fender.com">gui</a><a href="http://www.mguitar.com">tars</a>,
+    <a href="http://www.freeskier.com">skiing</a>,
+    <a href="http://www.stevenspass.com">snowboarding</a>, as well as life, the
+    universe, and everything.</p>
+    <ul class="entries">
+      <li><span class="when">VCU</span><a href="https://math.vcu.edu/directory/bushaw.html">My
+      official department profile</a>.</li>
+      <li><span class="when">ORCID</span><a href="https://orcid.org/0000-0003-2441-5713">0000-0003-2441-5713</a></li>
+      <li><span class="when">Profiles</span><a href="https://scholar.google.com/citations?user=8Oyig08AAAAJ">Google Scholar</a>
+      &middot; <a href="https://arxiv.org/a/bushaw_n_1">arXiv</a>
+      &middot; <a href="https://dblp.org/pid/95/10545.html">dblp</a>
+      &middot; <a href="https://www.ams.org/mathscinet/search/author.html?mrauthid=956367">MathSciNet</a>
+      &middot; <a href="https://www.mathgenealogy.org/id.php?id=163297">genealogy project</a></li>
+      <li><span class="when">Code</span><a href="https://github.com/thenealon">github.com/thenealon</a>,
+      including the source of this site.</li>
+      <li><span class="when">Family</span><a href="http://www.ams.org/mathscinet/search/author.html?mrauthid=420315">Donald
+      &ldquo;Beh&rdquo; Bushaw</a> &mdash; my illustrious grandfather, on MathSciNet.</li>
+      <li><span class="when">Pledges</span><a href="https://tcs4f.org">Theoretical
+      Computer Scientists for Future</a></li>
+      <li><span class="when">On AI</span><a href="https://leidendeclaration.ai/">The
+      Leiden Declaration on Artificial Intelligence and Mathematics</a>, endorsed by
+      the International Mathematical Union.</li>
+    </ul>
+  </section>
 
-		<!-- Main -->
-			<div id="main-wrapper">
-				<div id="main" class="container">
-					<div class="row">
-						<div class="12u">
+  <footer class="colophon">
+    <p>This website is entirely unsanctioned by Virginia Commonwealth University. Although it is intended to further the educational mission of the university, the opinions expressed here are the author's, and are not endorsed by VCU in any way.</p>
+  </footer>
+</main>
 
-							<!-- Highlight -->
-								<section class="is-highlight">
-									<ul class="special">
-										<li><a href="research.html" class="fa fa-coffee solo"><span>Research</span></a></li>
-										<li><a href="teaching.html" class="fa fa-book solo"><span>Teaching</span></a></li>
+</div><!-- /.shell -->
 
-										<li><a href="whois.html" class="fa fa-user solo"><span>Who?</span></a></li>
-										<li><a href="links.html" class="fa fa-chain solo"><span>Links</span></a></li>
-									</ul>
-									<header>
-										<h2><a href="research.html">Research</a>, <a href="teaching.html">Teaching</a>, <a href="whois.html">About Me</a>, <a href="links.html">Links</a></h2>
-										<span class="byline">This website is entirely unsanctioned by Virginia Commonwealth University. Although it is intended to further the educational mission of the university, the opinions expressed here are the author's, and are not endorsed by VCU in any way.</span>
-									</header>
-									<p>
+<div class="controls" role="group" aria-label="Background controls">
+  <button type="button" class="ctl" id="bg-toggle"><span class="ctl-ico" aria-hidden="true">&#9638;</span><span class="ctl-txt">Percolation</span></button>
+  <button type="button" class="ctl" id="speed-toggle"><span class="ctl-ico" aria-hidden="true">&#128034;</span><span class="ctl-txt">Slow</span></button>
+  <button type="button" class="ctl" id="tide-toggle" aria-pressed="false"><span class="ctl-ico" aria-hidden="true">&#9646;&#9646;</span><span class="ctl-txt">Pause</span></button>
+</div>
 
+<dialog id="abstract-dialog" aria-labelledby="dlg-title">
+  <div class="dlg-inner">
+    <p class="dlg-title" id="dlg-title"></p>
+    <p class="dlg-meta"></p>
+    <div class="dlg-body"></div>
+    <div class="dlg-foot">
+      <span class="dlg-src"></span>
+      <button type="button" class="tag" data-close>close</button>
+    </div>
+  </div>
+</dialog>
 
-
-	</body>
+<script src="assets/tidal-graph.js"></script>
+<script src="assets/abstracts.js"></script>
+<script src="assets/ui.js"></script>
+</body>
 </html>

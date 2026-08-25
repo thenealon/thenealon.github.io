@@ -1,0 +1,152 @@
+{
+ "stamp": "Last revised August 2026",
+ "colophon": "This website is entirely unsanctioned by Virginia Commonwealth University. Although it is intended to further the educational mission of the university, the opinions expressed here are the author's, and are not endorsed by VCU in any way.",
+ "pages": [
+  {
+   "file": "index.html",
+   "title": "Neal Bushaw",
+   "description": "Neal Bushaw, Associate Professor of Mathematics at Virginia Commonwealth University: combinatorics, graph theory, publications, teaching.",
+   "masthead": {
+    "h1": "Neal Bushaw",
+    "role": "Associate Professor of Mathematics",
+    "affiliation": [
+     {
+      "text": "Department of Mathematics and Statistics",
+      "href": "http://math.vcu.edu"
+     },
+     {
+      "text": "College of Humanities and Sciences",
+      "href": "https://chs.vcu.edu"
+     },
+     {
+      "text": "Virginia Commonwealth University",
+      "href": "http://www.vcu.edu"
+     }
+    ]
+   },
+   "jump": {
+    "href": "more.html",
+    "label": "The extras &rarr;",
+    "gloss": "Demos, exhibits, outreach, genealogy"
+   },
+   "sections": [
+    {
+     "id": "overview",
+     "rail": "Overview",
+     "heading": "Overview",
+     "block": "overview",
+     "intro": ""
+    },
+    {
+     "id": "research",
+     "rail": "Research",
+     "heading": "Research",
+     "block": "research",
+     "intro": "",
+     "subheads": {
+      "upcoming": "Upcoming",
+      "publications": "Publications and preprints",
+      "talks": "Talks",
+      "talksFold": "Research talks",
+      "outreachFold": "Outreach talks"
+     },
+     "talksNote": "In August 2022 this was declared a &ldquo;highlights&rdquo; section, and is no longer guaranteed to be exhaustive. There are talks which are lost to the sands of time &mdash; if you have a hint of a memory of a vision of seeing me give a talk somewhere and it isn't in this list, it is best to assume it probably happened. Or you could invite me for a repeat."
+    },
+    {
+     "id": "teaching",
+     "rail": "Teaching",
+     "heading": "Teaching",
+     "block": "teaching",
+     "intro": "",
+     "subheads": {
+      "history": "",
+      "historyFold": "Courses Taught"
+     }
+    },
+    {
+     "id": "who",
+     "rail": "Who?",
+     "heading": "Who?",
+     "block": "who",
+     "intro": ""
+    }
+   ]
+  },
+  {
+   "file": "more.html",
+   "title": "The extras &mdash; Neal Bushaw",
+   "description": "Demos, exhibits, math circles, organised sessions and an interactive mathematical genealogy, by Neal Bushaw.",
+   "masthead": {
+    "h1": "The extras",
+    "role": "Demos, exhibits, outreach, and the advisor graph",
+    "dept": "The academic record is <a href=\"index.html\">on the main page</a>.",
+    "affiliation": []
+   },
+   "jump": {
+    "href": "index.html",
+    "label": "&larr; Main page",
+    "gloss": "Research, teaching, biography"
+   },
+   "sections": [
+    {
+     "id": "demos",
+     "rail": "Demos",
+     "heading": "Demos",
+     "block": "items",
+     "kind": "demo",
+     "intro": ""
+    },
+    {
+     "id": "exhibits",
+     "rail": "Exhibits",
+     "heading": "Exhibits",
+     "block": "items",
+     "kind": "exhibit",
+     "intro": ""
+    },
+    {
+     "id": "outreach",
+     "rail": "Math circles and family days",
+     "heading": "Math circles and family days",
+     "block": "items",
+     "kind": "outreach",
+     "intro": ""
+    },
+    {
+     "id": "sessions",
+     "rail": "Special sessions organised",
+     "heading": "Special sessions organised",
+     "block": "items",
+     "kind": "session",
+     "intro": ""
+    },
+    {
+     "id": "elsewhere",
+     "rail": "Elsewhere",
+     "heading": "Elsewhere",
+     "block": "items",
+     "kind": "press",
+     "intro": ""
+    },
+    {
+     "id": "genealogy",
+     "rail": "Genealogy",
+     "heading": "Genealogy",
+     "block": "genealogy",
+     "intro": "Data from the <a href=\"https://www.mathgenealogy.org/\">Mathematics Genealogy Project</a>."
+    },
+    {
+     "id": "links",
+     "rail": "Links",
+     "heading": "Links",
+     "block": "links",
+     "intro": "Things I am interested in or find useful. I am in no way affiliated with any of these sites, and placement here should not be taken as any kind of endorsement."
+    }
+   ]
+  }
+ ],
+ "portrait": {
+  "src": "assets/portrait.jpg",
+  "alt": "Neal Bushaw, holding a large tuxedo cat"
+ }
+}
