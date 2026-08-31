@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rhythms">
+<title>Maximally Even Rhythms</title>
+<style>
+  /* ---------- theme: companion palette to Cyclic Pianos ----------
+     Piano materials: ebony stage, ivory ink, brass, felt crimson.
+     To match the partner page exactly, edit these values only.  */
+  :root {
+    --bg:        #0c0a07;                 /* warm ebony-black          */
+    --bg-glow-a: #201812;                 /* stage-light wash          */
+    --bg-glow-b: #171208;
+    --ink:       #f2ead8;                 /* ivory                     */
+    --panel:     rgba(30,25,19,0.93);     /* dark walnut               */
+    --brass:     #d9a441;
+    --brass-hi:  #eec96a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-user-select:none; user-select:none;
+      -webkit-tap-highlight-color:transparent; }
+  html,body { width:100%; height:100%; overflow:hidden; touch-action:none; }
+  body {
+    background:
+      radial-gradient(1200px 700px at 30% 20%, var(--bg-glow-a) 0%, transparent 60%),
+      radial-gradient(1000px 800px at 75% 80%, var(--bg-glow-b) 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family: "Avenir Next", "Futura", -apple-system, "Segoe UI", sans-serif;
+  }
+
+  /* readable instruction list on the intro screen */
+  #howto {
+    list-style:none; display:flex; flex-direction:column; gap:14px;
+    background:rgba(30,25,19,0.75); border-radius:20px; padding:24px 34px;
+    box-shadow:0 10px 34px rgba(0,0,0,0.4), 0 0 0 1px rgba(242,234,216,0.1);
+    font-size: clamp(18px, 2.4vw, 26px); line-height:1.35;
+  }
+  #howto li::before { content:"\25CF"; color:var(--brass); margin-right:14px; font-size:0.7em; }
+  #howto b { color:var(--brass-hi); font-weight:700; }
+
+  /* corner credit + QR link to nealbushaw.com, visible at all times */
+  #credit {
+    position:absolute; left:16px; bottom:16px; z-index:45; pointer-events:none;
+    display:flex; align-items:center; gap:12px;
+    font-size:14px; letter-spacing:0.05em; color:rgba(242,234,216,0.6);
+  }
+  #qr { width:92px; height:92px; border-radius:6px;
+        box-shadow:0 4px 18px rgba(0,0,0,0.45); }
+
+  /* ---------- start overlay ---------- */
+  #overlay {
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:26px; z-index:50;
+    transition:opacity 0.8s ease;
+  }
+  #overlay.gone { opacity:0; pointer-events:none; }
+  .bigbtn {
+    border:none; cursor:pointer; color:#241a08;
+    font-family:inherit; font-weight:700; letter-spacing:0.12em;
+    border-radius:999px; padding:22px 64px; font-size:30px;
+    background:linear-gradient(135deg, var(--brass-hi), var(--brass));
+    box-shadow:0 0 60px rgba(217,164,65,0.45), 0 8px 30px rgba(0,0,0,0.5);
+    animation:breathe 2.6s ease-in-out infinite;
+  }
+  .smallbtn {
+    border:1px solid rgba(242,234,216,0.3); cursor:pointer; color:var(--ink);
+    background:rgba(242,234,216,0.07); font-family:inherit; font-weight:600;
+    letter-spacing:0.06em; border-radius:999px; padding:12px 30px; font-size:17px;
+  }
+  @keyframes breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.045)} }
+  @media (prefers-reduced-motion: reduce){ .bigbtn{animation:none} }
+
+  /* ---------- fixed 2x2 workspace ---------- */
+  #space { position:absolute; inset:0; }
+  #grid {
+    position:absolute; inset:12px 12px 78px 12px;
+    display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr;
+    gap:14px;
+  }
+  .panel {
+    position:relative; display:flex; flex-direction:column;
+    border-radius:22px; background:var(--panel);
+    box-shadow:0 14px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(242,234,216,0.07),
+               0 0 34px var(--glow, rgba(242,234,216,0.05));
+    padding:14px 18px 12px; touch-action:none; min-width:0; min-height:0;
+  }
+  .panel.muted { opacity:0.45; }
+  .phead { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .pname {
+    font-weight:700; font-size:21px; color:var(--accent,#fff); letter-spacing:0.03em;
+    border:none; background:none; font-family:inherit; cursor:pointer; padding:0;
+    border-bottom:1px dashed var(--accent,#fff);
+  }
+  .psub  { font-size:15px; color:#efe7d2; margin-top:2px; }
+  .mutedot {
+    width:26px; height:26px; border-radius:50%; flex:0 0 auto;
+    background:var(--accent,#fff); box-shadow:0 0 12px var(--accent,#fff);
+    border:none; cursor:pointer;
+  }
+  .panel.muted .mutedot { background:transparent; box-shadow:none;
+    border:2px solid var(--accent,#fff); }
+  .cwrap { flex:1 1 auto; min-height:0; display:flex;
+           align-items:center; justify-content:center; }
+  .panel canvas { display:block; cursor:crosshair; }
+  .phint { font-size:14px; color:rgba(242,234,216,0.8); text-align:center;
+           padding-top:4px; letter-spacing:0.03em; }
+  .pfoot { display:flex; align-items:center; justify-content:space-between;
+           padding-top:6px; }
+  .penergy { font-size:12px; color:rgba(242,234,216,0.45); letter-spacing:0.05em; }
+  .gtoggle {
+    border:1.5px solid var(--accent,#fff); color:var(--accent,#fff);
+    background:transparent; font-family:inherit; font-weight:700;
+    font-size:14px; letter-spacing:0.08em; border-radius:999px;
+    padding:7px 18px; cursor:pointer;
+  }
+
+  /* ---------- bottom controls ---------- */
+  #controls {
+    position:absolute; right:16px; bottom:14px; z-index:40;
+    display:flex; align-items:center; gap:16px;
+    background:rgba(30,25,19,0.85); border-radius:999px; padding:10px 20px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.4), 0 0 0 1px rgba(242,234,216,0.08);
+  }
+  #controls label { font-size:12px; letter-spacing:0.08em; color:rgba(242,234,216,0.6); }
+  #tempo { width:130px; accent-color:var(--brass); }
+</style>
+</head>
+<body>
+
+<div id="space">
+  <div id="grid"></div>
+</div>
+<div id="credit"><svg id="qr" viewBox="0 0 33 33" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="33" height="33" rx="2" fill="#f7f2e4"/><path d="M4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM13 4h1v1h-1zM15 4h1v1h-1zM19 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM25 4h1v1h-1zM26 4h1v1h-1zM27 4h1v1h-1zM28 4h1v1h-1zM4 5h1v1h-1zM10 5h1v1h-1zM12 5h1v1h-1zM13 5h1v1h-1zM19 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM28 5h1v1h-1zM4 6h1v1h-1zM6 6h1v1h-1zM7 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM13 6h1v1h-1zM15 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM25 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM13 7h1v1h-1zM14 7h1v1h-1zM16 7h1v1h-1zM18 7h1v1h-1zM19 7h1v1h-1zM20 7h1v1h-1zM22 7h1v1h-1zM24 7h1v1h-1zM25 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM15 8h1v1h-1zM16 8h1v1h-1zM17 8h1v1h-1zM18 8h1v1h-1zM19 8h1v1h-1zM22 8h1v1h-1zM24 8h1v1h-1zM25 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM14 9h1v1h-1zM17 9h1v1h-1zM19 9h1v1h-1zM22 9h1v1h-1zM28 9h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM23 10h1v1h-1zM24 10h1v1h-1zM25 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM28 10h1v1h-1zM14 11h1v1h-1zM17 11h1v1h-1zM4 12h1v1h-1zM6 12h1v1h-1zM8 12h1v1h-1zM10 12h1v1h-1zM16 12h1v1h-1zM17 12h1v1h-1zM20 12h1v1h-1zM24 12h1v1h-1zM27 12h1v1h-1zM4 13h1v1h-1zM6 13h1v1h-1zM7 13h1v1h-1zM9 13h1v1h-1zM11 13h1v1h-1zM12 13h1v1h-1zM13 13h1v1h-1zM14 13h1v1h-1zM17 13h1v1h-1zM20 13h1v1h-1zM22 13h1v1h-1zM28 13h1v1h-1zM4 14h1v1h-1zM6 14h1v1h-1zM7 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM12 14h1v1h-1zM14 14h1v1h-1zM16 14h1v1h-1zM18 14h1v1h-1zM20 14h1v1h-1zM21 14h1v1h-1zM22 14h1v1h-1zM23 14h1v1h-1zM26 14h1v1h-1zM27 14h1v1h-1zM28 14h1v1h-1zM4 15h1v1h-1zM5 15h1v1h-1zM7 15h1v1h-1zM8 15h1v1h-1zM13 15h1v1h-1zM15 15h1v1h-1zM17 15h1v1h-1zM18 15h1v1h-1zM19 15h1v1h-1zM20 15h1v1h-1zM22 15h1v1h-1zM27 15h1v1h-1zM7 16h1v1h-1zM8 16h1v1h-1zM10 16h1v1h-1zM12 16h1v1h-1zM15 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1zM19 16h1v1h-1zM20 16h1v1h-1zM22 16h1v1h-1zM23 16h1v1h-1zM25 16h1v1h-1zM27 16h1v1h-1zM28 16h1v1h-1zM5 17h1v1h-1zM6 17h1v1h-1zM7 17h1v1h-1zM11 17h1v1h-1zM15 17h1v1h-1zM17 17h1v1h-1zM18 17h1v1h-1zM20 17h1v1h-1zM21 17h1v1h-1zM22 17h1v1h-1zM25 17h1v1h-1zM28 17h1v1h-1zM4 18h1v1h-1zM6 18h1v1h-1zM8 18h1v1h-1zM10 18h1v1h-1zM12 18h1v1h-1zM13 18h1v1h-1zM17 18h1v1h-1zM21 18h1v1h-1zM23 18h1v1h-1zM26 18h1v1h-1zM27 18h1v1h-1zM28 18h1v1h-1zM5 19h1v1h-1zM7 19h1v1h-1zM8 19h1v1h-1zM11 19h1v1h-1zM13 19h1v1h-1zM14 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM18 19h1v1h-1zM19 19h1v1h-1zM21 19h1v1h-1zM22 19h1v1h-1zM25 19h1v1h-1zM27 19h1v1h-1zM4 20h1v1h-1zM6 20h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM18 20h1v1h-1zM20 20h1v1h-1zM21 20h1v1h-1zM22 20h1v1h-1zM23 20h1v1h-1zM24 20h1v1h-1zM25 20h1v1h-1zM12 21h1v1h-1zM19 21h1v1h-1zM20 21h1v1h-1zM24 21h1v1h-1zM25 21h1v1h-1zM26 21h1v1h-1zM27 21h1v1h-1zM28 21h1v1h-1zM4 22h1v1h-1zM5 22h1v1h-1zM6 22h1v1h-1zM7 22h1v1h-1zM8 22h1v1h-1zM9 22h1v1h-1zM10 22h1v1h-1zM13 22h1v1h-1zM14 22h1v1h-1zM17 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM22 22h1v1h-1zM24 22h1v1h-1zM27 22h1v1h-1zM28 22h1v1h-1zM4 23h1v1h-1zM10 23h1v1h-1zM13 23h1v1h-1zM15 23h1v1h-1zM16 23h1v1h-1zM17 23h1v1h-1zM20 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM27 23h1v1h-1zM28 23h1v1h-1zM4 24h1v1h-1zM6 24h1v1h-1zM7 24h1v1h-1zM8 24h1v1h-1zM10 24h1v1h-1zM12 24h1v1h-1zM15 24h1v1h-1zM16 24h1v1h-1zM17 24h1v1h-1zM20 24h1v1h-1zM21 24h1v1h-1zM22 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM4 25h1v1h-1zM6 25h1v1h-1zM7 25h1v1h-1zM8 25h1v1h-1zM10 25h1v1h-1zM13 25h1v1h-1zM14 25h1v1h-1zM16 25h1v1h-1zM17 25h1v1h-1zM24 25h1v1h-1zM26 25h1v1h-1zM4 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM10 26h1v1h-1zM12 26h1v1h-1zM13 26h1v1h-1zM14 26h1v1h-1zM17 26h1v1h-1zM18 26h1v1h-1zM19 26h1v1h-1zM20 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM25 26h1v1h-1zM28 26h1v1h-1zM4 27h1v1h-1zM10 27h1v1h-1zM14 27h1v1h-1zM16 27h1v1h-1zM17 27h1v1h-1zM18 27h1v1h-1zM19 27h1v1h-1zM20 27h1v1h-1zM22 27h1v1h-1zM24 27h1v1h-1zM25 27h1v1h-1zM27 27h1v1h-1zM4 28h1v1h-1zM5 28h1v1h-1zM6 28h1v1h-1zM7 28h1v1h-1zM8 28h1v1h-1zM9 28h1v1h-1zM10 28h1v1h-1zM12 28h1v1h-1zM15 28h1v1h-1zM16 28h1v1h-1zM17 28h1v1h-1zM19 28h1v1h-1zM20 28h1v1h-1zM23 28h1v1h-1zM27 28h1v1h-1zM28 28h1v1h-1z" fill="#1a140c"/></svg><span>Neal Bushaw, VCU, Bridges2026<br>nealbushaw.com</span></div>
+
+<div id="overlay">
+  <button class="bigbtn" id="startBtn">START</button>
+  <button class="smallbtn" id="surpriseBtn0">Surprise Me!</button>
+  <ul id="howto">
+    <li><b>Drag up / down</b> &mdash; change # of pulses</li>
+    <li><b>Drag left / right</b> &mdash; change # of strikes</li>
+    <li><b>Pull the center</b> &mdash; rotate the pattern</li>
+    <li><b>Tap CYCLE / M&Ouml;BIUS</b> &mdash; twist the shape</li>
+  </ul>
+</div>
+
+<div id="controls" style="display:none">
+  <button class="smallbtn" id="resetBtn" style="padding:8px 18px; font-size:14px">Reset</button>
+  <label>TEMPO</label>
+  <input id="tempo" type="range" min="15" max="160" value="60">
+  <button class="smallbtn" id="surpriseBtn" style="padding:8px 18px; font-size:14px">Surprise Me!</button>
+</div>
+
+<script>
+"use strict";
+/* =====================================================================
+   Mathematical Rhythms — Bridges Family Day exhibit (2x2 kiosk layout)
+   Every rhythm is the minimum-energy k-subset of the vertices of a
+   graph (cycle C_n or Möbius ladder on n vertices), found by exhaustive
+   search over all k-subsets with Coulomb energy  E = Σ 1/d(i,j)²,
+   where d is graph distance.  Users choose only (graph, n, k, rotation).
+   ===================================================================== */
+
+/* ------------------------------ graphs ------------------------------ */
+
+// Adjacency: cycle edges always; Möbius ladder adds antipodal chords (n even).
+function buildAdjacency(n, graph){
+  const adj = Array.from({length:n}, () => []);
+  for (let i = 0; i < n; i++){ adj[i].push((i+1) % n, (i+n-1) % n); }
+  if (graph === "mobius" && n % 2 === 0){
+    for (let i = 0; i < n/2; i++){ adj[i].push(i + n/2); adj[i + n/2].push(i); }
+  }
+  return adj;
+}
+
+// All-pairs graph distances by BFS from every vertex.
+function distMatrix(n, graph){
+  const adj = buildAdjacency(n, graph);
+  const D = Array.from({length:n}, () => new Array(n).fill(-1));
+  for (let s = 0; s < n; s++){
+    const q = [s]; D[s][s] = 0;
+    for (let h = 0; h < q.length; h++){
+      const v = q[h];
+      for (const w of adj[v]) if (D[s][w] < 0){ D[s][w] = D[s][v] + 1; q.push(w); }
+    }
+  }
+  return D;
+}
+
+/* --------------------- minimum-energy onset sets --------------------- */
+
+const rhythmCache = new Map();
+
+// Exhaustive search (NOT Björklund): canonical = lexicographically first
+// among the global minimizers.  n ≤ 16, so C(n,k) is tiny.
+function minEnergySet(n, k, graph){
+  const key = graph + ":" + n + ":" + k;
+  if (rhythmCache.has(key)) return rhythmCache.get(key);
+  const D = distMatrix(n, graph);
+  let best = null, bestE = Infinity;
+  const S = [];
+  (function rec(start){
+    if (S.length === k){
+      let E = 0;
+      for (let a = 0; a < k; a++)
+        for (let b = a+1; b < k; b++){ const d = D[S[a]][S[b]]; E += 1/(d*d); }
+      if (E < bestE - 1e-12){ bestE = E; best = S.slice(); }
+      return;
+    }
+    for (let v = start; v <= n - (k - S.length); v++){ S.push(v); rec(v+1); S.pop(); }
+  })(0);
+  const res = { set: best || [], energy: (k > 1 ? bestE : 0) };
+  rhythmCache.set(key, res);
+  return res;
+}
+
+/* ------------------------------ audio ------------------------------- */
+
+const AC = window.AudioContext || window.webkitAudioContext;
+let ctx = null, master = null, noiseBuf = null;
+
+function initAudio(){
+  if (ctx) return;
+  ctx = new AC();
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -14; comp.ratio.value = 6;
+  master = ctx.createGain(); master.gain.value = 0.9;
+  master.connect(comp); comp.connect(ctx.destination);
+  // shared white-noise buffer
+  noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+  const d = noiseBuf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random()*2 - 1;
+}
+
+function noise(t, dur, filterType, freq, q, gain){
+  const src = ctx.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
+  const f = ctx.createBiquadFilter(); f.type = filterType;
+  f.frequency.value = freq; f.Q.value = q;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(gain, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  src.connect(f); f.connect(g); g.connect(master);
+  src.start(t); src.stop(t + dur + 0.02);
+}
+
+function tone(t, dur, type, f0, f1, gain){
+  const o = ctx.createOscillator(); o.type = type;
+  o.frequency.setValueAtTime(f0, t);
+  if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(gain, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  o.connect(g); g.connect(master);
+  o.start(t); o.stop(t + dur + 0.02);
+}
+
+// Each instrument: name + synthesis function(t, v) where v = overall level.
+const INSTRUMENTS = [
+  { name:"Kick",       play:(t,v)=>{ tone(t,0.28,"sine",150,44,0.95*v); tone(t,0.02,"square",120,120,0.2*v); } },
+  { name:"Snare",      play:(t,v)=>{ noise(t,0.18,"bandpass",1800,0.8,0.55*v); tone(t,0.10,"triangle",190,150,0.4*v); } },
+  { name:"Hi-Hat",     play:(t,v)=>{ noise(t,0.05,"highpass",7500,0.7,0.35*v); } },
+  { name:"Open Hat",   play:(t,v)=>{ noise(t,0.32,"highpass",6800,0.7,0.28*v); } },
+  { name:"Cowbell",    play:(t,v)=>{ tone(t,0.20,"square",545,545,0.18*v); tone(t,0.20,"square",800,800,0.14*v); } },
+  { name:"Wood Block", play:(t,v)=>{ tone(t,0.07,"sine",850,780,0.6*v); noise(t,0.02,"bandpass",2000,2,0.25*v); } },
+  { name:"Claves",     play:(t,v)=>{ tone(t,0.06,"sine",2450,2450,0.5*v); } },
+  { name:"Shaker",     play:(t,v)=>{ noise(t,0.07,"bandpass",5200,1.4,0.4*v); } },
+  { name:"Conga",      play:(t,v)=>{ tone(t,0.22,"sine",195,165,0.65*v); } },
+  { name:"Rimshot",    play:(t,v)=>{ noise(t,0.04,"bandpass",3400,3,0.5*v); tone(t,0.03,"sine",1100,900,0.3*v); } },
+];
+
+/* ----------------------------- transport ----------------------------- */
+
+const transport = {
+  bpm: 60,
+  nextStep: 0,          // global integer step counter (16th notes)
+  nextStepTime: 0,      // audio-clock time of that step
+  timer: null,
+  get stepDur(){ return 60 / this.bpm / 4; },
+  start(){
+    this.nextStep = 0;
+    this.nextStepTime = ctx.currentTime + 0.1;
+    this.timer = setInterval(() => this.tick(), 25);
+  },
+  stop(){
+    clearInterval(this.timer); this.timer = null;
+  },
+  tick(){
+    const horizon = ctx.currentTime + 0.12;
+    while (this.nextStepTime < horizon){
+      const level = 0.9 / Math.sqrt(Math.max(1, panels.filter(p => !p.muted).length));
+      for (const p of panels) p.scheduleStep(this.nextStep, this.nextStepTime, level);
+      this.nextStep++;
+      this.nextStepTime += this.stepDur;   // tempo changes take effect step-by-step
+    }
+  },
+  // continuous global phase in steps, for smooth playheads
+  phase(){
+    if (!ctx) return 0;
+    return this.nextStep - (this.nextStepTime - ctx.currentTime) / this.stepDur;
+  }
+};
+
+/* ------------------------------ panels ------------------------------ */
+
+/* Accent pool — piano materials: brass, felt crimson, ivory, patina,
+   copper, mahogany rose, verdigris, aged gold.  Edit freely to match. */
+const PALETTE = ["#d9a441","#c8434e","#f0e6cd","#5f8a8b","#c87a3e","#b06a80","#7d9c7f","#e6c05a"];
+const panels = [];
+let colorIdx = 0;
+
+class Panel {
+  constructor(opts){
+    this.n     = opts.n;                    // vertices ("# of pulses")
+    this.k     = opts.k;                    // onsets ("# of strikes")
+    this.rot   = opts.rot   || 0;           // rotation of onset set
+    this.graph = opts.graph || "cycle";     // "cycle" | "mobius"
+    this.inst  = opts.inst  || 0;           // instrument index
+    this.muted = false;
+    this.accent = PALETTE[colorIdx++ % PALETTE.length];
+    this.morph = (this.graph === "mobius") ? 1 : 0;   // circle→band morph, 0..1
+    this.lastHit = {};                      // vertex → audio time, for pulses
+    this.pending = [];                      // scheduled {v,t} not yet shown
+
+    // DOM — panel lives in one quarter of the fixed 2x2 grid
+    this.el = document.createElement("div");
+    this.el.className = "panel";
+    this.el.style.setProperty("--accent", this.accent);
+    this.el.style.setProperty("--glow", this.accent + "33");
+    this.el.innerHTML =
+      '<div class="phead"><div><button class="pname"></button><div class="psub"></div></div>' +
+      '<button class="mutedot" aria-label="mute"></button></div>' +
+      '<div class="cwrap"><canvas></canvas></div>' +
+      '<div class="phint">&#8597; # of pulses &nbsp;&#183;&nbsp; &#8596; # of strikes &nbsp;&#183;&nbsp; pull center to rotate</div>' +
+      '<div class="pfoot"><span class="penergy"></span><button class="gtoggle"></button></div>';
+    document.getElementById("grid").appendChild(this.el);
+    this.canvas = this.el.querySelector("canvas");
+    this.g = this.canvas.getContext("2d");
+
+    this.el.querySelector(".mutedot").addEventListener("pointerup", e => {
+      e.stopPropagation(); this.muted = !this.muted;
+      this.el.classList.toggle("muted", this.muted);
+    });
+    this.el.querySelector(".gtoggle").addEventListener("pointerup", e => {
+      e.stopPropagation();
+      this.graph = this.graph === "mobius" ? "cycle" : "mobius";
+      this.recompute();
+    });
+    this.el.querySelector(".pname").addEventListener("pointerup", e => {
+      e.stopPropagation();
+      this.inst = (this.inst + 1) % INSTRUMENTS.length;
+      this.recompute();
+    });
+    attachCanvasGestures(this);
+    this.recompute();
+    this.resize();
+  }
+
+  // fit the square canvas into this panel's quarter of the screen
+  resize(){
+    const w = this.el.clientWidth, h = this.el.clientHeight;
+    if (!w || !h) return;
+    const chrome = 150;                       // header + hint + foot + padding
+    const s = Math.max(120, Math.min(w - 36, h - chrome));
+    this.canvas.style.width = s + "px";
+    this.canvas.style.height = s + "px";
+    const px = Math.round(s * 2);             // 2x for retina
+    if (this.canvas.width !== px){ this.canvas.width = px; this.canvas.height = px; }
+  }
+
+  recompute(){
+    if (this.graph === "mobius" && this.n % 2) this.n += 1;     // Möbius needs even n
+    this.n = Math.max(4, Math.min(16, this.n));
+    this.k = Math.max(1, Math.min(this.n, this.k));
+    this.rot = ((this.rot % this.n) + this.n) % this.n;
+    const r = minEnergySet(this.n, this.k, this.graph);
+    this.onsets = new Set(r.set.map(v => (v + this.rot) % this.n));
+    this.energy = r.energy;
+    const gname = this.graph === "mobius" ? "M\u00d6BIUS" : "CYCLE";
+    this.el.querySelector(".pname").textContent = INSTRUMENTS[this.inst].name;
+    this.el.querySelector(".psub").textContent =
+      this.n + " pulses \u00b7 " + this.k + " strike" + (this.k === 1 ? "" : "s") +
+      " \u00b7 rotated " + this.rot;
+    this.el.querySelector(".penergy").textContent = "E = " + this.energy.toFixed(3);
+    this.el.querySelector(".gtoggle").textContent = gname;
+  }
+
+  scheduleStep(step, time, level){
+    if (this.muted) return;
+    const v = step % this.n;
+    if (this.onsets.has(v)){
+      INSTRUMENTS[this.inst].play(time, level);
+      this.pending.push({ v, t: time });
+    }
+  }
+
+  draw(now){
+    const px = this.canvas.width;
+    if (!px) return;
+    const g = this.g, f = px / 404;
+    g.setTransform(f, 0, 0, f, 0, 0);         // draw in fixed 404-space
+    const W = 404, cx = W/2, cy = W/2, R = 152;
+    // morph 0 (circle) → 1 (Möbius band edge)
+    const target = this.graph === "mobius" ? 1 : 0;
+    this.morph += (target - this.morph) * 0.12;
+    const m = this.morph;
+    // promote pending hits whose time has arrived
+    while (this.pending.length && this.pending[0].t <= now)
+      this.lastHit[this.pending.shift().v] = now;
+
+    g.clearRect(0, 0, W, W);
+    const PH = -Math.PI/2;                          // vertex 0 at top
+
+    // circle layout
+    const circ = i => {
+      const a = PH + i * 2*Math.PI/this.n;
+      return [cx + R*Math.cos(a), cy + R*Math.sin(a)];
+    };
+    // Möbius band boundary: ONE closed curve, twice around the band.
+    // Standard parametrization, tilted orthographic projection.
+    const edge = t => {
+      const Rb = 128, w = 38, u = t + PH;
+      const r3 = Rb + w * Math.cos(u/2);
+      return [cx + r3 * Math.cos(u),
+              cy + r3 * Math.sin(u) * 0.58 + w * Math.sin(u/2) * 0.95];
+    };
+    // vertex i sits at boundary parameter 4π·i/n — around the edge twice,
+    // so (i, i+n/2) share an angular station on opposite sides of the strip.
+    const mob = i => edge(4*Math.PI*i/this.n);
+    const pos = i => {
+      const [xa,ya] = circ(i), [xb,yb] = mob(i);
+      return [xa + (xb-xa)*m, ya + (yb-ya)*m];
+    };
+
+    // cycle edge fades out as the band fades in
+    if (m < 0.98){
+      g.strokeStyle = "rgba(242,234,216," + (0.16*(1-m)).toFixed(3) + ")";
+      g.lineWidth = 2;
+      g.beginPath(); g.arc(cx, cy, R, 0, 2*Math.PI); g.stroke();
+    }
+
+    if (m > 0.02 && this.n % 2 === 0){
+      // faint band surface: matched stations on the two sides of the strip
+      g.fillStyle = "rgba(242,234,216," + (0.05*m).toFixed(3) + ")";
+      g.beginPath();
+      for (let s = 0; s <= 90; s++){
+        const [x,y] = edge(2*Math.PI*s/90); s ? g.lineTo(x,y) : g.moveTo(x,y);
+      }
+      for (let s = 90; s >= 0; s--){
+        const [x,y] = edge(2*Math.PI + 2*Math.PI*s/90); g.lineTo(x,y);
+      }
+      g.closePath(); g.fill();
+      // the boundary curve itself
+      g.strokeStyle = "rgba(242,234,216," + (0.30*m).toFixed(3) + ")";
+      g.lineWidth = 2;
+      g.beginPath();
+      for (let s = 0; s <= 220; s++){
+        const [x,y] = edge(4*Math.PI*s/220); s ? g.lineTo(x,y) : g.moveTo(x,y);
+      }
+      g.closePath(); g.stroke();
+      // rungs across the width of the band
+      g.strokeStyle = "rgba(242,234,216," + (0.22*m).toFixed(3) + ")";
+      g.lineWidth = 1.5;
+      for (let i = 0; i < this.n/2; i++){
+        const [x1,y1] = pos(i), [x2,y2] = pos(i + this.n/2);
+        g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.stroke();
+      }
+    }
+
+    // rotation knob: hub at center + double-headed arc (rotation symbol),
+    // oriented toward the rotated station.  Pull it around to spin.
+    {
+      const [tx,ty] = pos(this.rot);
+      const dir = Math.atan2(ty - cy, tx - cx);     // toward current station
+      const AR = 62, half = 0.62*Math.PI;           // arc radius, half-span
+      const a0 = dir - half, a1 = dir + half;
+      g.fillStyle = this.accent + "22";
+      g.strokeStyle = this.accent + "77"; g.lineWidth = 2;
+      g.beginPath(); g.arc(cx, cy, 34, 0, 2*Math.PI); g.fill(); g.stroke();
+      g.strokeStyle = this.accent; g.lineWidth = 6; g.lineCap = "round";
+      g.beginPath(); g.arc(cx, cy, AR, a0, a1); g.stroke();
+      g.lineCap = "butt";
+      // arrowheads tangent to the arc at both ends
+      const head = (ang, ccw) => {
+        const hx = cx + AR*Math.cos(ang), hy = cy + AR*Math.sin(ang);
+        const ta = ang + (ccw ? Math.PI/2 : -Math.PI/2);   // tangent direction
+        g.fillStyle = this.accent;
+        g.beginPath();
+        g.moveTo(hx + 18*Math.cos(ta), hy + 18*Math.sin(ta));
+        g.lineTo(hx + 15*Math.cos(ta + 2.5), hy + 15*Math.sin(ta + 2.5));
+        g.lineTo(hx + 15*Math.cos(ta - 2.5), hy + 15*Math.sin(ta - 2.5));
+        g.closePath(); g.fill();
+      };
+      head(a1, true);                               // counterclockwise end
+      head(a0, false);                              // clockwise end
+    }
+
+    // playhead spark, both modes
+    {
+      const local = (transport.phase() % this.n + this.n) % this.n;
+      const a = PH + local * 2*Math.PI/this.n;
+      const xc = cx + R*Math.cos(a), yc = cy + R*Math.sin(a);
+      const [xm,ym] = edge(4*Math.PI*local/this.n);
+      const x = xc + (xm-xc)*m, y = yc + (ym-yc)*m;
+      g.beginPath(); g.arc(x, y, 6, 0, 2*Math.PI);
+      g.shadowColor = this.accent; g.shadowBlur = 16;
+      g.fillStyle = this.accent; g.fill(); g.shadowBlur = 0;
+    }
+
+    // vertices
+    for (let i = 0; i < this.n; i++){
+      const [x, y] = pos(i);
+      const active = this.onsets.has(i);
+      let r = active ? 11 : 5.5;
+      const h = this.lastHit[i];
+      if (h !== undefined){
+        const dt = now - h;
+        if (dt < 0.4) r += 8 * Math.exp(-dt * 9);       // pulse on hit
+      }
+      g.beginPath(); g.arc(x, y, r, 0, 2*Math.PI);
+      if (active){
+        g.shadowColor = this.accent; g.shadowBlur = 22;
+        g.fillStyle = this.accent;
+      } else {
+        g.shadowBlur = 0; g.fillStyle = "rgba(242,234,216,0.35)";
+      }
+      g.fill(); g.shadowBlur = 0;
+    }
+  }
+}
+
+/* ----------------------------- gestures ------------------------------ */
+
+// On the canvas only.  Near the center hub: drag the arrow around to
+// rotate (knob).  Elsewhere: vertical = # of pulses, horizontal =
+// # of strikes.  No double-taps anywhere (iPad Safari zoom).
+function attachCanvasGestures(p){
+  let mode = null, sx = 0, sy = 0, base = null, moved = false, lastAng = 0, acc = 0;
+
+  const center = () => {
+    const r = p.canvas.getBoundingClientRect();
+    return { x: r.left + r.width/2, y: r.top + r.height/2, s: r.width };
+  };
+  const down = e => {
+    e.preventDefault();
+    p.canvas.setPointerCapture(e.pointerId);
+    sx = e.clientX; sy = e.clientY; moved = false;
+    base = { n: p.n, k: p.k, rot: p.rot };
+    const c = center();
+    const d = Math.hypot(e.clientX - c.x, e.clientY - c.y);
+    if (d < c.s * 0.28){                       // grabbed the knob region
+      mode = "rotate";
+      lastAng = Math.atan2(e.clientY - c.y, e.clientX - c.x);
+      acc = 0;
+    } else {
+      mode = "param";
+    }
+  };
+  const move = e => {
+    if (!mode) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.abs(dx) + Math.abs(dy) > 8) moved = true;
+    if (!moved) return;
+    if (mode === "rotate"){
+      const c = center();
+      const a = Math.atan2(e.clientY - c.y, e.clientX - c.x);
+      let da = a - lastAng;                    // accumulate with wraparound
+      if (da >  Math.PI) da -= 2*Math.PI;
+      if (da < -Math.PI) da += 2*Math.PI;
+      acc += da; lastAng = a;
+      const steps = Math.round(acc / (2*Math.PI / p.n));
+      const r2 = ((base.rot + steps) % p.n + p.n) % p.n;
+      if (r2 !== p.rot){ p.rot = r2; p.recompute(); }
+    } else {
+      const step = (p.graph === "mobius") ? 2 : 1;       // keep n even on Möbius
+      const dn = -Math.round(dy / 40) * step;            // drag up → more pulses
+      const dk =  Math.round(dx / 34);                   // drag right → more strikes
+      const n2 = Math.max(4, Math.min(16, base.n + dn));
+      const k2 = Math.max(1, Math.min(n2, base.k + dk));
+      if (n2 !== p.n || k2 !== p.k){ p.n = n2; p.k = k2; p.recompute(); }
+    }
+  };
+  const up = () => { mode = null; };
+
+  p.canvas.addEventListener("pointerdown", down);
+  p.canvas.addEventListener("pointermove", move);
+  p.canvas.addEventListener("pointerup", up);
+  p.canvas.addEventListener("pointercancel", up);
+}
+
+/* ---------------------------- ensembles ------------------------------ */
+
+function clearPanels(){
+  for (const p of panels) p.el.remove();
+  panels.length = 0; colorIdx = 0;
+}
+function resizeAll(){ for (const p of panels) p.resize(); }
+
+// Always exactly four panels — one per quarter of the screen.
+function defaultEnsemble(){
+  clearPanels();
+  const specs = [
+    { n:16, k:4,  rot:0, graph:"cycle",  inst:0 },   // kick: four on the floor
+    { n:16, k:2,  rot:4, graph:"cycle",  inst:1 },   // snare: backbeat
+    { n:16, k:7,  rot:0, graph:"cycle",  inst:2 },   // hats
+    { n:12, k:5,  rot:0, graph:"mobius", inst:4 },   // cowbell on a Möbius band
+  ];
+  specs.forEach(s => panels.push(new Panel(s)));
+  requestAnimationFrame(resizeAll);
+}
+
+function surpriseEnsemble(){
+  clearPanels();
+  const ri = a => a[Math.floor(Math.random()*a.length)];
+  const used = new Set([0]);
+  panels.push(new Panel({ n: ri([8,12,16]), k: ri([3,4,5]), rot:0,
+                          graph:"cycle", inst:0 }));   // always anchor with a kick
+  for (let i = 1; i < 4; i++){
+    let inst; do { inst = Math.floor(Math.random()*INSTRUMENTS.length); } while (used.has(inst));
+    used.add(inst);
+    const graph = Math.random() < 0.45 ? "mobius" : "cycle";
+    const n = graph === "mobius" ? ri([8,10,12,14,16]) : ri([8,9,10,12,13,15,16]);
+    const k = 2 + Math.floor(Math.random() * Math.min(6, n-2));
+    panels.push(new Panel({ n, k, rot: Math.floor(Math.random()*n), graph, inst }));
+  }
+  requestAnimationFrame(resizeAll);
+}
+
+/* --------------------------- wiring & loop --------------------------- */
+
+const overlay = document.getElementById("overlay");
+
+/* ---- idle watchdog: 30 s without a touch → back to the intro ---- */
+const IDLE_MS = 30000;
+let running = false, idleTimer = null;
+
+function bumpIdle(){
+  if (!running) return;
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(goIdle, IDLE_MS);
+}
+function goIdle(){
+  running = false;
+  clearTimeout(idleTimer);
+  transport.stop();
+  if (ctx) ctx.suspend();
+  clearPanels();
+  overlay.classList.remove("gone");
+  document.getElementById("controls").style.display = "none";
+}
+// any touch or drag anywhere counts as activity
+document.addEventListener("pointerdown", bumpIdle, true);
+document.addEventListener("pointermove", bumpIdle, true);
+
+// belt & suspenders against iPad Safari zoom gestures
+document.addEventListener("dblclick", e => e.preventDefault(), { passive:false });
+document.addEventListener("gesturestart", e => e.preventDefault(), { passive:false });
+
+function begin(build){
+  initAudio();
+  ctx.resume();
+  build();
+  if (!transport.timer) transport.start();
+  overlay.classList.add("gone");
+  document.getElementById("controls").style.display = "flex";
+  running = true;
+  bumpIdle();
+}
+document.getElementById("startBtn").addEventListener("pointerup", () => begin(defaultEnsemble));
+document.getElementById("surpriseBtn0").addEventListener("pointerup", () => begin(surpriseEnsemble));
+document.getElementById("surpriseBtn").addEventListener("pointerup", surpriseEnsemble);
+document.getElementById("resetBtn").addEventListener("pointerup", goIdle);
+document.getElementById("tempo").addEventListener("input", e => { transport.bpm = +e.target.value; });
+window.addEventListener("resize", resizeAll);
+window.addEventListener("orientationchange", () => setTimeout(resizeAll, 250));
+
+(function loop(){
+  if (ctx){ const now = ctx.currentTime; for (const p of panels) p.draw(now); }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
