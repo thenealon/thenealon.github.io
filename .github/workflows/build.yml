@@ -1,0 +1,45 @@
+# Rebuild the site whenever anything is pushed.
+#
+# What it does: runs `python3 build.py`, which regenerates index.html and
+# more.html from the data files and the apps/ folder, then commits the result
+# back if it changed.  So you can add a web app by uploading one .html file to
+# apps/ straight on github.com -- this rebuilds the gallery for you.
+#
+# It will NOT loop: commits made with the built-in GITHUB_TOKEN do not start
+# another workflow run.
+
+name: Build site
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Regenerate the pages
+        run: python3 build.py
+
+      - name: Commit the result if it changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html more.html assets/genealogy-data.js
+          if git diff --staged --quiet; then
+            echo "Nothing changed."
+          else
+            git commit -m "Rebuild site (automated)"
+            git push
+          fi

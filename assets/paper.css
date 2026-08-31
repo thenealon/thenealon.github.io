@@ -461,3 +461,28 @@ dialog#abstract-dialog::backdrop { background: rgba(20, 19, 15, 0.35); }
   .axioms > li::before { position: static; display: block; width: auto;
                          margin-bottom: 0.1rem; }
 }
+
+/* ---------- web-app gallery ---------- */
+.gallery { list-style: none; margin: 0; padding: 0;
+           display: grid; gap: 0.9rem;
+           grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); }
+.app { display: block; text-decoration: none; color: var(--ink);
+       border: 1px solid var(--rule-faint); border-radius: 3px;
+       overflow: hidden; background: var(--panel);
+       transition: border-color 0.15s ease, transform 0.15s ease; }
+.app:hover, .app:focus-visible {
+  border-color: var(--gold); color: var(--ink); transform: translateY(-2px); }
+.app .thumb { display: block; width: 100%; height: auto;
+              background: var(--graph-bg);
+              border-bottom: 1px solid var(--rule-faint); }
+.app .thumb line { stroke: var(--graph-edge); stroke-width: 1;
+                   opacity: 0.55; }
+.app:hover .thumb line, .app:focus-visible .thumb line {
+  stroke: var(--gold); opacity: 0.9; }
+.app .thumb circle { fill: var(--gold-ink); }
+.app .app-name { display: block; padding: 0.55rem 0.7rem 0.6rem;
+                 font-size: 0.9rem; line-height: 1.3; }
+@media (prefers-reduced-motion: reduce) {
+  .app { transition: none; }
+  .app:hover, .app:focus-visible { transform: none; }
+}

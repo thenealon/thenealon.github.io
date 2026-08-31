@@ -97,6 +97,13 @@
      "intro": ""
     },
     {
+     "id": "gallery",
+     "rail": "Web apps",
+     "heading": "Web apps",
+     "block": "gallery",
+     "intro": ""
+    },
+    {
      "id": "exhibits",
      "rail": "Exhibits",
      "heading": "Exhibits",
@@ -147,6 +154,6 @@
  ],
  "portrait": {
   "src": "assets/portrait.jpg",
-  "alt": "Neal Bushaw (right), and Eggy."
+  "alt": "Neal Bushaw, holding a large tuxedo cat"
  }
 }

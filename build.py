@@ -188,8 +188,9 @@ def block_overview(sec):
             '      <li><span class="when">Seminar</span>'
             '<a href="http://www.people.vcu.edu/~dcranston/DM-seminar/">VCU '
             'Discrete Math Seminar</a>.</li>\n'
-            '      <li><span class="when">Email</span>nobushaw (at) vcu (dot) '
-            'edu</li>\n'
+            '      <li><span class="when">Email</span>'
+            '<span class="email" data-user="nobushaw" data-domain="vcu.edu">'
+            'nobushaw (at) vcu (dot) edu</span></li>\n'
             '      <li><span class="when">Office</span>'
             '<a href="https://maps.vcu.edu/monroepark/harrishall/">Grace E. '
             'Harris Hall</a> 4107</li>\n'
@@ -402,10 +403,103 @@ WHO = """    <p class="lede">I'm an Associate Professor in the
     </ul>
 """
 
+
+# ------------------------------------------------------------------ gallery
+#
+# The gallery scans the apps/ folder at build time.  Drop a self-contained
+# .html file in there and it appears here on the next build, with its name
+# taken from the file's <title> and a thumbnail generated from that name --
+# a small random geometric graph, the same object as the site background,
+# seeded so each app gets its own stable little picture.  No screenshots, no
+# image files, nothing to write by hand.
+
+import glob
+import re as _re
+
+
+def _title_of(path):
+    """The <title> of an app file, or a tidied filename if it has none."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            head = f.read(4000)
+    except OSError:
+        head = ""
+    m = _re.search(r"<title[^>]*>(.*?)</title>", head, _re.I | _re.S)
+    if m and m.group(1).strip():
+        return _re.sub(r"\\s+", " ", m.group(1)).strip()
+    stem = os.path.splitext(os.path.basename(path))[0]
+    return stem.replace("-", " ").replace("_", " ").strip().title()
+
+
+def _seed(s):
+    h = 2166136261
+    for ch in s:
+        h = ((h ^ ord(ch)) * 16777619) & 0xffffffff
+    return h
+
+
+def _rng(seed):
+    st = [seed & 0xffffffff]
+    def rnd():
+        st[0] = (st[0] + 0x6D2B79F5) & 0xffffffff
+        t = st[0]
+        t = ((t ^ (t >> 15)) * (t | 1)) & 0xffffffff
+        t = (t ^ (t + (((t ^ (t >> 7)) * (t | 61)) & 0xffffffff))) & 0xffffffff
+        return ((t ^ (t >> 14)) & 0xffffffff) / 4294967296.0
+    return rnd
+
+
+def _thumb(name):
+    """An inline-SVG random geometric graph seeded from the app's name."""
+    W, H, pad = 320, 176, 22
+    rnd = _rng(_seed(name))
+    n = 10 + int(rnd() * 4)                 # 10-13 vertices
+    pts = [(pad + rnd() * (W - 2 * pad), pad + rnd() * (H - 2 * pad))
+           for _ in range(n)]
+    r = 96                                   # connection radius
+    edges = []
+    for i in range(n):
+        for j in range(i + 1, n):
+            dx, dy = pts[i][0] - pts[j][0], pts[i][1] - pts[j][1]
+            if dx * dx + dy * dy < r * r:
+                edges.append((i, j))
+    parts = ['<svg class="thumb" viewBox="0 0 %d %d" role="img" '
+             'aria-label="Abstract graph motif" focusable="false">' % (W, H)]
+    for i, j in edges:
+        parts.append('<line x1="%.1f" y1="%.1f" x2="%.1f" y2="%.1f"/>'
+                     % (pts[i][0], pts[i][1], pts[j][0], pts[j][1]))
+    for x, y in pts:
+        parts.append('<circle cx="%.1f" cy="%.1f" r="2.6"/>' % (x, y))
+    parts.append('</svg>')
+    return "".join(parts)
+
+
+def block_gallery(sec):
+    files = sorted(glob.glob(os.path.join(HERE, "apps", "*.html")))
+    files = [f for f in files
+             if os.path.basename(f).lower() not in ("index.html",)]
+    if not files:
+        return ('    <p class="note">Nothing here yet. Drop a self-contained '
+                '<code>.html</code> file into the <code>apps/</code> folder and '
+                'it will appear here automatically.</p>\n')
+    cards = []
+    for path in files:
+        href = "apps/" + os.path.basename(path)
+        title = _title_of(path)
+        cards.append(
+            '      <li><a class="app" href="%s">\n'
+            '        %s\n'
+            '        <span class="app-name">%s</span>\n'
+            '      </a></li>\n' % (href, _thumb(title), title))
+    return ('    <ul class="gallery">\n' + "".join(cards) + '    </ul>\n')
+
+
+
 BLOCKS = {
     "overview": block_overview, "research": block_research,
     "teaching": block_teaching, "who": block_who, "items": block_items,
     "genealogy": block_genealogy, "links": block_links,
+    "gallery": block_gallery,
 }
 
 

@@ -121,6 +121,24 @@
     }
   }());
 
+  /* ---- the address ------------------------------------------------
+     Assembled here rather than written into the HTML.  Harvesters that do
+     not run JavaScript see only the spelled-out form; everyone else gets a
+     real mailto link they can tap.  Without JavaScript the spelled-out form
+     stays put and is still perfectly readable, including aloud.        */
+  (function () {
+    var slots = document.querySelectorAll('.email[data-user][data-domain]');
+    for (var i = 0; i < slots.length; i++) {
+      var el = slots[i];
+      var addr = el.getAttribute('data-user') + '@' + el.getAttribute('data-domain');
+      var a = document.createElement('a');
+      a.href = 'mailto:' + addr;
+      a.textContent = addr;
+      el.textContent = '';
+      el.appendChild(a);
+    }
+  }());
+
   /* ---- abstracts ---------------------------------------------------
      Buttons ship hidden.  One is revealed only if fetch_abstracts.py has
      actually retrieved that paper's abstract, so a paper with no abstract

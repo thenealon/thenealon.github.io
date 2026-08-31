@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Maximally Even Drummer</title>
+<style>
+  :root{
+    --bg:#0a0e0d;
+    --panel:#0f1512;
+    --ink:#c9f5d9;          /* phosphor green */
+    --ink-dim:#5c7a68;
+    --grid:#1b2620;
+    --amber:#f5c96b;        /* target / original */
+    --magenta:#e86bd0;      /* residual / miss */
+    --line:#243029;
+    --hit:#6bf5b0;
+    --false:#e8746b;        /* false onset */
+    --mono:"SFMono-Regular",ui-monospace,"Cascadia Code","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--mono);
+    -webkit-font-smoothing:antialiased}
+  body{padding:22px clamp(14px,4vw,48px) 60px;line-height:1.4}
+  a{color:var(--ink)}
+
+  header{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 18px;
+    border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:22px}
+  h1{font-size:clamp(18px,2.6vw,26px);font-weight:600;letter-spacing:.14em;
+    text-transform:uppercase;margin:0}
+  .sub{color:var(--ink-dim);font-size:12.5px;letter-spacing:.06em;max-width:60ch}
+  .cite{color:var(--ink-dim);font-size:11px;margin-left:auto;text-align:right;
+    letter-spacing:.03em}
+
+  .controls{display:flex;flex-wrap:wrap;gap:20px 26px;align-items:flex-end;
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 20px;margin-bottom:24px}
+  .ctl{display:flex;flex-direction:column;gap:6px}
+  .ctl label{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--ink-dim)}
+  .val{font-size:22px;color:var(--ink);min-width:2ch;text-align:center}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:132px;height:3px;
+    background:var(--line);border-radius:2px;outline:none;margin:9px 0}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;
+    border-radius:50%;background:var(--ink);cursor:pointer;box-shadow:0 0 8px var(--ink)}
+  input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;
+    background:var(--ink);cursor:pointer;box-shadow:0 0 8px var(--ink)}
+  .knob-row{display:flex;align-items:center;gap:12px}
+
+  button,.filebtn{font-family:var(--mono);font-size:12px;letter-spacing:.08em;
+    text-transform:uppercase;background:transparent;color:var(--ink);
+    border:1px solid var(--line);border-radius:7px;padding:9px 15px;cursor:pointer;
+    transition:.12s}
+  button:hover,.filebtn:hover{border-color:var(--ink);box-shadow:0 0 10px -2px var(--ink)}
+  button.on{background:var(--ink);color:#04110a;border-color:var(--ink)}
+  button:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;border-color:var(--line)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+  .seg button{border:0;border-radius:0;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:0}
+  input[type=file]{display:none}
+  select{font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;
+    background:#0c1310;color:var(--ink);border:1px solid var(--line);border-radius:7px;
+    padding:9px 30px 9px 12px;cursor:pointer;appearance:none;
+    background-image:linear-gradient(45deg,transparent 50%,var(--ink-dim) 50%),
+      linear-gradient(135deg,var(--ink-dim) 50%,transparent 50%);
+    background-position:calc(100% - 15px) center,calc(100% - 10px) center;
+    background-size:5px 5px,5px 5px;background-repeat:no-repeat;min-width:190px}
+  select:hover{border-color:var(--ink)}
+  select optgroup{background:#0c1310;color:var(--ink-dim);font-style:normal}
+  select option{background:#0c1310;color:var(--ink)}
+
+  .transport{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+  .status{color:var(--ink-dim);font-size:11.5px;letter-spacing:.05em}
+
+  .drumpanel{display:flex;flex-wrap:wrap;gap:18px;margin-bottom:24px;align-items:stretch}
+  .drummer-box{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;min-width:300px}
+  .drummer-box canvas{width:100%;max-width:440px;height:auto;background:#0b1210;
+    border:1px solid var(--line);border-radius:8px}
+  .drummer-cap{font-size:10.5px;color:var(--ink-dim);letter-spacing:.05em;text-align:center}
+  .drum-tools{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:2px}
+  .drum-tools button{font-size:10px;padding:6px 10px}
+  .tab-box{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;flex:1;min-width:300px;display:flex;flex-direction:column;gap:8px;overflow:auto}
+  .tab-title{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
+  #notation{width:100%;max-width:620px;height:auto;background:#0c1310;
+    border:1px solid var(--line);border-radius:7px}
+  .tab{font-family:var(--mono);font-size:12px;line-height:1.5;color:var(--ink);
+    white-space:pre;margin:0;overflow-x:auto;letter-spacing:0}
+  .tab .hit{color:#6bf5b0}
+  .tab .accent{color:#f5c96b;font-weight:600}
+  .lanes{display:flex;flex-direction:column;gap:18px}  .lane{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;display:grid;grid-template-columns:auto 1fr;gap:16px 20px;
+    align-items:center}
+  .lane-head{grid-column:1;display:flex;flex-direction:column;gap:4px;min-width:120px}
+  .lane-name{font-size:15px;letter-spacing:.1em;text-transform:uppercase}
+  .lane-meta{font-size:11px;color:var(--ink-dim);letter-spacing:.03em;line-height:1.6}
+  .lane-meta b{color:var(--ink);font-weight:600}
+  .viz{grid-column:2;display:flex;gap:22px;flex-wrap:wrap;align-items:center}
+  .circle-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .circle-wrap span{font-size:10px;color:var(--ink-dim);letter-spacing:.1em;
+    text-transform:uppercase}
+  canvas{display:block}
+  .sets{display:flex;flex-direction:column;gap:7px;font-size:11.5px;min-width:210px}
+  .setrow{display:flex;gap:9px;align-items:center;letter-spacing:.02em}
+  .swatch{width:11px;height:11px;border-radius:50%;flex:none;box-shadow:0 0 6px currentColor}
+  .setrow code{color:var(--ink);background:#0c1310;border:1px solid var(--line);
+    padding:1px 6px;border-radius:4px}
+  .lane.muted{opacity:.45}
+
+  .legend{display:flex;flex-wrap:wrap;gap:6px 20px;margin:20px 0 4px;
+    font-size:11px;color:var(--ink-dim);letter-spacing:.04em}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:9px;height:9px;border-radius:50%}
+
+  footer{margin-top:34px;color:var(--ink-dim);font-size:11px;letter-spacing:.03em;
+    border-top:1px solid var(--line);padding-top:14px;max-width:78ch;line-height:1.7}
+  footer code{color:var(--ink)}
+  .beatbar{grid-column:1 / -1;margin-top:4px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Even&nbsp;Division</h1>
+  <div class="sub">Decompose a drum beat into maximally even sets. Each drum voice is
+    approximated by a union of Clough&ndash;Douthett ME sets on the cycle&nbsp;&#8484;<sub>n</sub>.</div>
+  <div class="cite">Clough &amp; Douthett,<br>&ldquo;Maximally Even Sets,&rdquo;<br>J. Music Theory 35 (1991) 93&ndash;173</div>
+</header>
+
+<div class="controls">
+  <div class="ctl">
+    <label>Sets per drum — M</label>
+    <div class="knob-row">
+      <input type="range" id="mSets" min="1" max="4" step="1" value="1">
+      <div class="val" id="mVal">1</div>
+    </div>
+  </div>
+  <div class="ctl">
+    <label>Beat grid — n (target)</label>
+    <div class="knob-row">
+      <input type="range" id="nGrid" min="8" max="32" step="1" value="16">
+      <div class="val" id="nVal">16</div>
+    </div>
+  </div>
+  <div class="ctl">
+    <label>Tempo — BPM</label>
+    <div class="knob-row">
+      <input type="range" id="bpm" min="60" max="200" step="1" value="120">
+      <div class="val" id="bpmVal">120</div>
+    </div>
+  </div>
+  <div class="ctl">
+    <label>Preset pattern</label>
+    <div class="knob-row">
+      <select id="preset"></select>
+    </div>
+  </div>
+  <div class="ctl">
+    <label>Source</label>
+    <div class="transport">
+      <label class="filebtn" for="file">Load MIDI…</label>
+      <input type="file" id="file" accept=".mid,.midi">
+      <button id="reset">Default beat</button>
+    </div>
+  </div>
+</div>
+
+<div class="controls" style="margin-top:-8px">
+  <div class="ctl">
+    <label>Transport</label>
+    <div class="transport">
+      <button id="play">▶ Play</button>
+      <button id="stop" disabled>■ Stop</button>
+    </div>
+  </div>
+  <div class="ctl">
+    <label>Hear</label>
+    <div class="seg" id="hearSeg">
+      <button data-hear="orig">Original</button>
+      <button data-hear="me" class="on">Max-even</button>
+      <button data-hear="both">Both</button>
+    </div>
+  </div>
+  <div class="ctl" style="flex:1;min-width:220px">
+    <label>Status</label>
+    <div class="status" id="status">Default rock beat loaded · n=16</div>
+  </div>
+</div>
+
+<div class="legend">
+  <span><i class="dot" style="background:var(--hit)"></i>beat onset — landed on (ME within ½ step)</span>
+  <span><i class="dot" style="background:var(--magenta)"></i>beat onset — drifted (nearest ME is off-grid)</span>
+  <span><i class="dot" style="background:var(--amber)"></i>instrument's own grid ℤ<sub>nᵢ</sub> &amp; produced onsets</span>
+  <span>rings coloured by set · inner rings sit on the instrument grid</span>
+</div>
+
+<div class="drumpanel">
+  <div class="drummer-box">
+    <canvas id="drummer" width="520" height="360"></canvas>
+    <div class="drum-tools">
+      <button id="catBtn">🐈 Cat head</button>
+      <button id="rndGrids">🎲 De-align grids</button>
+      <button id="rndBeat">🎲 Random beat</button>
+      <button id="rndAll">🎲 Everything</button>
+      <button id="resetGrids">Re-align</button>
+    </div>
+    <div class="drummer-cap" id="drummerCap">he plays whatever you have selected under “Hear”</div>
+  </div>
+  <div class="tab-box">
+    <div class="tab-title" id="tabTitle">Drum tab</div>
+    <canvas id="notation" width="620" height="150"></canvas>
+    <pre class="tab" id="tab"></pre>
+  </div>
+</div>
+
+<div class="lanes" id="lanes"></div>
+
+<footer id="foot"></footer>
+
+<script>
+/* ============================================================
+   EVEN DIVISION
+   Maximally even (Clough–Douthett) decomposition of a drum beat.
+   Pure JS / Web Audio. No dependencies.
+   ============================================================ */
+
+/* ---------- 1. Maximal evenness core -------------------------------------
+   The size-d maximally even set in Z_n (canonical rotation) is the
+   Clough–Douthett J-function:   J_{n,d}(m) = floor( m*n / d ),  m=0..d-1.
+   Any ME set of size d is a rotation of this by r in Z_n.
+   Ref: Clough & Douthett, J. Music Theory 35 (1991), 93–173.        */
+
+function meSet(n, d, r){          // size-d ME set in Z_n, rotated by r
+  const s = [];
+  for(let m=0;m<d;m++) s.push(((Math.floor(m*n/d)) + r) % n);
+  return s.sort((a,b)=>a-b);
+}
+
+/* Best union of M maximally even sets approximating target T (a Set of ints
+   in Z_n). Cardinality of each set is FREE, overlap ALLOWED. Objective:
+   minimise symmetric-difference |union △ T|.
+   Strategy: exhaustive for the first set over (d,r); then greedily add sets
+   against the residual symmetric difference. Greedy is used because the full
+   joint search is n^M · (choices); flagged in UI. For M=1 it is exact. */
+
+/* ---------- 1b. Cross-grid distance: circular earth-mover (Wasserstein-1) ---
+   Onsets live on the unit circle [0,1). An instrument re-gridded to n_i has its
+   onset options at {0,1/n_i,...,(n_i-1)/n_i}, which need not coincide with the
+   target's 16-grid positions. We measure the mismatch by the circular
+   earth-mover's distance between the two onset multisets (unit mass per onset),
+   with a creation/deletion penalty LAMBDA for count differences. This is the
+   balanced-on-the-matched-part unbalanced EMD on S^1; it reduces to 0 exactly
+   when the sets coincide, and grows with both positional drift and count gaps.
+   Ref: circular Wasserstein / Mallows distance; Rubner et al., "The earth
+   mover's distance," IJCV 40 (2000) 99–121; Delon–Rabin–Gousseau for S^1.   */
+const LAMBDA = 0.25;                     // per-onset creation cost (half-circle = 0.5 max)
+function circDist(a,b){ const d=Math.abs(a-b); return d<0.5? d : 1-d; }
+function emd(U, T){                       // U,T: arrays of positions in [0,1)
+  if(!U.length && !T.length) return 0;
+  if(!U.length || !T.length) return LAMBDA;
+  const small = U.length<=T.length ? U : T;
+  const large = U.length<=T.length ? T : U;
+  const used = new Array(large.length).fill(false);
+  const pairs=[];
+  for(let i=0;i<small.length;i++) for(let j=0;j<large.length;j++)
+    pairs.push([circDist(small[i],large[j]), i, j]);
+  pairs.sort((x,y)=>x[0]-y[0]);          // greedy min-cost matching (k small: exact enough)
+  const uS=new Array(small.length).fill(false);
+  let cost=0, matched=0;
+  for(const [d,i,j] of pairs){
+    if(uS[i]||used[j]) continue;
+    uS[i]=true; used[j]=true; cost+=d; matched++;
+    if(matched===small.length) break;
+  }
+  cost += LAMBDA*(large.length - small.length);
+  return cost/large.length;              // per-onset average, in [0, ~0.5]
+}
+
+/* Snap one ME set (indices on Z_16) onto Z_ni: pick the ME set on Z_ni whose
+   circle positions are closest (by EMD) to the source set's positions. Free
+   size and rotation on the new grid. Returns the Z_ni set + its snap distance. */
+function snapToGrid(setIdx16, ni){
+  if(ni===16) { const d=setIdx16.length; return {set:setIdx16.slice(), d, r:null, ni, emd:0}; }
+  const src = setIdx16.map(x=>x/16);
+  let best=null, bv=Infinity;
+  for(const c of candidates(ni)){
+    const v = emd(c.set.map(x=>x/ni), src);
+    if(v<bv){ bv=v; best={set:c.set, d:c.d, r:c.r, ni, emd:v}; }
+  }
+  return best;
+}
+
+/* All candidate ME sets in Z_n, deduplicated by point-set. Sizes 1..n-1:
+   singletons are (vacuously) maximally even and are what let the union
+   reconstruct an arbitrary beat as M grows; the full-cycle set (d=n) is
+   excluded as it trivially covers everything. */
+let _candCache={};
+function candidates(n){
+  if(_candCache[n]) return _candCache[n];
+  const seen=new Map();
+  for(let d=1; d<=n-1; d++) for(let r=0;r<n;r++){
+    const S=meSet(n,d,r); const key=S.join(',');
+    if(!seen.has(key)) seen.set(key,{set:S,d,r,key});
+  }
+  return _candCache[n]=[...seen.values()];
+}
+function symDiff(u,T){ let s=0;
+  for(const x of u) if(!T.has(x)) s++;
+  for(const x of T) if(!u.has(x)) s++;
+  return s; }
+
+/* Approximate target T by a union of UP TO M distinct ME sets, minimising the
+   symmetric difference |union △ T|. M is a ceiling, not a quota: a set is added
+   only if it strictly lowers the error, so error is monotone non-increasing in M
+   and reaches 0 (exact reconstruction) once enough sets are allowed. Method is
+   greedy against the running union, then coordinate-descent refinement of each
+   chosen slot, then removal of any set made redundant by the others.
+   M=1 is exact (exhaustive over all (d,r)). */
+function decompose(n, targetArr, M){
+  const T = new Set(targetArr);
+  if(T.size===0) return {sets:[], union:new Set(), sd:0, miss:0, fal:0};
+  const C = candidates(n);
+  let chosen=[], union=new Set(), curSD=symDiff(union,T);
+  // greedy: add strictly-improving sets up to M
+  for(let i=0;i<M;i++){
+    let best=null, bestSD=curSD, bestU=null;
+    for(const c of C){
+      if(chosen.some(x=>x.key===c.key)) continue;
+      const u=new Set(union); for(const x of c.set) u.add(x);
+      const sd=symDiff(u,T);
+      if(sd<bestSD){ bestSD=sd; best=c; bestU=u; }
+    }
+    if(!best) break;                       // nothing improves further
+    chosen.push(best); union=bestU; curSD=bestSD;
+    if(curSD===0) break;
+  }
+  // coordinate descent: re-pick each slot given the others
+  for(let pass=0; pass<6 && chosen.length; pass++){
+    let improved=false;
+    for(let i=0;i<chosen.length;i++){
+      const others=new Set();
+      chosen.forEach((c,j)=>{ if(j!==i) for(const x of c.set) others.add(x); });
+      const cur=symDiff(new Set([...others,...chosen[i].set]),T);
+      let best=chosen[i], bestSD=cur;
+      for(const c of C){
+        if(chosen.some((x,j)=>j!==i && x.key===c.key)) continue;
+        const u=new Set(others); for(const x of c.set) u.add(x);
+        const sd=symDiff(u,T);
+        if(sd<bestSD){ bestSD=sd; best=c; }
+      }
+      if(best.key!==chosen[i].key){ chosen[i]=best; improved=true; }
+    }
+    if(!improved) break;
+  }
+  // drop redundant sets (removal leaves the union unchanged)
+  const fullU=new Set(); chosen.forEach(c=>{for(const x of c.set) fullU.add(x);});
+  const fullSD=symDiff(fullU,T);
+  chosen=chosen.filter((c,i)=>{
+    const without=new Set();
+    chosen.forEach((x,j)=>{ if(j!==i) for(const y of x.set) without.add(y); });
+    return symDiff(without,T) > fullSD;    // keep only sets that matter
+  });
+  const union2=new Set(); chosen.forEach(c=>{for(const x of c.set) union2.add(x);});
+  let miss=0, fal=0;
+  for(const x of union2) if(!T.has(x)) fal++;
+  for(const x of T) if(!union2.has(x)) miss++;
+  return {sets:chosen, union:union2, sd:miss+fal, miss, fal};
+}
+
+/* ---------- 2. Default beat --------------------------------------------
+   A basic rock beat on a 16-pulse bar (sixteenth grid):
+     Kick  : beats 1 and 3        -> pulses 0, 8
+     Snare : beats 2 and 4        -> pulses 4, 12
+     Hat   : straight eighths     -> pulses 0,2,4,6,8,10,12,14         */
+
+const DEFAULT_N = 16;
+function defaultBeat(){
+  return {
+    n: DEFAULT_N,
+    lanes: [
+      {name:"Kick",  note:36, key:"kick",  limb:"foot",  onsets:[0,8]},
+      {name:"Snare", note:38, key:"snare", limb:"lhand", onsets:[4,12]},
+      {name:"Hat",   note:42, key:"hat",   limb:"rhand", onsets:[0,2,4,6,8,10,12,14]},
+    ]
+  };
+}
+
+/* ---------- 2b. Preset pattern library --------------------------------
+   All patterns are one 16-pulse bar. Positions 0..15: beat k downbeat at
+   4(k-1); the 'e','&','a' of beat k are +1,+2,+3. Transcribed from cited
+   pedagogical sources; standard voicings where the grid is unambiguous.
+   Sources: muted.io/drum-patterns; drumpracticepro.com/learn/grooves;
+   Native Instruments blog "7 drum patterns"; Roland "Behind the Beat:
+   Funky Drummer"; DrumsTheWord Funky Drummer lesson.                     */
+const PATTERNS = {
+  "Straight / rock": {
+    "Basic Rock":        {kick:[0,8],        snare:[4,12],      hat:[0,2,4,6,8,10,12,14], crash:[0]},
+    "Four on the Floor": {kick:[0,4,8,12],   snare:[4,12],      hat:[2,6,10,14], crash:[0]},
+    "Half-Time":         {kick:[0,8],        snare:[8],         hat:[0,2,4,6,8,10,12,14], crash:[0], floor:[14]},
+    "Driving 16th Hat":  {kick:[0,8],        snare:[4,12],      hat:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], crash:[0]},
+    "Double Kick Rock":  {kick:[0,1,8,9],    snare:[4,12],      hat:[0,2,4,6,8,10,12,14], crash:[0], tom2:[14], floor:[15]},
+    "Heavy Metal":       {kick:[0,1,8,9],    snare:[8],         hat:[0,2,4,6,8,10,12,14], crash:[0,8], tom1:[13], tom2:[14], floor:[15]},
+    "Train Beat":        {kick:[0,8],        snare:[2,4,6,10,12,14], hat:[0,2,4,6,8,10,12,14], floor:[0,8]},
+    "Motown Backbeat":   {kick:[0,8],        snare:[4,12],      hat:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], crash:[0]},
+    "Stomp (We Will)":   {kick:[0,3,8,11],   snare:[4,12],      hat:[], crash:[4,12], floor:[0,3,8,11]},
+    "Tom Groove":        {kick:[0,3,8],      snare:[4,12],      hat:[], crash:[0], tom1:[2,6], tom2:[10], floor:[14]},
+    "Tom Fill Bar":      {kick:[0,8],        snare:[0,2,4,5],   hat:[], crash:[0], tom1:[6,7], tom2:[8,9,10,11], floor:[12,13,14,15]},
+    "Surf":              {kick:[0,8],        snare:[4,12],      hat:[0,2,4,6,8,10,12,14], floor:[6,14], crash:[0]},
+  },
+  "Funk / syncopated": {
+    "Syncopated Pocket": {kick:[0,6,8],      snare:[4,11,12],   hat:[0,2,4,6,8,10,12,14], crash:[0]},
+    "Funk (ghost &3)":   {kick:[0,3,10],     snare:[4,10,12],   hat:[0,2,4,6,8,10,12,14]},
+    "Funky Drummer":     {kick:[0,2,6,9],    snare:[4,7,10,12,15], hat:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]},
+    "Breakbeat (Amen-ish)":{kick:[0,10,11],  snare:[4,7,12,14], hat:[0,2,4,6,8,10,12,14], crash:[0], floor:[15]},
+    "Cold Sweat":        {kick:[0,3,6,11],   snare:[4,12],      hat:[0,2,4,6,8,10,12,14], crash:[0]},
+    "The Meters":        {kick:[0,3,7,8,11], snare:[4,12],      hat:[0,2,4,6,8,10,12,14]},
+    "Purdie Shuffle":    {kick:[0,8],        snare:[2,4,6,10,12,14], hat:[0,3,4,7,8,11,12,15]},
+    "Second Line":       {kick:[0,6,8],      snare:[3,4,10,11], hat:[], tom1:[6],tom2:[13], floor:[0,8], crash:[0]},
+    "Clyde 16th Kick":   {kick:[0,2,6,8,9,14], snare:[4,12],    hat:[0,2,4,6,8,10,12,14]},
+    "Tom Funk":          {kick:[0,6,10],     snare:[4,12],      hat:[], tom1:[2,8], tom2:[14], floor:[0,10], crash:[0]},
+  },
+  "Hip-hop / electronic": {
+    "Hip-Hop (classic)": {kick:[0,10],       snare:[4,12],      hat:[0,2,4,6,8,10,12,14]},
+    "Boom-Bap":          {kick:[0,11],       snare:[4,12],      hat:[0,2,4,6,8,10,12,14], crash:[0]},
+    "Disco":             {kick:[0,4,8,12],   snare:[4,12],      hat:[2,6,10,14], ohat:[2,6,10,14], crash:[0]},
+    "Trap":              {kick:[0,3,7,8],    snare:[8],         hat:[0,2,4,6,7,8,10,12,14,15], crash:[0]},
+    "House (4-floor)":   {kick:[0,4,8,12],   snare:[4,12],      hat:[2,6,10,14], ohat:[2,6,10,14], crash:[0]},
+    "Boogaloo":          {kick:[0,6,8,14],   snare:[4,12],      hat:[0,2,4,6,8,10,12,14], tom1:[10]},
+    "Dilla (drunk)":     {kick:[0,3,9],      snare:[4,11],      hat:[0,2,4,6,8,10,12,14]},
+    "Jungle / DnB":      {kick:[0,10],       snare:[4,12],      hat:[0,2,4,6,8,10,12,14], crash:[0], floor:[14]},
+    "Trap Rolls":        {kick:[0,7,8],      snare:[8],         hat:[0,2,4,5,6,8,10,11,12,13,14,15], crash:[0]},
+  },
+  "Latin / world": {
+    "Samba":             {kick:[0,3,6,10,14],snare:[2,7,11,15], hat:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], floor:[0,8]},
+    "Bossa Nova":        {kick:[0,6,8,14],   snare:[3,7,10,13], hat:[0,2,4,6,8,10,12,14]},
+    "Reggae One-Drop":   {kick:[8],          snare:[8],         hat:[2,6,10,14], crash:[8]},
+    "Blues Shuffle":     {kick:[0,8],        snare:[4,12],      hat:[0,3,4,7,8,11,12,15]},
+    "Son Clave (3-2)":   {kick:[0,3,6,10,12],snare:[0,3,6,10,12], hat:[0,4,8,12]},
+    "Rumba Clave":       {kick:[0,3,7,10,12],snare:[0,3,7,10,12], hat:[0,4,8,12]},
+    "Cha-Cha":           {kick:[0,4,8,11,12],snare:[4,12],      hat:[0,2,4,6,8,10,12,14], tom1:[14],tom2:[15]},
+    "Mambo":             {kick:[2,6,8,10,14],snare:[4,12],      hat:[0,2,4,6,8,10,12,14], tom1:[0],tom2:[8], floor:[6,14]},
+    "Reggaeton (Dembow)":{kick:[0,8],        snare:[3,6,11,14], hat:[0,2,4,6,8,10,12,14]},
+    "Afrobeat":          {kick:[0,6,8,10],   snare:[4,12],      hat:[0,2,4,6,8,10,12,14], tom1:[2],tom2:[14], floor:[6]},
+    "Calypso":           {kick:[0,6,10],     snare:[4,12],      hat:[0,2,4,6,8,10,12,14], floor:[14]},
+    "Tribal Floor":      {kick:[0,6,8,14],   snare:[],          hat:[], floor:[0,2,4,6,8,10,12,14], tom1:[3,11], tom2:[7,15], crash:[0]},
+  },
+  "Jazz / odd / roots": {
+    "Jazz Ride (swing)": {kick:[0],          snare:[],          hat:[4,12], ride:[0,4,7,8,12,15]},
+    "Jazz Comping":      {kick:[0,8],        snare:[3,11],      hat:[4,12], ride:[0,4,7,8,12,15]},
+    "Jazz Tom Trade":    {kick:[0,8],        snare:[3,6],       hat:[4,12], ride:[0,7,8,15], tom1:[10],tom2:[12], floor:[14]},
+    "Waltz (3→12)":      {kick:[0],          snare:[4,8],       hat:[0,4,8], ride:[0,4,8], crash:[0]},
+    "Bo Diddley":        {kick:[0,3,6,10,12],snare:[4,12],      hat:[0,2,4,6,8,10,12,14], floor:[0,6]},
+    "Tresillo":          {kick:[0,3,6],      snare:[4,12],      hat:[0,2,4,6,8,10,12,14], tom2:[14]},
+    "Charleston":        {kick:[0,6],        snare:[4,12],      hat:[0,2,4,6,8,10,12,14], crash:[6]},
+  },
+};
+const VOICES=[                 // canonical lane order + GM note + drummer limb
+  {key:"kick",  name:"Kick",  note:36, limb:"foot"},
+  {key:"snare", name:"Snare", note:38, limb:"lhand"},
+  {key:"hat",   name:"Hat",   note:42, limb:"rhand"},
+  {key:"ohat",  name:"Open Hat", note:46, limb:"rhand"},
+  {key:"ride",  name:"Ride",  note:51, limb:"rhand"},
+  {key:"crash", name:"Crash", note:49, limb:"rhand"},
+  {key:"tom1",  name:"Hi Tom",note:48, limb:"lhand"},
+  {key:"tom2",  name:"Mid Tom",note:45,limb:"lhand"},
+  {key:"floor", name:"Floor Tom",note:41,limb:"lhand"},
+];
+function patternToBeat(p){
+  const lanes=[];
+  for(const v of VOICES){ if(p[v.key] && p[v.key].length!==undefined)
+    lanes.push({name:v.name, note:v.note, key:v.key, limb:v.limb, onsets:p[v.key].slice().sort((a,b)=>a-b)}); }
+  // always include kick/snare/hat even if empty so the kit reads consistently
+  ["kick","snare","hat"].forEach(k=>{ if(!lanes.some(l=>l.key===k)){
+    const v=VOICES.find(x=>x.key===k); lanes.push({name:v.name,note:v.note,key:k,limb:v.limb,onsets:[]}); }});
+  // order by VOICES
+  lanes.sort((a,b)=>VOICES.findIndex(v=>v.key===a.key)-VOICES.findIndex(v=>v.key===b.key));
+  return {n:16, lanes};
+}
+function findPattern(name){
+  for(const grp of Object.values(PATTERNS)) if(grp[name]) return grp[name];
+  return null;
+}
+
+let beat = defaultBeat();
+let n = beat.n;
+let M = 1;
+let bpm = 120;
+let hearMode = "me";
+let playing = false;
+let laneNi = {};        // per-lane instrument grid, keyed by lane name; default = target n
+let lanePlot = {};      // per-lane plot panel state {open, view}
+
+/* ---------- 4. Rendering ----------------------------------------------- */
+const SET_COLORS = ["#6bf5b0","#f5c96b","#e86bd0","#6bb8f5"]; // up to 4 sets
+const lanesEl = document.getElementById('lanes');
+let laneModels = [];  // {lane, ni, decomp, snapped, unionNi, overallEMD, muted, canvas}
+
+function computeAll(){
+  _surfaceCache={};                    // surfaces depend on the (possibly new) beat/target-n
+  laneModels = beat.lanes.map(l=>{
+    const onsets = l.onsets.filter(x=>x<n);
+    const ni = laneNi[l.name] || n;               // instrument's own cycle length
+    // STAGE 1: decompose the target on the beat grid Z_n (symmetric difference; M meaningful)
+    const decomp = decompose(n, onsets, M);
+    // STAGE 2: snap each ME set onto the instrument grid Z_ni; EMD measures the distortion
+    const snapped = decomp.sets.map(s=>snapToGrid(s.set, ni));
+    // union of snapped onsets as circle positions, and overall EMD to the original target
+    const unionNiIdx = new Set();
+    snapped.forEach(s=>s.set.forEach(x=>unionNiIdx.add(x)));
+    const unionNiPos = [...unionNiIdx].map(x=>x/ni).sort((a,b)=>a-b);
+    const targetPos = onsets.map(x=>x/n);
+    const overallEMD = emd(unionNiPos, targetPos);
+    return {lane:l, ni, onsets:new Set(onsets), decomp, snapped,
+            unionNiIdx, overallEMD, muted:(laneModels.find(x=>x.lane.name===l.name)||{}).muted||false};
+  });
+}
+
+function fmtSet(s){ return "{"+s.join(", ")+"}"; }
+
+/* ---------- 4b. EMD surface over (n_i, M) for a lane -------------------
+   Computes overall EMD for every instrument grid n_i in [NI_MIN,NI_MAX] and
+   every M in [1,M_MAX], for a fixed target (onsets on Z_n). Cached per lane;
+   invalidated when the beat or target grid changes. This is the surface the
+   plots visualise: it depends only on the target pattern, not on the current
+   n_i or M sliders (those just mark a point on the surface).                */
+const NI_MIN=3, NI_MAX=32, M_MAX=4;
+let _surfaceCache={};                 // key: laneName + '|' + onsets + '|' + n
+function laneSurface(onsets){
+  const key = onsets.join(',')+'|'+n;
+  if(_surfaceCache[key]) return _surfaceCache[key];
+  const tPos = onsets.map(x=>x/n);
+  const grid=[];                      // grid[mIdx][niIdx] = emd
+  let min={v:Infinity,ni:NI_MIN,M:1}, max=0;
+  for(let M=1;M<=M_MAX;M++){
+    const dec=decompose(n, onsets, M);      // decomposition depends on M only
+    const row=[];
+    for(let ni=NI_MIN;ni<=NI_MAX;ni++){
+      const snapped=dec.sets.map(s=>snapToGrid(s.set, ni));
+      const U=new Set(); snapped.forEach(s=>s.set.forEach(x=>U.add(x)));
+      const v=emd([...U].map(x=>x/ni), tPos);
+      row.push(v);
+      if(v<min.v) min={v,ni,M};
+      if(v>max) max=v;
+    }
+    grid.push(row);
+  }
+  return _surfaceCache[key]={grid,min,max,NI_MIN,NI_MAX,M_MAX};
+}
+// viridis-ish colour ramp for EMD (0 = good/dark-teal, high = bright-yellow)
+function emdColor(t){ // t in [0,1]
+  t=Math.max(0,Math.min(1,t));
+  const stops=[[15,32,40],[33,80,99],[46,140,120],[120,180,90],[245,201,107],[240,120,90]];
+  const x=t*(stops.length-1), i=Math.floor(x), f=x-i;
+  const a=stops[i], b=stops[Math.min(i+1,stops.length-1)];
+  return `rgb(${Math.round(a[0]+(b[0]-a[0])*f)},${Math.round(a[1]+(b[1]-a[1])*f)},${Math.round(a[2]+(b[2]-a[2])*f)})`;
+}
+
+function renderLanes(){
+  lanesEl.innerHTML='';
+  laneModels.forEach((lm,idx)=>{
+    const {lane, onsets, decomp, ni, overallEMD} = lm;
+    const wrap = document.createElement('div');
+    wrap.className='lane'+(lm.muted?' muted':'');
+
+    // head
+    const head=document.createElement('div');
+    head.className='lane-head';
+    const k=onsets.size;
+    const emdPct=(overallEMD*100).toFixed(2);
+    const detuned = ni!==n;
+    head.innerHTML=`<div class="lane-name">${lane.name}</div>
+      <div class="lane-meta">target <b>${k}</b> onsets on ℤ${sub(n)}<br>
+      grid ℤ<b>${ni}</b>${detuned?' (detuned)':''}<br>
+      sets used <b>${decomp.sets.length}</b><br>
+      EMD to beat <b style="color:${detuned?'#f5c96b':'#6bf5b0'}">${emdPct}</b><span style="color:var(--ink-dim)">%circle</span></div>`;
+
+    // per-instrument grid slider
+    const niWrap=document.createElement('div');
+    niWrap.style.marginTop='10px';
+    niWrap.innerHTML=`<label style="font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)">beats / cycle — n${sub2(lane.name)}</label>`;
+    const niRow=document.createElement('div');niRow.style.cssText='display:flex;align-items:center;gap:8px;margin-top:3px';
+    const niSl=document.createElement('input');niSl.type='range';niSl.min=3;niSl.max=32;niSl.step=1;niSl.value=ni;
+    niSl.style.width='96px';
+    const niVal=document.createElement('div');niVal.className='val';niVal.style.fontSize='15px';niVal.textContent=ni;
+    niSl.oninput=()=>{niVal.textContent=niSl.value;laneNi[lane.name]=+niSl.value;
+      computeAll();renderLanes();
+      document.getElementById('status').textContent=`${lane.name}: grid ℤ${niSl.value}`;};
+    niRow.appendChild(niSl);niRow.appendChild(niVal);
+    niWrap.appendChild(niRow);
+    head.appendChild(niWrap);
+
+    // mute toggle
+    const mute=document.createElement('button');
+    mute.textContent=lm.muted?'Unmute':'Mute';
+    mute.style.marginTop='10px';mute.style.fontSize='10px';mute.style.padding='5px 9px';
+    mute.onclick=()=>{lm.muted=!lm.muted;renderLanes();};
+    head.appendChild(mute);
+    wrap.appendChild(head);
+
+    // viz
+    const viz=document.createElement('div');
+    viz.className='viz';
+
+    const cw=document.createElement('div');cw.className='circle-wrap';
+    const cv=document.createElement('canvas');
+    cv.width=240;cv.height=240;cv.style.width='200px';cv.style.height='200px';
+    lm.canvas=cv;
+    cw.appendChild(cv);
+    const cap=document.createElement('span');
+    cap.innerHTML = detuned
+      ? `outer = beat on ℤ${sub(n)} · inner rings = ME on ℤ${sub(ni)}`
+      : `ℤ${sub(n)} · outer = beat, inner = ME sets`;
+    cw.appendChild(cap);
+    viz.appendChild(cw);
+
+    // set list — one colour-matched row per ME set (ring), showing the snapped grid
+    const sets=document.createElement('div');sets.className='sets';
+    decomp.sets.forEach((s,i)=>{
+      const col=SET_COLORS[i%SET_COLORS.length];
+      const sn=lm.snapped[i];
+      const row=document.createElement('div');row.className='setrow';
+      const label = sn.set.length===1
+        ? `singleton` : `size <code>${sn.d}</code> · rot <code>${sn.r??s.r}</code>`;
+      const drift = detuned ? ` <span style="color:var(--ink-dim)">Δ${(sn.emd*100).toFixed(1)}%</span>` : '';
+      row.innerHTML=`<i class="swatch" style="color:${col};background:${col}"></i>
+        <span style="color:${col};font-weight:600">ring ${i+1}</span> ${label}${drift}`;
+      const line=document.createElement('div');
+      line.style.fontSize='10.5px';line.style.color='var(--ink-dim)';
+      line.style.marginLeft='20px';
+      line.textContent = detuned
+        ? `{${sn.set.join(', ')}}/${ni}  ← {${s.set.join(', ')}}/${n}`
+        : fmtSet(s.set);
+      sets.appendChild(row);sets.appendChild(line);
+    });
+    if(decomp.sets.length===0){
+      sets.innerHTML='<div style="color:var(--ink-dim)">— empty target —</div>';
+    }
+    viz.appendChild(sets);
+
+    // ---- EMD surface plot panel ----
+    const plotState = lanePlot[lane.name] || {open:false, view:'line'};
+    lanePlot[lane.name] = plotState;
+    const plotWrap=document.createElement('div');
+    plotWrap.style.cssText='flex-basis:100%;margin-top:4px';
+    const plotBtn=document.createElement('button');
+    plotBtn.textContent = (plotState.open?'▾ ':'▸ ')+'EMD surface  (nᵢ × M)';
+    plotBtn.style.cssText='font-size:10.5px;padding:6px 11px';
+    plotWrap.appendChild(plotBtn);
+
+    const plotBody=document.createElement('div');
+    plotBody.style.cssText='margin-top:10px;'+(plotState.open?'':'display:none');
+    // view toggle
+    const seg=document.createElement('div');seg.className='seg';seg.style.marginBottom='8px';
+    ['line','heat','3d'].forEach(v=>{
+      const b=document.createElement('button');
+      b.textContent = v==='line'?'Lines':v==='heat'?'Heatmap':'3D mesh';
+      b.style.fontSize='10px';b.style.padding='6px 10px';
+      if(plotState.view===v)b.classList.add('on');
+      b.onclick=()=>{plotState.view=v;renderLanes();};
+      seg.appendChild(b);
+    });
+    plotBody.appendChild(seg);
+    // plot canvas
+    const pcv=document.createElement('canvas');
+    pcv.width=560;pcv.height=240;pcv.style.width='100%';pcv.style.maxWidth='460px';
+    pcv.style.height='auto';pcv.style.border='1px solid var(--line)';pcv.style.borderRadius='7px';
+    plotBody.appendChild(pcv);
+    // readout of best cell
+    const readout=document.createElement('div');
+    readout.style.cssText='font-size:10.5px;color:var(--ink-dim);margin-top:6px';
+    plotBody.appendChild(readout);
+
+    plotBtn.onclick=()=>{plotState.open=!plotState.open;renderLanes();};
+    plotWrap.appendChild(plotBody);
+    viz.appendChild(plotWrap);
+
+    wrap.appendChild(viz);
+    lanesEl.appendChild(wrap);
+    drawCircle(lm);
+
+    // render the plot if open (compute surface lazily, once, cached)
+    if(plotState.open){
+      const surf=laneSurface([...lm.onsets].sort((a,b)=>a-b));
+      const R={line:drawSurfaceLine,heat:drawSurfaceHeat,'3d':drawSurface3D}[plotState.view];
+      R(pcv, lm, surf);
+      readout.innerHTML=`best: ℤ<b style="color:#6bf5b0">${surf.min.ni}</b> at M=<b>${surf.min.M}</b> → EMD <b>${(surf.min.v*100).toFixed(2)}%</b>`
+        +` · your grid ℤ${lm.ni}, M${currentM()} → <b style="color:${lm.ni===surf.min.ni?'#6bf5b0':'#f5c96b'}">${(lm.overallEMD*100).toFixed(2)}%</b>`;
+    }
+  });
+}
+
+function sub2(name){ return ""; }   // (placeholder subscript for instrument label)
+
+function sub(x){ // unicode subscript for small ints
+  return String(x).split('').map(d=>"₀₁₂₃₄₅₆₇₈₉"[+d]).join('');
+}
+
+function ptAng(pos01,cx,cy,R){          // pos01 in [0,1) -> point on circle
+  const a=-Math.PI/2 + 2*Math.PI*pos01;
+  return {x:cx+R*Math.cos(a), y:cy+R*Math.sin(a)};
+}
+function ptOn(p,cx,cy,R){ return ptAng(((p%n)+n)%n / n, cx,cy,R); }  // p on Z_n
+
+function drawCircle(lm){
+  const cv=lm.canvas, ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height,cx=W/2,cy=H/2;
+  ctx.clearRect(0,0,W,H);
+  const target=lm.onsets, nSets=lm.snapped.length, ni=lm.ni, detuned=(ni!==n);
+  const Router=W*0.40, Rinner=W*0.14;
+  const gap = nSets>0 ? (Router-Rinner-14)/Math.max(nSets,1) : 0;
+
+  // target-grid spokes (Z_n) — faint
+  ctx.strokeStyle="#141d18";ctx.lineWidth=1;
+  for(let p=0;p<n;p++){const a=ptAng(p/n,cx,cy,Router);
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(a.x,a.y);ctx.stroke();}
+  // instrument-grid spokes (Z_ni) — faint amber, only when detuned, to show the mismatch
+  if(detuned){
+    ctx.strokeStyle="rgba(245,201,107,.16)";ctx.lineWidth=1;
+    for(let j=0;j<ni;j++){const a=ptAng(j/ni,cx,cy,Router-8);
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(a.x,a.y);ctx.stroke();}
+  }
+
+  /* ---- inner rings: one per ME set, drawn on the instrument grid Z_ni ---- */
+  lm.snapped.forEach((s,i)=>{
+    const col=SET_COLORS[i%SET_COLORS.length];
+    const R=Router-14-gap*(i+0.5);
+    ctx.strokeStyle=col;ctx.globalAlpha=0.18;ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();ctx.globalAlpha=1;
+    // polygon through the set's points at their Z_ni angles
+    if(s.set.length>1){
+      ctx.strokeStyle=col;ctx.globalAlpha=0.7;ctx.lineWidth=1.6;
+      ctx.beginPath();
+      s.set.forEach((p,j)=>{const a=ptAng(p/ni,cx,cy,R);j?ctx.lineTo(a.x,a.y):ctx.moveTo(a.x,a.y);});
+      const a0=ptAng(s.set[0]/ni,cx,cy,R);ctx.lineTo(a0.x,a0.y);
+      ctx.stroke();ctx.globalAlpha=1;
+    }
+    s.set.forEach(p=>{const a=ptAng(p/ni,cx,cy,R);
+      ctx.beginPath();ctx.arc(a.x,a.y,s.set.length===1?5:4,0,7);
+      ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=8;ctx.fill();ctx.shadowBlur=0;
+      // tick out to the SAME angle on the outer ring (shows where this onset actually lands)
+      const ao=ptAng(p/ni,cx,cy,Router);
+      ctx.strokeStyle=col;ctx.globalAlpha=0.22;ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(ao.x,ao.y);ctx.stroke();ctx.globalAlpha=1;
+    });
+  });
+
+  // union of snapped onset positions (for proximity colouring on the outer ring)
+  const unionPos=[...lm.unionNiIdx].map(x=>x/ni);
+  const near=(pos)=>{ let m=1; for(const u of unionPos){const d=Math.abs(pos-u);m=Math.min(m,d<0.5?d:1-d);} return m; };
+  const HIT=0.6/n;   // "landed on it" tolerance: within ~half a target-grid step
+
+  /* ---- outer ring: original beat on Z_n, coloured by how well ME lands ---- */
+  ctx.strokeStyle="#243029";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(cx,cy,Router,0,7);ctx.stroke();
+  // ghost markers at every Z_ni onset actually produced (small amber ticks on the rim)
+  if(detuned){
+    for(const u of unionPos){const a=ptAng(u,cx,cy,Router);
+      ctx.beginPath();ctx.arc(a.x,a.y,2,0,7);ctx.fillStyle="rgba(245,201,107,.5)";ctx.fill();}
+  }
+  // target onsets
+  target.forEach(p=>{
+    const pos=p/n, a=ptAng(pos,cx,cy,Router);
+    const covered = unionPos.length && near(pos)<=HIT;
+    const color = covered ? "#6bf5b0" : "#e86bd0";
+    const rad = covered ? 6 : 5.5;
+    ctx.beginPath();ctx.arc(a.x,a.y,rad,0,7);
+    ctx.fillStyle=color;ctx.shadowColor=color;ctx.shadowBlur=9;ctx.fill();ctx.shadowBlur=0;
+    ctx.strokeStyle="#f5c96b";ctx.lineWidth=1.2;ctx.globalAlpha=.6;
+    ctx.beginPath();ctx.arc(a.x,a.y,rad+3,0,7);ctx.stroke();ctx.globalAlpha=1;
+  });
+  lm._geo={cx,cy,Router};
+}
+
+/* ---------- 4c. Surface plot renderers -------------------------------- */
+const M_COLORS=["#6bf5b0","#f5c96b","#e86bd0","#6bb8f5"];
+function plotFrame(ctx,W,H){ ctx.clearRect(0,0,W,H); ctx.fillStyle="#0c1310"; ctx.fillRect(0,0,W,H); }
+
+// (1) LINE: EMD vs n_i, one line per M
+function drawSurfaceLine(cv, lm, surf){
+  const ctx=cv.getContext('2d'), W=cv.width, H=cv.height;
+  const padL=44,padR=12,padT=14,padB=30;
+  plotFrame(ctx,W,H);
+  const x0=padL,x1=W-padR,y0=H-padB,y1=padT;
+  const nis=surf.NI_MAX-surf.NI_MIN, ymax=Math.max(surf.max,0.001);
+  const X=ni=>x0+(x1-x0)*(ni-surf.NI_MIN)/nis, Y=v=>y0+(y1-y0)*(v/ymax);
+  ctx.strokeStyle="#182219";ctx.fillStyle="#5c7a68";ctx.font="9px monospace";ctx.textAlign="right";
+  for(let g=0;g<=4;g++){const v=ymax*g/4,y=Y(v);
+    ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();
+    ctx.fillText((v*100).toFixed(1),x0-4,y+3);}
+  ctx.textAlign="center";
+  for(let ni=surf.NI_MIN;ni<=surf.NI_MAX;ni+=(nis>20?4:2)) ctx.fillText(ni,X(ni),H-padB+12);
+  ctx.strokeStyle="rgba(201,245,217,.25)";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(X(lm.ni),y1);ctx.lineTo(X(lm.ni),y0);ctx.stroke();
+  surf.grid.forEach((row,mi)=>{
+    ctx.strokeStyle=M_COLORS[mi%M_COLORS.length];ctx.lineWidth=1.6;ctx.globalAlpha=.95;
+    ctx.beginPath();
+    row.forEach((v,j)=>{const px=X(surf.NI_MIN+j),py=Y(v);j?ctx.lineTo(px,py):ctx.moveTo(px,py);});
+    ctx.stroke();ctx.globalAlpha=1;
+  });
+  ctx.fillStyle="#6bf5b0";ctx.beginPath();ctx.arc(X(surf.min.ni),Y(surf.min.v),3.5,0,7);
+  ctx.shadowColor="#6bf5b0";ctx.shadowBlur=8;ctx.fill();ctx.shadowBlur=0;
+  ctx.fillStyle="#5c7a68";ctx.textAlign="center";
+  ctx.fillText("instrument grid  nᵢ",(x0+x1)/2,H-4);
+  ctx.save();ctx.translate(11,(y0+y1)/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText("EMD  (% circle)",0,0);ctx.restore();
+}
+
+// (2) HEATMAP: n_i (x) × M (y), colour = EMD
+function drawSurfaceHeat(cv, lm, surf){
+  const ctx=cv.getContext('2d'), W=cv.width, H=cv.height;
+  const padL=44,padR=12,padT=14,padB=30;
+  plotFrame(ctx,W,H);
+  const x0=padL,x1=W-padR,y0=padT,y1=H-padB;
+  const nCols=surf.NI_MAX-surf.NI_MIN+1, nRows=surf.M_MAX;
+  const cw=(x1-x0)/nCols, ch=(y1-y0)/nRows, vmax=Math.max(surf.max,0.001);
+  for(let mi=0;mi<nRows;mi++)for(let j=0;j<nCols;j++){
+    ctx.fillStyle=emdColor(surf.grid[mi][j]/vmax);
+    ctx.fillRect(x0+j*cw, y0+mi*ch, cw+0.6, ch+0.6);
+  }
+  ctx.strokeStyle="#c9f5d9";ctx.lineWidth=2;
+  ctx.strokeRect(x0+(lm.ni-surf.NI_MIN)*cw, y0+(currentM()-1)*ch, cw, ch);
+  ctx.strokeStyle="#04110a";ctx.lineWidth=1.5;
+  ctx.strokeRect(x0+(surf.min.ni-surf.NI_MIN)*cw, y0+(surf.min.M-1)*ch, cw, ch);
+  ctx.fillStyle="#5c7a68";ctx.font="9px monospace";ctx.textAlign="center";
+  for(let ni=surf.NI_MIN;ni<=surf.NI_MAX;ni+=(nCols>20?4:2)) ctx.fillText(ni,x0+(ni-surf.NI_MIN+0.5)*cw,H-padB+12);
+  ctx.textAlign="right";
+  for(let mi=0;mi<nRows;mi++) ctx.fillText("M"+(mi+1),x0-4,y0+(mi+0.5)*ch+3);
+  ctx.textAlign="center";ctx.fillText("instrument grid  nᵢ",(x0+x1)/2,H-4);
+}
+
+// (3) 3D MESH: axonometric projection of the (n_i, M, EMD) surface
+function drawSurface3D(cv, lm, surf){
+  const ctx=cv.getContext('2d'), W=cv.width, H=cv.height;
+  plotFrame(ctx,W,H);
+  const nCols=surf.NI_MAX-surf.NI_MIN+1, nRows=surf.M_MAX, vmax=Math.max(surf.max,0.001);
+  const ox=W*0.30, oy=H*0.66;
+  const ax={x:(W*0.52)/(nCols-1), y:-H*0.10/(nCols-1)};
+  const az={x:-W*0.20/Math.max(nRows-1,1), y:-(H*0.34)/Math.max(nRows-1,1)};
+  const zScale=H*0.42;
+  const P=(i,j,v)=>({x:ox+ax.x*i+az.x*j, y:oy+ax.y*i+az.y*j - v/vmax*zScale});
+  for(let mi=nRows-1;mi>=0;mi--){
+    if(mi<nRows-1) for(let i=0;i<nCols-1;i++){
+      const v00=surf.grid[mi][i], v10=surf.grid[mi][i+1], v01=surf.grid[mi+1][i], v11=surf.grid[mi+1][i+1];
+      const p00=P(i,mi,v00),p10=P(i+1,mi,v10),p11=P(i+1,mi+1,v11),p01=P(i,mi+1,v01);
+      ctx.fillStyle=emdColor((v00+v10+v11+v01)/4/vmax);ctx.globalAlpha=.9;
+      ctx.beginPath();ctx.moveTo(p00.x,p00.y);ctx.lineTo(p10.x,p10.y);ctx.lineTo(p11.x,p11.y);ctx.lineTo(p01.x,p01.y);ctx.closePath();ctx.fill();
+      ctx.strokeStyle="rgba(10,14,13,.5)";ctx.lineWidth=.5;ctx.stroke();ctx.globalAlpha=1;
+    }
+    ctx.strokeStyle=M_COLORS[mi%M_COLORS.length];ctx.lineWidth=1.5;ctx.globalAlpha=.9;
+    ctx.beginPath();
+    for(let i=0;i<nCols;i++){const p=P(i,mi,surf.grid[mi][i]);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);}
+    ctx.stroke();ctx.globalAlpha=1;
+  }
+  const pmin=P(surf.min.ni-surf.NI_MIN, surf.min.M-1, surf.min.v);
+  const pbase=P(surf.min.ni-surf.NI_MIN, surf.min.M-1, 0);
+  ctx.strokeStyle="#6bf5b0";ctx.lineWidth=1;ctx.globalAlpha=.6;
+  ctx.beginPath();ctx.moveTo(pmin.x,pmin.y);ctx.lineTo(pbase.x,pbase.y);ctx.stroke();ctx.globalAlpha=1;
+  ctx.fillStyle="#6bf5b0";ctx.beginPath();ctx.arc(pmin.x,pmin.y,3.5,0,7);
+  ctx.shadowColor="#6bf5b0";ctx.shadowBlur=9;ctx.fill();ctx.shadowBlur=0;
+  ctx.fillStyle="#5c7a68";ctx.font="9px monospace";ctx.textAlign="center";
+  const pNiEnd=P(nCols-1,0,0), pNi0=P(0,0,0);
+  ctx.fillText("nᵢ→",(pNiEnd.x+pNi0.x)/2,(pNiEnd.y+pNi0.y)/2+16);
+  const pMEnd=P(0,nRows-1,0);
+  ctx.fillText("M",(pNi0.x+pMEnd.x)/2-14,(pNi0.y+pMEnd.y)/2);
+  ctx.textAlign="left";ctx.fillText("EMD↑",6,14);
+}
+function currentM(){ return +document.getElementById('mSets').value; }
+
+/* ---------- 4d. Drum tab ----------------------------------------------- */
+/* Standard drum-tab grid: one row per voice, one column per pulse of Z_n.
+   'x' = hit, 'o' = open hat, '-' = rest. Beat boundaries marked with '|'. */
+const TAB_ROWS=[
+  {key:"crash",label:"Crash",sym:"x"},
+  {key:"ride", label:"Ride", sym:"x"},
+  {key:"ohat", label:"OpHat",sym:"o"},
+  {key:"hat",  label:"HiHat",sym:"x"},
+  {key:"tom1", label:"HiTom",sym:"o"},
+  {key:"tom2", label:"MdTom",sym:"o"},
+  {key:"snare",label:"Snare",sym:"o"},
+  {key:"floor",label:"FlTom",sym:"o"},
+  {key:"kick", label:"Kick", sym:"o"},
+];
+function renderTab(){
+  const tabEl=document.getElementById('tab');
+  const titleEl=document.getElementById('tabTitle');
+  const presetName=document.getElementById('preset')?document.getElementById('preset').value:'Beat';
+  titleEl.textContent = `Drum tab — ${presetName}`;
+  const N=n;
+  // which voices are present
+  const present=new Set(beat.lanes.filter(l=>l.onsets.length).map(l=>l.key));
+  const rows=TAB_ROWS.filter(r=>present.has(r.key) || (r.key==='hat'&&present.has('hat')));
+  let out='';
+  // header: beat numbers on quarters
+  let hdr='      ';
+  for(let p=0;p<N;p++){
+    const isBeat = (p % Math.round(N/4))===0;
+    hdr += isBeat ? String(1+Math.round(p/(N/4))%4) : ' ';
+    hdr += (p% Math.round(N/4)===Math.round(N/4)-1)?' ':'';
+  }
+  out += hdr + '\n';
+  for(const r of rows){
+    const lane=beat.lanes.find(l=>l.key===r.key);
+    const set=new Set(lane?lane.onsets:[]);
+    let line=r.label.padEnd(5)+'|';
+    for(let p=0;p<N;p++){
+      line += set.has(p) ? r.sym : '-';
+      if(p%Math.round(N/4)===Math.round(N/4)-1) line+='|';
+    }
+    out += line + '\n';
+  }
+  // legend line
+  out += '\n     x = cymbal   o = drum   | = beat';
+  tabEl.textContent=out;
+}
+
+/* ---------- 4d-bis. Standard notation ----------------------------------
+   Drum-kit notation on a 5-line staff with the neutral (percussion) clef.
+   Two voices, as is conventional: hands stems-up, feet stems-down. Cymbals
+   take x noteheads, drums oval ones. A note's written duration is the gap to
+   the next note in its own voice, and beams group notes within a beat.
+   Staff positions (half-steps down from the top line):
+     ride -1 (space above)   hi-hat 0 (top line)
+     snare 3 (3rd space up)  kick 7 (1st space up)                        */
+const NOTE_POS={crash:-2, ride:-1, ohat:0, hat:0, tom1:1, tom2:2, snare:3, floor:5, kick:7};
+const UP_VOICE=['crash','ride','ohat','hat','tom1','tom2','snare','floor'], DOWN_VOICE=['kick'];
+
+function drawNotation(){
+  const cv=document.getElementById('notation'); if(!cv) return;
+  const ctx=cv.getContext('2d'), W=cv.width, H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="#0c1310"; ctx.fillRect(0,0,W,H);
+  const ink="#c9f5d9", dim="#3f5a4c";
+  const S=10, top=52, left=74, right=W-18;
+  const N=n, beatLen=Math.max(1,Math.round(N/4));
+  const colW=(right-left)/N;
+  const yOf=h=>top+h*(S/2);
+
+  // staff
+  ctx.strokeStyle=dim; ctx.lineWidth=1;
+  for(let k=0;k<5;k++){const y=top+k*S;
+    ctx.beginPath(); ctx.moveTo(left-46,y); ctx.lineTo(right,y); ctx.stroke();}
+  // bar lines
+  ctx.strokeStyle=ink; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(left-46,top); ctx.lineTo(left-46,top+4*S); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(right,top); ctx.lineTo(right,top+4*S); ctx.stroke();
+  ctx.lineWidth=3.2;
+  ctx.beginPath(); ctx.moveTo(right-5,top); ctx.lineTo(right-5,top+4*S); ctx.stroke();
+
+  // neutral percussion clef: two thick vertical strokes
+  ctx.strokeStyle=ink; ctx.lineWidth=3.4;
+  ctx.beginPath(); ctx.moveTo(left-36,top+S*0.85); ctx.lineTo(left-36,top+S*3.15);
+  ctx.moveTo(left-28,top+S*0.85); ctx.lineTo(left-28,top+S*3.15); ctx.stroke();
+  // time signature 4/4 (the bar is always four beats here)
+  ctx.fillStyle=ink; ctx.textAlign="center"; ctx.font="bold 17px Georgia,serif";
+  ctx.fillText("4",left-14,top+S*1.95);
+  ctx.fillText("4",left-14,top+S*3.95);
+
+  // beat tick marks above the staff
+  ctx.fillStyle=dim; ctx.font="9px monospace"; ctx.textAlign="center";
+  for(let b=0;b<4;b++) ctx.fillText(String(b+1), left+(b*beatLen+0.5)*colW, top-26);
+
+  const laneOf=k=>beat.lanes.find(l=>l.key===k);
+  const at=(k,p)=>{const l=laneOf(k); return l && l.onsets.indexOf(p)>=0;};
+
+  // ---- collect the two voices ----
+  function voiceNotes(keys){
+    const out=[];
+    for(let p=0;p<N;p++){
+      const heads=keys.filter(k=>at(k,p));
+      if(heads.length) out.push({p, heads});
+    }
+    return out;
+  }
+  const up=voiceNotes(UP_VOICE), down=voiceNotes(DOWN_VOICE);
+
+  // duration of each note = gap to the next note of the same voice (cyclic)
+  function withDur(list){
+    return list.map((nt,i)=>{
+      const nx=list[(i+1)%list.length];
+      let d=(nx.p-nt.p+N)%N; if(d===0)d=N;
+      return {...nt, dur:d, beams: d<=1?2 : d<=3?1 : 0};
+    });
+  }
+  const upN=withDur(up), downN=withDur(down);
+
+  const xOf=p=>left+(p+0.5)*colW;
+  const headR=Math.min(4.6, colW*0.36);
+
+  function drawHead(x,y,kind){
+    if(kind==='x'){
+      ctx.strokeStyle=ink; ctx.lineWidth=1.9;
+      ctx.beginPath();
+      ctx.moveTo(x-headR,y-headR); ctx.lineTo(x+headR,y+headR);
+      ctx.moveTo(x+headR,y-headR); ctx.lineTo(x-headR,y+headR);
+      ctx.stroke();
+    } else if(kind==='xo'){          // open hi-hat: x with a circle over it
+      drawHead(x,y,'x');
+      ctx.strokeStyle=ink; ctx.lineWidth=1.4;
+      ctx.beginPath(); ctx.arc(x,y-headR*2.5,headR*0.82,0,7); ctx.stroke();
+    } else {
+      ctx.fillStyle=ink;
+      ctx.save(); ctx.translate(x,y); ctx.rotate(-0.32);
+      ctx.beginPath(); ctx.ellipse(0,0,headR*1.12,headR*0.82,0,0,7); ctx.fill();
+      ctx.restore();
+    }
+  }
+  const headKind=k=> k==='ohat' ? 'xo' : (k==='hat'||k==='ride'||k==='crash') ? 'x' : 'oval';
+
+  // ---- render one voice with stems and beams ----
+  function renderVoice(notes, dir){          // dir: -1 stems up, +1 stems down
+    if(!notes.length) return;
+    const beamY = dir<0 ? top-16 : top+4*S+16;
+    // noteheads
+    for(const nt of notes){
+      const x=xOf(nt.p);
+      for(const k of nt.heads){
+        const h=NOTE_POS[k];
+        if(h<=-2){                                  // ledger line above the staff
+          ctx.strokeStyle=dim; ctx.lineWidth=1;
+          ctx.beginPath(); ctx.moveTo(x-headR*1.9,yOf(-2)); ctx.lineTo(x+headR*1.9,yOf(-2)); ctx.stroke();
+        }
+        drawHead(x, yOf(h), headKind(k));
+      }
+    }
+    // stems
+    ctx.strokeStyle=ink; ctx.lineWidth=1.5;
+    for(const nt of notes){
+      const x=xOf(nt.p);
+      const ys=nt.heads.map(k=>yOf(NOTE_POS[k]));
+      const from = dir<0 ? Math.min(...ys) : Math.max(...ys);
+      const sx = x + (dir<0 ? headR*1.05 : -headR*1.05);
+      ctx.beginPath(); ctx.moveTo(sx,from); ctx.lineTo(sx,beamY); ctx.stroke();
+      nt._sx=sx;
+    }
+    // beams: group consecutive beamed notes inside one beat
+    let i=0;
+    while(i<notes.length){
+      const nt=notes[i];
+      if(nt.beams===0){ i++; continue; }
+      const beat0=Math.floor(nt.p/beatLen);
+      let j=i;
+      while(j+1<notes.length && notes[j+1].beams>0 &&
+            Math.floor(notes[j+1].p/beatLen)===beat0 &&
+            notes[j].p+notes[j].dur===notes[j+1].p) j++;
+      const grp=notes.slice(i,j+1);
+      const maxB=Math.max(...grp.map(g=>g.beams));
+      for(let b=0;b<maxB;b++){
+        const off=(dir<0? 1 : -1)*b*4.4;
+        if(grp.length===1){
+          // lone beamed note gets a flag stub
+          const g0=grp[0]; if(g0.beams<=b) continue;
+          ctx.lineWidth=3;
+          ctx.beginPath(); ctx.moveTo(g0._sx, beamY+off);
+          ctx.lineTo(g0._sx+colW*0.42, beamY+off+(dir<0?5:-5)); ctx.stroke();
+        } else {
+          // run of notes that carry at least b+1 beams
+          let s=0;
+          while(s<grp.length){
+            if(grp[s].beams<=b){ s++; continue; }
+            let e=s; while(e+1<grp.length && grp[e+1].beams>b) e++;
+            ctx.lineWidth=3;
+            const x1=grp[s]._sx, x2=grp[e]._sx;
+            if(e>s){ ctx.beginPath(); ctx.moveTo(x1,beamY+off); ctx.lineTo(x2,beamY+off); ctx.stroke(); }
+            else { ctx.beginPath(); ctx.moveTo(x1,beamY+off);
+                   ctx.lineTo(x1+colW*0.4,beamY+off+(dir<0?5:-5)); ctx.stroke(); }
+            s=e+1;
+          }
+        }
+      }
+      i=j+1;
+    }
+  }
+  renderVoice(upN,-1);
+  renderVoice(downN,+1);
+
+  // key
+  ctx.fillStyle=dim; ctx.font="9px monospace"; ctx.textAlign="left";
+  ctx.fillText("hands: stems up   feet: stems down   ✕ = cymbal   ○✕ = open hi-hat",
+               left-46, H-8);
+}
+
+/* ---------- 4e. The drummer -------------------------------------------- */
+/* Audience view of a full kit, drawn waist-up: that is how a drummer actually
+   reads from the front, and it removes the legs entirely (they live behind the
+   kick drum, which is where every warped-limb problem came from).
+
+   Geometry is deliberately un-clever:
+     · the hands are FIXED STATIONS, one over the snare and one over the hi-hat,
+       so nothing chases a moving target and the arms never cross;
+     · the sticks are PINNED TO THE DRUM HEAD, not to the hand — the tip sits on
+       the head, and the hand is placed one stick-length back along a fixed
+       stick angle, so the hand slides along a single line as it lifts and the
+       tip can never miss the drum;
+     · the arm is then solved with two-bone IK to that hand, with exact bone
+       lengths, so elbows cannot warp.
+
+   Every drum and cymbal flashes on its own hit. The head bangs DOWN on the bass
+   drum and UP on the snare, driven by an impulse-fed damped spring; when both
+   land together the snare impulse is delayed a few milliseconds, so a
+   simultaneous hit reads as a quick down-then-up instead of cancelling out.   */
+
+function kitGeom(W,H){
+  const g=H/360;                        // design space is 520 x 360
+  const P=(x,y,r)=>({x:x*g,y:y*g,r:(r||0)*g});
+  return { g, ground:322*g,
+    kick:P(258,256,58), snare:P(306,244,30), hihat:P(372,198,28),
+    ride:P(162,150,46),  crash:P(194,116,36),
+    tom1:P(212,194,25), tom2:P(294,192,27), floor:P(168,250,38),
+    head:P(258,120,17), shoulderY:166*g, shoulderDX:12*g, hip:P(258,262,0),
+    arm:{u:56*g,l:56*g}, stick:32*g, liftPx:22*g, lean:30*g };
+}
+
+
+
+/* Strike point on each kit piece, and its x for hand assignment */
+function strikePoints(K){
+  const g=K.g;
+  return {
+    snare:{x:K.snare.x-4*g, y:K.snare.y-6*g},
+    hihat:{x:K.hihat.x-2*g, y:K.hihat.y-10*g},
+    ride: {x:K.ride.x+6*g,  y:K.ride.y-4*g},
+    crash:{x:K.crash.x+6*g, y:K.crash.y-4*g},
+    tom1: {x:K.tom1.x,      y:K.tom1.y-6*g},
+    tom2: {x:K.tom2.x,      y:K.tom2.y-6*g},
+    floor:{x:K.floor.x+4*g, y:K.floor.y-6*g},
+  };
+}
+
+/* Sticking. The drummer's LEFT hand owns the hi-hat (it sits on his left, so
+   this is the uncrossed, natural grip) and the RIGHT hand covers snare, toms
+   and cymbals. Two exceptions where alternating is what a real player does:
+     · a fast hi-hat run (sixteenths or quicker) gets split between both hands;
+     · when two non-hat voices land together, both hands are needed, so the
+       hi-hat on that pulse is dropped from the animation (it still flashes).
+   With no hi-hat in the pattern at all, everything simply alternates.        */
+function stickingPlan(K){
+  const SP=strikePoints(K);
+  const on=pieceOnsets();
+  const hats=(on.hihat||[]).slice();
+  const hatSet=new Set(hats.map(p=>p.toFixed(6)));
+
+  // is the hi-hat moving fast enough that one hand could not carry it?
+  let hatFast=false;
+  if(hats.length>=2){
+    let minGap=1;
+    for(let i=0;i<hats.length;i++){
+      const nx=hats[(i+1)%hats.length];
+      let gap=(nx-hats[i]+1)%1; if(gap<1e-9) gap=1;
+      minGap=Math.min(minGap,gap);
+    }
+    hatFast = minGap <= 1/16 + 1e-9;          // sixteenths or faster
+  }
+
+  // gather the non-hat hand voices, grouped by pulse
+  const others=[];
+  for(const piece in on){
+    if(piece==='kick'||piece==='hihat') continue;
+    if(!SP[piece]) continue;
+    for(const pos of on[piece]) others.push({pos,piece,x:SP[piece].x});
+  }
+  const groupBy=(arr)=>{
+    const m=new Map();
+    for(const e of arr){const k=e.pos.toFixed(6); if(!m.has(k))m.set(k,[]); m.get(k).push(e);}
+    return [...m.entries()].map(([k,v])=>({pos:+k,items:v})).sort((a,b)=>a.pos-b.pos);
+  };
+
+  const R=[],L=[];
+  if(hatFast || hats.length===0){
+    // everything alternates
+    const all=others.concat(hats.map(p=>({pos:p,piece:'hihat',x:SP.hihat.x})));
+    let turn='R';
+    for(const gp of groupBy(all)){
+      if(gp.items.length===1){
+        (turn==='R'?R:L).push({pos:gp.pos,piece:gp.items[0].piece});
+        turn = turn==='R'?'L':'R';
+      } else {
+        const s=[...gp.items].sort((a,b)=>a.x-b.x);
+        R.push({pos:gp.pos,piece:s[0].piece});
+        L.push({pos:gp.pos,piece:s[s.length-1].piece});
+        turn = turn==='R'?'L':'R';
+      }
+    }
+  } else {
+    // left hand rides the hats; right hand takes the rest
+    const busyL=new Set();                     // pulses where L is pulled off the hat
+    let turn='R';
+    for(const gp of groupBy(others)){
+      const hatHere=hatSet.has(gp.pos.toFixed(6));
+      if(gp.items.length===1){
+        const hand = hatHere ? 'R' : turn;     // L is on the hat, so R takes it
+        (hand==='R'?R:L).push({pos:gp.pos,piece:gp.items[0].piece});
+        turn = hand==='R'?'L':'R';
+      } else {
+        const s=[...gp.items].sort((a,b)=>a.x-b.x);
+        R.push({pos:gp.pos,piece:s[0].piece});
+        L.push({pos:gp.pos,piece:s[s.length-1].piece});
+        if(hatHere) busyL.add(gp.pos.toFixed(6));   // both hands needed here
+        turn='R';
+      }
+    }
+    for(const p of hats) if(!busyL.has(p.toFixed(6))) L.push({pos:p,piece:'hihat'});
+    L.sort((a,b)=>a.pos-b.pos);
+    R.sort((a,b)=>a.pos-b.pos);
+  }
+  return {R,L,SP};
+}
+
+/* where a hand is right now: travelling from its previous drum to its next one,
+   lifting off and arriving exactly on the onset */
+function handState(list, SP, frac, restPt){
+  if(!list.length) return {pt:restPt, lift:0.5, piece:null};
+  let ni=list.findIndex(e=>e.pos>frac+1e-9); if(ni<0) ni=0;
+  const pi=(ni-1+list.length)%list.length;
+  const a=SP[list[pi].piece]||restPt, b=SP[list[ni].piece]||restPt;
+  let interval=(list[ni].pos-list[pi].pos+1)%1; if(interval<1e-6) interval=1;
+  const since=(frac-list[pi].pos+1)%1;
+  const u=Math.min(1,since/interval);
+  const s=u*u*(3-2*u);                                  // smoothstep travel
+  const amp=Math.min(1,interval/0.16);
+  const lift=amp*Math.pow(Math.sin(Math.PI*u),0.7);      // 0 at both strikes
+  return {pt:{x:a.x+(b.x-a.x)*s, y:a.y+(b.y-a.y)*s}, lift, piece:list[ni].piece};
+}
+function pieceOnsets(){
+  const o={kick:[],snare:[],hihat:[],ride:[],crash:[],tom1:[],tom2:[],floor:[]};
+  (typeof laneModels==='undefined'?[]:laneModels).forEach(lm=>{
+    if(lm.muted) return;
+    let k=lm.lane.key;
+    if(k==='hat'||k==='ohat') k='hihat';
+    if(!(k in o)) k='tom1';
+    if(hearMode==='orig'||hearMode==='both') lm.onsets.forEach(p=>o[k].push(p/n));
+    if(hearMode==='me'||hearMode==='both')  lm.unionNiIdx.forEach(j=>o[k].push(j/lm.ni));
+  });
+  for(const k in o) o[k]=[...new Set(o[k].map(x=>+x.toFixed(6)))].sort((a,b)=>a-b);
+  return o;
+}
+function phaseIn(list, frac){
+  if(!list || !list.length) return null;
+  let ni=list.findIndex(p=>p>frac+1e-9); if(ni<0) ni=0;
+  const pi=(ni-1+list.length)%list.length;
+  let interval=(list[ni]-list[pi]+1)%1; if(interval<1e-6) interval=1;
+  const since=(frac-list[pi]+1)%1;
+  return {since, interval, u:Math.min(1,since/interval)};
+}
+
+/* ---- headbang: impulse-driven damped spring ---- */
+let bangY=0, bangV=0, bangPend=[], bangLastFrac=0, bangPrimed=false;
+const BANG_K=55, BANG_C=5, BANG_IMP=8;
+function updateBang(frac, dt, on){
+  const wrapped = frac < bangLastFrac;
+  // on the very first frame nothing has been "crossed" yet, so an onset sitting
+  // exactly on the downbeat would be missed; prime it by treating frac 0 as new.
+  const cross = p => !bangPrimed ? (p<=frac+1e-9)
+                   : wrapped ? (p>bangLastFrac || p<=frac)
+                             : (p>bangLastFrac && p<=frac);
+  let kick=false, snare=false;
+  for(const p of on.kick)  if(cross(p)) kick=true;
+  for(const p of on.snare) if(cross(p)) snare=true;
+  bangLastFrac=frac; bangPrimed=true;
+  if(kick)  bangPend.push({t:0, v:+BANG_IMP});                 // down
+  if(snare) bangPend.push({t:kick?0.045:0, v:-BANG_IMP});      // up (delayed if both)
+  bangPend.forEach(i=>i.t-=dt);
+  bangPend=bangPend.filter(i=>{ if(i.t<=0){ bangV+=i.v; return false; } return true; });
+  bangV += (-BANG_K*bangY - BANG_C*bangV)*dt;
+  bangY += bangV*dt;
+  if(!isFinite(bangY)||!isFinite(bangV)){bangY=0;bangV=0;bangPend=[];}
+  bangY=Math.max(-1.6,Math.min(1.6,bangY));
+}
+
+/* ---- hair: verlet chains, inextensible by hard projection ---- */
+let hair=null, hairSettled=false;
+function initHair(K){
+  const strands=[], NS=17, NP=15;
+  for(let i=0;i<NS;i++){
+    const t=NS===1?0.5:i/(NS-1);
+    strands.push({
+      pts:Array.from({length:NP},()=>({x:K.head.x,y:K.head.y,px:K.head.x,py:K.head.y})),
+      seg:6.6,
+      ang:-Math.PI*1.02 + t*Math.PI*1.04,        // wraps the scalp, front to back
+      len:0.86+0.26*Math.sin(i*3.7)+0.10*Math.sin(i*1.3),
+      w:0.75+0.5*((i*7)%5)/5                     // per-strand thickness
+    });
+  }
+  return strands;
+}
+function stepHair(K,hc,tilt,steps){
+  if(!hair) hair=initHair(K);
+  const g=K.g;
+  for(let it=0;it<steps;it++) for(const s of hair){
+    const a={x:hc.x+Math.cos(s.ang+tilt)*K.head.r*0.94, y:hc.y+Math.sin(s.ang+tilt)*K.head.r*0.94};
+    const P=s.pts, segLen=s.seg*s.len*g;
+    P[0].x=a.x; P[0].y=a.y; P[0].px=a.x; P[0].py=a.y;
+    for(let i=1;i<P.length;i++){
+      const p=P[i];
+      const vx=(p.x-p.px)*0.91, vy=(p.y-p.py)*0.91;
+      p.px=p.x; p.py=p.y; p.x+=vx; p.y+=vy+0.62*g;
+      if(!isFinite(p.x)||!isFinite(p.y)){p.x=a.x;p.y=a.y;p.px=a.x;p.py=a.y;}
+    }
+    for(let k=0;k<3;k++) for(let i=1;i<P.length;i++){
+      const p0=P[i-1],p1=P[i];
+      let dx=p1.x-p0.x, dy=p1.y-p0.y;
+      const d=Math.hypot(dx,dy)||1e-6, diff=(d-segLen)/d;
+      if(i===1){p1.x-=dx*diff;p1.y-=dy*diff;}
+      else{p0.x+=dx*diff*0.5;p0.y+=dy*diff*0.5;p1.x-=dx*diff*0.5;p1.y-=dy*diff*0.5;}
+    }
+    for(let i=1;i<P.length;i++){          // hard projection: exactly inextensible
+      const p0=P[i-1],p1=P[i];
+      let dx=p1.x-p0.x, dy=p1.y-p0.y; const d=Math.hypot(dx,dy)||1e-6;
+      p1.x=p0.x+dx/d*segLen; p1.y=p0.y+dy/d*segLen;
+    }
+  }
+}
+
+/* ---- head: human or cat, per the Cat head toggle ---- */
+let catMode=false;
+function drawHeadShape(ctx,K,hc,tilt,g,ink){
+  ctx.strokeStyle=ink; ctx.lineWidth=2.8;
+  const r=K.head.r;
+  if(!catMode){
+    ctx.beginPath(); ctx.arc(hc.x,hc.y,r,0,7); ctx.stroke();
+    return;
+  }
+  ctx.save(); ctx.translate(hc.x,hc.y); ctx.rotate(tilt*0.5);
+  // skull: a slightly wide cat face
+  ctx.beginPath(); ctx.ellipse(0,0,r*1.06,r*0.96,0,0,7); ctx.stroke();
+  // ears (triangles, with inner ear)
+  const ear=(sx)=>{
+    ctx.beginPath();
+    ctx.moveTo(sx*r*0.28, -r*0.86);
+    ctx.lineTo(sx*r*0.72, -r*1.78);
+    ctx.lineTo(sx*r*0.98, -r*0.60);
+    ctx.closePath(); ctx.stroke();
+    ctx.lineWidth=1.4;
+    ctx.beginPath();
+    ctx.moveTo(sx*r*0.44, -r*0.84);
+    ctx.lineTo(sx*r*0.68, -r*1.42);
+    ctx.lineTo(sx*r*0.80, -r*0.72);
+    ctx.stroke();
+    ctx.lineWidth=2.8;
+  };
+  ear(-1); ear(1);
+  // eyes: half-lidded rocker cat
+  ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(-r*0.40,-r*0.08,r*0.19,Math.PI*0.05,Math.PI*0.95); ctx.stroke();
+  ctx.beginPath(); ctx.arc( r*0.40,-r*0.08,r*0.19,Math.PI*0.05,Math.PI*0.95); ctx.stroke();
+  // muzzle + nose
+  ctx.lineWidth=1.8;
+  ctx.beginPath();
+  ctx.moveTo(-r*0.11,r*0.30); ctx.lineTo(0,r*0.42); ctx.lineTo(r*0.11,r*0.30); ctx.closePath();
+  ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,r*0.42); ctx.lineTo(0,r*0.56); ctx.stroke();
+  ctx.beginPath(); ctx.arc(-r*0.20,r*0.56,r*0.20,Math.PI*1.75,Math.PI*0.55); ctx.stroke();
+  ctx.beginPath(); ctx.arc( r*0.20,r*0.56,r*0.20,Math.PI*0.45,Math.PI*1.25); ctx.stroke();
+  // whiskers
+  ctx.lineWidth=1.2; ctx.globalAlpha=0.8;
+  for(const s of [-1,1]) for(const dy of [-0.10,0.08,0.26]){
+    ctx.beginPath();
+    ctx.moveTo(s*r*0.44, r*0.46+dy*r);
+    ctx.lineTo(s*r*1.45, r*(0.30+dy)*1.0);
+    ctx.stroke();
+  }
+  ctx.globalAlpha=1; ctx.restore();
+}
+function drawHand(ctx,hand,aim,g,ink){
+  if(!catMode){
+    ctx.fillStyle=ink;
+    ctx.beginPath(); ctx.arc(hand.x,hand.y,2.6*g,0,7); ctx.fill();
+    return;
+  }
+  // cat paw: pad plus three toe beans, turned to face the drum
+  const a=Math.atan2(aim.y-hand.y, aim.x-hand.x);
+  ctx.save(); ctx.translate(hand.x,hand.y); ctx.rotate(a);
+  ctx.strokeStyle=ink; ctx.lineWidth=1.8; ctx.fillStyle="#0b1210";
+  ctx.beginPath(); ctx.ellipse(0,0,5.4*g,4.4*g,0,0,7); ctx.fill(); ctx.stroke();
+  ctx.fillStyle=ink;
+  for(const t of [-0.72,0,0.72]){
+    ctx.beginPath();
+    ctx.ellipse(4.4*g*Math.cos(t), 4.4*g*Math.sin(t), 1.9*g, 1.6*g, t, 0, 7);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+let _lastDrumT=null;
+function drawDrummer(frac, live){
+  const cv=document.getElementById('drummer'); if(!cv) return;
+  const ctx=cv.getContext('2d'), W=cv.width, H=cv.height;
+  const K=kitGeom(W,H), g=K.g;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="#0b1210"; ctx.fillRect(0,0,W,H);
+  ctx.lineCap="round"; ctx.lineJoin="round";
+  const ink="#c9f5d9", dim="#2c453a", steel="#7fb9a0", stickCol="#e8e3c6", hairCol="#8fd8b4";
+
+  const on = live ? pieceOnsets() : {kick:[],snare:[],hihat:[],ride:[],crash:[],tom1:[],tom2:[],floor:[]};
+  const barSec=(typeof barDur==='function')?barDur():2;
+  const tau=Math.min(0.35, 0.13/barSec);            // flash decay, bar fractions
+  const F={};
+  for(const k in on){ const p=phaseIn(on[k],frac); F[k]= p? Math.exp(-p.since/(tau*0.6)) : 0; }
+  const liftOf=k=>{
+    const p=phaseIn(on[k],frac);
+    if(!p) return 0.55;
+    return Math.min(1,p.interval/0.16)*Math.pow(Math.sin(Math.PI*p.u),0.65);
+  };
+
+  // headbang integration
+  if(live){
+    const nowT=(typeof AC!=="undefined"&&AC&&AC.currentTime>0)?AC.currentTime:(Date.now()/1000);
+    let dt=_lastDrumT==null?1/60:Math.min(0.05,Math.max(0.001,nowT-_lastDrumT));
+    _lastDrumT=nowT;
+    updateBang(frac, dt, on);
+  } else { bangY*=0.6; bangV=0; _lastDrumT=null; }
+  const nod=bangY, tilt=0.13*nod;
+  // the hands drive a torso lean, which is what lets him reach across the kit
+  const plan=stickingPlan(K);
+  const restR={x:K.snare.x-4*g,y:K.snare.y-6*g}, restL={x:K.hihat.x-2*g,y:K.hihat.y-10*g};
+  const hR=handState(plan.R, plan.SP, live?frac:0, restR);
+  const hL=handState(plan.L, plan.SP, live?frac:0, restL);
+  const meanX=(hR.pt.x+hL.pt.x)/2;
+  const leanX=Math.max(-K.lean,Math.min(K.lean,(meanX-K.head.x)*0.45));
+  const headC={x:K.head.x+tilt*5*g+leanX*0.75, y:K.head.y+nod*13*g};
+  const shY=K.shoulderY+nod*4*g;
+
+  /* ---------- helpers ---------- */
+  function cymbal(c, flash, tiltA){
+    ctx.strokeStyle=dim; ctx.lineWidth=1.4;
+    ctx.beginPath(); ctx.moveTo(c.x,c.y+3*g); ctx.lineTo(c.x,K.ground); ctx.stroke();
+    const wob=flash*0.10;
+    ctx.save(); ctx.translate(c.x,c.y); ctx.rotate((tiltA||0)+wob);
+    ctx.strokeStyle=steel; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.ellipse(0,0,c.r,c.r*0.22,0,0,7); ctx.stroke();
+    ctx.strokeStyle=dim; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.ellipse(0,0,c.r*0.2,c.r*0.05,0,0,7); ctx.stroke();
+    if(flash>0.02){
+      ctx.globalAlpha=flash*0.55; ctx.fillStyle=ink;
+      ctx.beginPath(); ctx.ellipse(0,0,c.r*0.95,c.r*0.2,0,0,7); ctx.fill();
+      ctx.globalAlpha=flash*0.45; ctx.strokeStyle=ink; ctx.lineWidth=1.6;
+      const ring=c.r*(1+0.35*(1-flash));
+      ctx.beginPath(); ctx.ellipse(0,0,ring,ring*0.22,0,0,7); ctx.stroke();
+      ctx.globalAlpha=1;
+    }
+    ctx.restore();
+  }
+  function drum(d, flash, depth, legs){
+    const ry=d.r*0.34, dep=depth*g;
+    ctx.strokeStyle=dim; ctx.lineWidth=1.6;
+    ctx.beginPath();                                   // shell sides
+    ctx.moveTo(d.x-d.r,d.y); ctx.lineTo(d.x-d.r,d.y+dep);
+    ctx.moveTo(d.x+d.r,d.y); ctx.lineTo(d.x+d.r,d.y+dep); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(d.x,d.y+dep,d.r,ry,0,0,Math.PI); ctx.stroke();
+    ctx.strokeStyle=ink; ctx.lineWidth=2;              // head
+    ctx.beginPath(); ctx.ellipse(d.x,d.y,d.r,ry,0,0,7); ctx.stroke();
+    if(flash>0.02){
+      ctx.globalAlpha=flash*0.6; ctx.fillStyle=ink;
+      ctx.beginPath(); ctx.ellipse(d.x,d.y,d.r*0.9,ry*0.86,0,0,7); ctx.fill();
+      ctx.globalAlpha=1;
+    }
+    if(legs){ ctx.strokeStyle=dim; ctx.lineWidth=1.4;
+      ctx.beginPath();
+      ctx.moveTo(d.x-d.r*0.8,d.y+dep*0.7); ctx.lineTo(d.x-d.r*0.95,K.ground);
+      ctx.moveTo(d.x+d.r*0.8,d.y+dep*0.7); ctx.lineTo(d.x+d.r*0.95,K.ground);
+      ctx.stroke(); }
+  }
+
+  /* ---------- back layer: ground, cymbals, floor tom ---------- */
+  ctx.strokeStyle=dim; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.moveTo(18*g,K.ground); ctx.lineTo(W-18*g,K.ground); ctx.stroke();
+  cymbal(K.ride,  F.ride,  -0.07);
+  cymbal(K.crash, F.crash, -0.14);
+  drum(K.floor, F.floor, 40, true);
+
+  /* ---------- hi-hat (two cymbals + stand + pedal) ---------- */
+  const hhGap=5*g+F.hihat*5*g;
+  ctx.strokeStyle=dim; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(K.hihat.x,K.hihat.y+4*g); ctx.lineTo(K.hihat.x,K.ground); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(K.hihat.x-14*g,K.ground); ctx.lineTo(K.hihat.x+16*g,K.ground); ctx.stroke();
+  ctx.strokeStyle=steel; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.ellipse(K.hihat.x,K.hihat.y,K.hihat.r,K.hihat.r*0.2,0,0,7); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(K.hihat.x,K.hihat.y-hhGap,K.hihat.r,K.hihat.r*0.2,0,0,7); ctx.stroke();
+  if(F.hihat>0.02){ ctx.globalAlpha=F.hihat*0.55; ctx.fillStyle=ink;
+    ctx.beginPath(); ctx.ellipse(K.hihat.x,K.hihat.y-hhGap*0.5,K.hihat.r*0.9,K.hihat.r*0.2,0,0,7); ctx.fill();
+    ctx.globalAlpha=1; }
+
+  /* ---------- the drummer (behind the kit, waist up) ---------- */
+  if(live) stepHair(K,headC,tilt,1);
+  else { if(!hairSettled){ hair=initHair(K); stepHair(K,headC,tilt,120); hairSettled=true; }
+         else stepHair(K,headC,tilt,1); }
+  if(hair){
+    // straight, tapered segments: lank metal hair rather than smooth curls
+    for(const s of hair){
+      const P=s.pts;
+      for(let i=1;i<P.length;i++){
+        const t=i/(P.length-1);
+        ctx.strokeStyle=hairCol;
+        ctx.globalAlpha=0.92-0.35*t;
+        ctx.lineWidth=Math.max(0.6,(2.3*s.w)*(1-0.72*t))*g;
+        ctx.beginPath(); ctx.moveTo(P[i-1].x,P[i-1].y); ctx.lineTo(P[i].x,P[i].y); ctx.stroke();
+      }
+    }
+    ctx.globalAlpha=1;
+  }
+  const LS={x:K.head.x+K.shoulderDX+tilt*3*g+leanX, y:shY};   // drummer's LEFT  (viewer right)
+  const RS={x:K.head.x-K.shoulderDX+tilt*3*g+leanX, y:shY};   // drummer's RIGHT (viewer left)
+  ctx.strokeStyle=ink;
+  ctx.lineWidth=5.2; ctx.beginPath();                       // torso (thicker: arms grow out of it)
+  ctx.moveTo((RS.x+LS.x)/2,shY-6*g); ctx.lineTo(K.hip.x,K.hip.y); ctx.stroke();
+  ctx.lineWidth=2.8;
+  ctx.beginPath(); ctx.moveTo((RS.x+LS.x)/2,shY-4*g); ctx.lineTo(headC.x,headC.y+K.head.r*0.9); ctx.stroke();
+  drawHeadShape(ctx,K,headC,tilt,g,ink);
+
+  /* ---------- front layer: kick, rack toms, snare ---------- */
+  ctx.strokeStyle=ink; ctx.lineWidth=2.4;
+  ctx.beginPath(); ctx.arc(K.kick.x,K.kick.y,K.kick.r,0,7); ctx.stroke();
+  ctx.strokeStyle=dim; ctx.lineWidth=1.3;
+  ctx.beginPath(); ctx.arc(K.kick.x,K.kick.y,K.kick.r*0.33,0,7); ctx.stroke();
+  if(F.kick>0.02){ ctx.globalAlpha=F.kick*0.5; ctx.fillStyle=ink;
+    ctx.beginPath(); ctx.arc(K.kick.x,K.kick.y,K.kick.r*0.93,0,7); ctx.fill(); ctx.globalAlpha=1; }
+  ctx.strokeStyle=dim; ctx.lineWidth=1.4;                       // kick legs + pedal
+  ctx.beginPath();
+  ctx.moveTo(K.kick.x-K.kick.r*0.75,K.kick.y+K.kick.r*0.62); ctx.lineTo(K.kick.x-K.kick.r*1.05,K.ground);
+  ctx.moveTo(K.kick.x+K.kick.r*0.75,K.kick.y+K.kick.r*0.62); ctx.lineTo(K.kick.x+K.kick.r*1.05,K.ground);
+  ctx.stroke();
+
+  drum(K.tom1, F.tom1, 30, false);
+  drum(K.tom2, F.tom2, 32, false);
+  drum(K.snare, F.snare, 22, true);
+
+  /* ---------- arms + sticks: alternating sticking across the whole kit ------
+     The stick lies along the shoulder→drum line, so the hand always sits one
+     stick-length nearer the shoulder than the tip. That buys a stick-length of
+     reach and keeps the stick pointing at whatever it is about to hit.      */
+  function poseArm(S, st){
+    const tip={x:st.pt.x, y:st.pt.y - st.lift*K.liftPx};
+    let dx=tip.x-S.x, dy=tip.y-S.y; const d=Math.hypot(dx,dy)||1;
+    let hand={x:tip.x-dx/d*K.stick, y:tip.y-dy/d*K.stick};
+    // keep the hand inside the arm's span
+    const reach=K.arm.u+K.arm.l;
+    let hx=hand.x-S.x, hy=hand.y-S.y; const hd=Math.hypot(hx,hy)||1e-6;
+    if(hd>reach*0.99){ hand={x:S.x+hx/hd*reach*0.99, y:S.y+hy/hd*reach*0.99}; }
+    return {tip,hand};
+  }
+  /* Arms are drawn as arcs rather than two rigid bones with an elbow: a
+     quadratic curve from shoulder to hand, bowed outward. The bow shrinks as
+     the arm extends, so a folded arm curves a lot and an outstretched one runs
+     nearly straight — the read of an elbow, without the joint that made the
+     old figure look broken. `side` is which way the arc bows. */
+  function armCurve(S, hand, side){
+    const reach=K.arm.u+K.arm.l;
+    let dx=hand.x-S.x, dy=hand.y-S.y; const d=Math.hypot(dx,dy)||1e-6;
+    const slack=Math.max(0,1-d/reach);
+    const bow=reach*0.40*Math.sqrt(slack)+4*g;
+    const px=-dy/d, py=dx/d;                       // unit perpendicular
+    const cx=(S.x+hand.x)/2 + px*bow*side, cy=(S.y+hand.y)/2 + py*bow*side + bow*0.25;
+    ctx.beginPath(); ctx.moveTo(S.x,S.y); ctx.quadraticCurveTo(cx,cy,hand.x,hand.y); ctx.stroke();
+  }
+  const Rp=poseArm(RS,hR), Lp=poseArm(LS,hL);
+  ctx.strokeStyle=ink; ctx.lineWidth=2.8;
+  armCurve(RS, Rp.hand, -1);
+  armCurve(LS, Lp.hand, +1);
+  ctx.strokeStyle=stickCol; ctx.lineWidth=2.2;
+  ctx.beginPath(); ctx.moveTo(Rp.hand.x,Rp.hand.y); ctx.lineTo(Rp.tip.x,Rp.tip.y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(Lp.hand.x,Lp.hand.y); ctx.lineTo(Lp.tip.x,Lp.tip.y); ctx.stroke();
+  drawHand(ctx,Rp.hand,Rp.tip,g,ink);
+  drawHand(ctx,Lp.hand,Lp.tip,g,ink);
+  ctx.fillStyle=stickCol;
+  ctx.beginPath(); ctx.arc(Rp.tip.x,Rp.tip.y,2*g,0,7); ctx.fill();
+  ctx.beginPath(); ctx.arc(Lp.tip.x,Lp.tip.y,2*g,0,7); ctx.fill();
+}
+
+/* ---------- 5. Audio ---------------------------------------------------- */
+let AC=null, master=null;
+function audio(){
+  if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)();
+    master=AC.createGain();master.gain.value=0.9;master.connect(AC.destination);}
+  return AC;
+}
+// synthesized drum voices
+function kick(t){
+  const o=AC.createOscillator(),g=AC.createGain();
+  o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(45,t+0.12);
+  g.gain.setValueAtTime(0.9,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.22);
+  o.connect(g);g.connect(master);o.start(t);o.stop(t+0.24);
+}
+function snare(t){
+  const n=noiseBuf(),src=AC.createBufferSource();src.buffer=n;
+  const bp=AC.createBiquadFilter();bp.type="bandpass";bp.frequency.value=1800;
+  const g=AC.createGain();g.gain.setValueAtTime(0.55,t);
+  g.gain.exponentialRampToValueAtTime(0.001,t+0.18);
+  src.connect(bp);bp.connect(g);g.connect(master);src.start(t);src.stop(t+0.2);
+  const o=AC.createOscillator(),g2=AC.createGain();o.type="triangle";
+  o.frequency.setValueAtTime(180,t);g2.gain.setValueAtTime(0.3,t);
+  g2.gain.exponentialRampToValueAtTime(0.001,t+0.1);
+  o.connect(g2);g2.connect(master);o.start(t);o.stop(t+0.12);
+}
+function hat(t){
+  const src=AC.createBufferSource();src.buffer=noiseBuf();
+  const hp=AC.createBiquadFilter();hp.type="highpass";hp.frequency.value=7000;
+  const g=AC.createGain();g.gain.setValueAtTime(0.25,t);
+  g.gain.exponentialRampToValueAtTime(0.001,t+0.05);
+  src.connect(hp);hp.connect(g);g.connect(master);src.start(t);src.stop(t+0.06);
+}
+function ohatV(t){
+  const src=AC.createBufferSource();src.buffer=noiseBuf();
+  const hp=AC.createBiquadFilter();hp.type="highpass";hp.frequency.value=6000;
+  const g=AC.createGain();g.gain.setValueAtTime(0.2,t);
+  g.gain.exponentialRampToValueAtTime(0.001,t+0.32);   // longer = open
+  src.connect(hp);hp.connect(g);g.connect(master);src.start(t);src.stop(t+0.34);
+}
+function rideV(t){
+  const src=AC.createBufferSource();src.buffer=noiseBuf();
+  const bp=AC.createBiquadFilter();bp.type="bandpass";bp.frequency.value=5200;bp.Q.value=1.2;
+  const g=AC.createGain();g.gain.setValueAtTime(0.14,t);
+  g.gain.exponentialRampToValueAtTime(0.001,t+0.4);
+  // a bit of metallic "ping"
+  const o=AC.createOscillator(),g2=AC.createGain();o.type="square";o.frequency.value=5200;
+  g2.gain.setValueAtTime(0.05,t);g2.gain.exponentialRampToValueAtTime(0.001,t+0.12);
+  src.connect(bp);bp.connect(g);g.connect(master);src.start(t);src.stop(t+0.42);
+  o.connect(g2);g2.connect(master);o.start(t);o.stop(t+0.14);
+}
+let _nb=null;
+function noiseBuf(){
+  if(_nb) return _nb;
+  const len=AC.sampleRate*0.5;_nb=AC.createBuffer(1,len,AC.sampleRate);
+  const d=_nb.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;
+  return _nb;
+}
+function tomV(freq){
+  return function(t){
+    const o=AC.createOscillator(), g=AC.createGain();
+    o.type="sine";
+    o.frequency.setValueAtTime(freq*1.7,t);
+    o.frequency.exponentialRampToValueAtTime(freq,t+0.12);
+    g.gain.setValueAtTime(0.55,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.34);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t+0.36);
+    // a little skin noise on the attack
+    const src=AC.createBufferSource(); src.buffer=noiseBuf();
+    const bp=AC.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=freq*2.4;
+    const g2=AC.createGain(); g2.gain.setValueAtTime(0.14,t);
+    g2.gain.exponentialRampToValueAtTime(0.001,t+0.07);
+    src.connect(bp); bp.connect(g2); g2.connect(master); src.start(t); src.stop(t+0.08);
+  };
+}
+const tom1V=tomV(220), tom2V=tomV(160), floorV=tomV(100);
+function crashV(t){
+  const src=AC.createBufferSource(); src.buffer=noiseBuf();
+  const hp=AC.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=3200;
+  const g=AC.createGain(); g.gain.setValueAtTime(0.30,t);
+  g.gain.exponentialRampToValueAtTime(0.001,t+1.1);
+  src.connect(hp); hp.connect(g); g.connect(master); src.start(t); src.stop(t+1.15);
+}
+function voiceFor(lane){
+  switch(lane.key){
+    case 'kick': return kick;
+    case 'snare': return snare;
+    case 'ohat': return ohatV;
+    case 'ride': return rideV;
+    case 'crash': return crashV;
+    case 'tom1': return tom1V;
+    case 'tom2': return tom2V;
+    case 'floor': return floorV;
+    case 'hat': return hat;
+  }
+  // fallback for MIDI-loaded lanes without a key
+  const nm=(lane.name||'').toLowerCase();
+  if(nm.includes('kick')||lane.note<=36) return kick;
+  if(nm.includes('snare')||lane.note===38||lane.note===40) return snare;
+  if(nm.includes('ride')) return rideV;
+  if(nm.includes('open')) return ohatV;
+  return hat;
+}
+
+/* ---------- 6. Scheduler ----------------------------------------------- */
+/* Bar-based scheduling. The original beat's onsets sit at k/n of the bar; each
+   instrument's ME onsets sit at j/n_i of the bar — these need not align, so we
+   schedule every onset at its exact fractional bar time (true polymeter). */
+let startTime=0, schedTimer=null, rafId=null, barIndex=0;
+function barDur(){ return (60/bpm)*4; }        // one 4-beat bar in seconds
+function scheduleBar(barStart){
+  laneModels.forEach(lm=>{
+    if(lm.muted) return;
+    const v=voiceFor(lm.lane);
+    // original onsets at k/n
+    if(hearMode==='orig' || hearMode==='both'){
+      lm.onsets.forEach(p=>v(barStart + (p/n)*barDur()));
+    }
+    // ME onsets at j/n_i (on the instrument grid)
+    if(hearMode==='me' || hearMode==='both'){
+      const ni=lm.ni;
+      lm.unionNiIdx.forEach(j=>{
+        const t=barStart + (j/ni)*barDur();
+        // in 'both' mode, nudge ME slightly so a coincident original+ME are both audible
+        v(hearMode==='both' ? t+0.0006 : t);
+      });
+    }
+  });
+}
+function play(){
+  audio(); if(AC.state==='suspended')AC.resume();
+  playing=true;
+  document.getElementById('play').disabled=true;
+  document.getElementById('stop').disabled=false;
+  startTime=AC.currentTime+0.08;
+  barIndex=0;prevFrac=0;
+  bangY=0;bangV=0;bangPend=[];bangLastFrac=0;bangPrimed=false;_lastDrumT=null;
+  const scheduleAhead=0.3;
+  function tick(){
+    if(!playing)return;
+    const now=AC.currentTime;
+    while(startTime + barIndex*barDur() < now + scheduleAhead){
+      scheduleBar(startTime + barIndex*barDur());
+      barIndex++;
+    }
+    schedTimer=setTimeout(tick,30);
+  }
+  tick();
+  animate();
+}
+function stop(){
+  playing=false;clearTimeout(schedTimer);cancelAnimationFrame(rafId);
+  document.getElementById('play').disabled=false;
+  document.getElementById('stop').disabled=true;
+  drawDrummer(0,false);
+  laneModels.forEach(lm=>drawCircle(lm));
+}
+function animate(){
+  if(!playing)return;
+  const elapsed=AC.currentTime-startTime;
+  const frac=((elapsed/barDur())%1+1)%1;        // position within the bar [0,1)
+  drawDrummer(frac, true);                      // phase-driven: no strike bookkeeping needed
+
+  laneModels.forEach(lm=>{
+    drawCircle(lm);
+    if(!lm._geo)return;
+    const {cx,cy,Router}=lm._geo;
+    const cv=lm.canvas,ctx=cv.getContext('2d');
+    const a=ptAng(frac,cx,cy,Router);
+    ctx.strokeStyle="rgba(201,245,217,.4)";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(a.x,a.y);ctx.stroke();
+    ctx.beginPath();ctx.arc(a.x,a.y,3.5,0,7);
+    ctx.fillStyle="#c9f5d9";ctx.shadowColor="#c9f5d9";ctx.shadowBlur=10;
+    ctx.fill();ctx.shadowBlur=0;
+  });
+  rafId=requestAnimationFrame(animate);
+}
+
+/* ---------- 7. MIDI parsing (minimal, type-0/1, note-on drum lanes) ---- */
+function parseMIDI(buf){
+  const dv=new DataView(buf);let p=0;
+  function u32(){const v=dv.getUint32(p);p+=4;return v;}
+  function u16(){const v=dv.getUint16(p);p+=2;return v;}
+  function u8(){return dv.getUint8(p++);}
+  if(u32()!==0x4d546864) throw new Error("Not a MIDI file");
+  u32(); u16(); const ntrk=u16(); const div=u16();
+  const events=[]; // {tick, note}
+  for(let t=0;t<ntrk;t++){
+    if(u32()!==0x4d54726b){ // seek MTrk
+      // resync: back up and scan
+    }
+    const len=u32();const end=p+len;let tick=0,run=0;
+    while(p<end){
+      let d=0,b;do{b=u8();d=(d<<7)|(b&0x7f);}while(b&0x80);
+      tick+=d;
+      let st=dv.getUint8(p);
+      if(st&0x80){p++;run=st;}else{st=run;}
+      const hi=st&0xf0, ch=st&0x0f;
+      if(st===0xff){const type=u8();let l=0,b2;do{b2=u8();l=(l<<7)|(b2&0x7f);}while(b2&0x80);p+=l;}
+      else if(st===0xf0||st===0xf7){let l=0,b2;do{b2=u8();l=(l<<7)|(b2&0x7f);}while(b2&0x80);p+=l;}
+      else if(hi===0x90){const note=u8(),vel=u8();if(vel>0)events.push({tick,note,ch});}
+      else if(hi===0x80){p+=2;}
+      else if(hi===0xa0||hi===0xb0||hi===0xe0){p+=2;}
+      else if(hi===0xc0||hi===0xd0){p+=1;}
+      else{p++;}
+    }
+    p=end;
+  }
+  return {events, div:div&0x7fff};
+}
+
+const GM_NAMES={35:"Kick",36:"Kick",38:"Snare",40:"Snare",42:"Hat",44:"Hat",46:"Hat",
+  41:"Tom",43:"Tom",45:"Tom",47:"Tom",48:"Tom",50:"Tom",49:"Crash",51:"Ride",39:"Clap"};
+
+function midiToBeat(parsed, nGrid){
+  const {events,div}=parsed;
+  if(events.length===0) throw new Error("No note-on events found");
+  // assume one bar = 4 quarter notes = 4*div ticks; fold everything into one bar
+  const barTicks=4*div;
+  const byNote={};
+  for(const e of events){
+    const rel=((e.tick % barTicks)+barTicks)%barTicks;
+    const pulse=Math.round(rel/barTicks*nGrid)%nGrid;
+    const name=GM_NAMES[e.note]|| ("Note "+e.note);
+    const key=name+"|"+ (GM_NAMES[e.note]?groupNote(e.note):e.note);
+    (byNote[key]=byNote[key]||{name,note:e.note,set:new Set()}).set.add(pulse);
+  }
+  // merge kick/snare/hat groups; keep others
+  const lanes=Object.values(byNote)
+    .sort((a,b)=>laneRank(a.name)-laneRank(b.name))
+    .map(o=>{
+      const nm=o.name.toLowerCase();
+      let key='hat', limb='rhand';
+      if(nm.includes('kick')){key='kick';limb='foot';}
+      else if(nm.includes('snare')){key='snare';limb='lhand';}
+      else if(nm.includes('ride')){key='ride';limb='rhand';}
+      else if(nm.includes('crash')){key='crash';limb='rhand';}
+      else if(nm.includes('tom')){key= o.note<=43?'floor':(o.note<=47?'tom1':'tom2'); limb='lhand';}
+      return {name:o.name,note:o.note,key,limb,onsets:[...o.set].sort((x,y)=>x-y)};
+    });
+  return {n:nGrid, lanes};
+}
+function groupNote(x){ // canonical note per drum group
+  if([35,36].includes(x))return 36;
+  if([38,40].includes(x))return 38;
+  if([42,44,46].includes(x))return 42;
+  return x;
+}
+function laneRank(nm){const o=["Kick","Snare","Hat","Clap","Tom","Ride","Crash"];
+  const i=o.indexOf(nm);return i<0?99:i;}
+
+/* ---------- 8. Wiring --------------------------------------------------- */
+function refresh(statusMsg){
+  n = +document.getElementById('nGrid').value;
+  M = +document.getElementById('mSets').value;
+  bpm = +document.getElementById('bpm').value;
+  computeAll();
+  renderLanes();
+  renderTab();
+  drawNotation();
+  if(!playing) drawDrummer(0,false);
+  updateDrummerCap();
+  if(statusMsg) document.getElementById('status').textContent=statusMsg;
+  writeFoot();
+}
+
+const mS=document.getElementById('mSets'),nS=document.getElementById('nGrid'),
+      bS=document.getElementById('bpm');
+mS.oninput=()=>{document.getElementById('mVal').textContent=mS.value;refresh(
+  `M = ${mS.value} set(s) per drum`);};
+nS.oninput=()=>{document.getElementById('nVal').textContent=nS.value;
+  laneNi={};                        // detune resets when the target grid changes
+  refresh(`Beat grid n = ${nS.value} · per-instrument grids reset`);};
+bS.oninput=()=>{document.getElementById('bpmVal').textContent=bS.value;bpm=+bS.value;
+  document.getElementById('status').textContent=`Tempo ${bS.value} BPM`;};
+
+document.getElementById('hearSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  hearMode=b.dataset.hear;
+  [...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b));
+  updateDrummerCap();
+  if(!playing) drawDrummer(0,false);
+});
+function updateDrummerCap(){
+  const el=document.getElementById('drummerCap'); if(!el) return;
+  const detuned=laneModels.some(lm=>lm.ni!==n);
+  const what = hearMode==='orig' ? 'the written beat'
+             : hearMode==='both' ? 'the written beat and the maximally even one together'
+             : (detuned ? 'the maximally even groove on the detuned grids' : 'the maximally even groove');
+  el.textContent = `playing ${what} — kick: right foot · snare: left hand · hats/ride: right hand`;
+}
+
+/* ---- cat mode + randomisers ---- */
+function gcd(a,b){while(b){[a,b]=[b,a%b];}return a;}
+document.getElementById('catBtn').onclick=e=>{
+  catMode=!catMode;
+  e.currentTarget.classList.toggle('on',catMode);
+  e.currentTarget.textContent = catMode ? '🐈 Cat head: on' : '🐈 Cat head';
+  if(!playing) drawDrummer(0,false);
+};
+/* De-align: give each instrument a cycle length that shares as little as
+   possible with the beat grid, so the maximally even sets drift out of phase
+   with the written rhythm. Coprime lengths are preferred, and repeats across
+   lanes are avoided so no two instruments share a grid.                     */
+function randomizeGrids(){
+  const used=new Set([n]);
+  laneModels.forEach(lm=>{
+    let best=null, bestScore=-1;
+    for(let tries=0;tries<40;tries++){
+      const cand=3+Math.floor(Math.random()*30);          // 3..32
+      if(used.has(cand)) continue;
+      const score = (gcd(cand,n)===1?2:0) + (cand%2===n%2?0:1) + Math.random();
+      if(score>bestScore){bestScore=score;best=cand;}
+    }
+    if(best==null) best=3+Math.floor(Math.random()*30);
+    used.add(best);
+    laneNi[lm.lane.name]=best;
+  });
+  computeAll(); renderLanes();
+  const desc=laneModels.map(lm=>lm.lane.name+'→ℤ'+lm.ni).join('  ');
+  document.getElementById('status').textContent='De-aligned: '+desc;
+  updateDrummerCap(); if(!playing) drawDrummer(0,false);
+}
+/* Random beat: plausible densities per voice rather than uniform noise. */
+function randomizeBeat(){
+  const N=16, pick=(k)=>{const s=new Set();while(s.size<k)s.add(Math.floor(Math.random()*N));
+    return [...s].sort((a,b)=>a-b);};
+  const p={
+    kick: pick(2+Math.floor(Math.random()*4)),
+    snare:pick(2+Math.floor(Math.random()*3)),
+    hat:  Math.random()<0.35 ? [] : (Math.random()<0.5 ? [0,2,4,6,8,10,12,14] : pick(6+Math.floor(Math.random()*8))),
+  };
+  if(Math.random()<0.55) p.tom1=pick(1+Math.floor(Math.random()*2));
+  if(Math.random()<0.5)  p.tom2=pick(1+Math.floor(Math.random()*2));
+  if(Math.random()<0.5)  p.floor=pick(1+Math.floor(Math.random()*3));
+  if(Math.random()<0.6)  p.crash=[0];
+  if(Math.random()<0.25) p.ride=pick(3+Math.floor(Math.random()*4));
+  beat=patternToBeat(p);
+  document.getElementById('nGrid').value=16;document.getElementById('nVal').textContent=16;
+  refresh('Random beat');
+}
+document.getElementById('rndGrids').onclick=()=>randomizeGrids();
+document.getElementById('rndBeat').onclick=()=>randomizeBeat();
+document.getElementById('rndAll').onclick=()=>{
+  randomizeBeat();
+  document.getElementById('mSets').value=1+Math.floor(Math.random()*4);
+  document.getElementById('mVal').textContent=document.getElementById('mSets').value;
+  refresh();
+  randomizeGrids();
+  document.getElementById('status').textContent='Randomised beat, M and grids';
+};
+document.getElementById('resetGrids').onclick=()=>{
+  laneNi={}; computeAll(); renderLanes();
+  document.getElementById('status').textContent='Grids re-aligned to ℤ'+n;
+  updateDrummerCap(); if(!playing) drawDrummer(0,false);
+};
+
+document.getElementById('play').onclick=play;document.getElementById('stop').onclick=stop;
+document.getElementById('reset').onclick=()=>{
+  beat=defaultBeat();laneNi={};
+  document.getElementById('nGrid').value=16;document.getElementById('nVal').textContent=16;
+  document.getElementById('preset').value='Basic Rock';
+  refresh("Default rock beat loaded · n=16");
+};
+
+/* preset dropdown */
+const presetSel=document.getElementById('preset');
+for(const[grpName,grp]of Object.entries(PATTERNS)){
+  const og=document.createElement('optgroup');og.label=grpName;
+  for(const name of Object.keys(grp)){
+    const o=document.createElement('option');o.value=name;o.textContent=name;og.appendChild(o);
+  }
+  presetSel.appendChild(og);
+}
+presetSel.value='Basic Rock';
+presetSel.onchange=()=>{
+  const p=findPattern(presetSel.value);
+  if(!p)return;
+  beat=patternToBeat(p);laneNi={};
+  document.getElementById('nGrid').value=16;document.getElementById('nVal').textContent=16;
+  refresh(`Preset: ${presetSel.value} · n=16`);
+};
+document.getElementById('file').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const buf=await f.arrayBuffer();
+    const parsed=parseMIDI(buf);
+    beat=midiToBeat(parsed, +document.getElementById('nGrid').value);laneNi={};
+    refresh(`Loaded ${f.name} · ${beat.lanes.length} lane(s) · n=${n}`);
+  }catch(err){
+    document.getElementById('status').textContent="MIDI error: "+err.message;
+  }
+};
+
+function writeFoot(){
+  document.getElementById('foot').innerHTML =
+    `Two stages. <b>Decompose:</b> each drum's onset set on the beat grid ℤ<sub>${n}</sub> is written as a
+     union of up to M maximally even (Clough–Douthett) sets, <code>J(m)=⌊m·${n}/d⌋</code> rotated by r,
+     minimising symmetric difference — M is a ceiling, so error is monotone in M and the slider does real work.
+     <b>Re-grid:</b> each instrument has its own cycle length n<sub>i</sub> (its slider). Its onset options are
+     {0,1/n<sub>i</sub>,…}, which need <i>not</i> line up with the beat's ${n}-grid, so each ME set is snapped to
+     the closest ME set on ℤ<sub>n<sub>i</sub></sub> and the mismatch is measured by the <b>circular
+     earth-mover's distance</b> (Wasserstein-1 on the unit circle, unit mass per onset, creation cost
+     λ=${LAMBDA}). EMD is reported per instrument as % of the circle: 0 means the detuned grid still reproduces
+     the beat exactly (e.g. a half-bar kick is exact on any even n<sub>i</sub>), and it grows as the lattices
+     fall out of phase — some patterns resonate better with an <i>unexpected</i> n<sub>i</sub> (a 5-onset samba
+     figure often fits ℤ₇ better than ℤ₁₃). Each lane's <b>EMD surface</b> panel plots this distance over every
+     grid n<sub>i</sub>∈[3,32] and M∈[1,4] — as lines (EMD vs n<sub>i</sub>, one per M), a heatmap, or a 3D mesh —
+     with the global minimum marked, so the grid that best fits that drum is read straight off the surface. EMD need
+     not decrease with M: adding a set sharpens the ℤ<sub>${n}</sub> decomposition but can snap poorly onto a coarse
+     n<sub>i</sub>, so the surface is genuinely non-monotone in M — that structure is the point.
+     Playback places each instrument's onsets at their true j/n<sub>i</sub>
+     bar positions, so detuned grids are genuine polymeter. Cross-grid matching is greedy (a close upper bound on
+     optimal EMD); M&gt;1 decomposition is greedy + coordinate descent. Refs: Clough &amp; Douthett, J. Music
+     Theory 35 (1991) 93–173; Rubner, Tomasi &amp; Guibas, "The earth mover's distance," IJCV 40 (2000) 99–121;
+     Demaine et al., "The distance geometry of music," Comput. Geom. 42 (2009) 429–454. The stick drummer plays
+     the written beat (kick=foot, snare=left hand, hi-hat/ride=right hand) and the tab shows each preset in
+     standard grid notation. 44 preset grids across six families, transcribed from muted.io, drumpracticepro.com,
+     Native Instruments, and Roland/DrumsTheWord.`;
+}
+
+/* init */
+refresh();
+</script>
+</body>
+</html>
