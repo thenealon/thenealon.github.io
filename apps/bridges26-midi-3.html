@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+<title>Cyclic Pianos</title>
+<style>
+  /* --- Global Styles --- */
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+    background: #e4e4e4; margin: 0; padding: 10px 10px 40px;
+    /* pan-y, NOT none: "none" here blocks page scrolling entirely on iPad.
+       The canvases below re-disable touch gestures for themselves.        */
+    touch-action: pan-y; user-select: none; -webkit-tap-highlight-color: transparent;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* --- Splash Screen --- */
+  #splash {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: #111111; color: #FFB81C; 
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    z-index: 9999; transition: opacity 0.4s ease;
+  }
+  #splash h1 { font-size: 3rem; margin: 0 0 10px 0; text-align: center; }
+  #splash p { font-size: 1.2rem; color: #fdfdfd; margin-bottom: 30px; }
+  #start-btn {
+    background: #FFB81C; color: #111; border: none; padding: 15px 30px;
+    font-size: 1.2rem; font-weight: bold; border-radius: 8px; cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 184, 28, 0.3); transition: transform 0.1s;
+  }
+  #start-btn:active { transform: scale(0.95); }
+
+  /* --- Header & Controls --- */
+  header { text-align: center; color: #111; margin-bottom: 15px; }
+  header h1 { margin: 0; font-size: 1.8rem; color: #111; }
+  header p { margin: 4px 0; font-size: 0.95rem; opacity: 0.9; color: #444; }
+  header a { color: #D49A18; text-decoration: none; font-weight: bold; }
+  
+  #controls {
+    background: #fdfdfd; color: #111; padding: 10px 15px; border-radius: 12px;
+    margin-bottom: 15px; text-align: center; box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    width: 100%; max-width: 650px; box-sizing: border-box; border-top: 4px solid #FFB81C; 
+  }
+  .control-row { margin-top: 8px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; }
+  .control-group { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+  
+  /* --- MIDI Controls --- */
+  #midi-file { display: none; }
+  .midi-btn {
+    background: #111; color: #FFB81C; border: none; padding: 7px 16px;
+    border-radius: 6px; font-size: 0.9em; font-weight: bold; cursor: pointer;
+    font-family: inherit;
+  }
+  .midi-btn:active { transform: scale(0.96); }
+  .midi-btn:disabled { opacity: 0.35; cursor: default; }
+  #midi-play.playing { background: #FFB81C; color: #111; }
+  .midi-btn.rat-on { background: #FFB81C; color: #111; box-shadow: 0 0 0 2px #111 inset; }
+  #midi-score { font-size: 0.82em; color: #A87510; font-weight: bold; }
+  .midi-btn.on { background: #FFB81C; color: #111; box-shadow: 0 0 0 2px #111 inset; }
+  #midi-status { margin-top: 8px; font-size: 0.82em; color: #333; font-style: normal; line-height: 1.45; }
+  #midi-status b { color: #A87510; }
+  
+  /* --- Canvas Layout --- */
+  #canvas-container {
+    display: flex; flex-direction: row; flex-wrap: wrap; gap: 12px;
+    justify-content: center; align-items: flex-start; width: 100%; max-width: 900px;
+  }
+  .canvas-wrapper {
+    flex: 1 1 340px; display: flex; flex-direction: column; align-items: center;
+    max-width: 430px; min-width: 280px;
+  }
+  .canvas-caption {
+    font-size: 0.8em; font-weight: bold; letter-spacing: 0.06em; color: #555;
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+  canvas {
+    outline: none; width: 100%; height: auto; aspect-ratio: 1 / 1;
+    touch-action: none;                     /* gestures belong to the canvas */
+  }
+  /* The graph was invisible against the page: give both a light card. */
+  #keyboard, #graph {
+    background: #fdfdfd; border-radius: 14px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08);
+  }
+  #keyboard { cursor: pointer; }
+  #graph { cursor: default; }
+
+  /* --- Comparison View --- */
+  #compare-wrapper {
+    width: 100%; max-width: 900px; margin-top: 14px;
+    background: #fdfdfd; border-radius: 14px; padding: 10px 10px 6px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08);
+  }
+  #compare-wrapper.hidden { display: none; }
+  .compare-caption {
+    text-align: center; font-size: 0.85em; font-weight: bold; color: #A87510;
+    margin-bottom: 8px;
+  }
+  #compare-canvases {
+    display: flex; flex-direction: row; flex-wrap: wrap; gap: 12px;
+    justify-content: center; align-items: flex-start;
+  }
+  #keyboard2, #graph2 {
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.14), 0 0 0 1px rgba(0,0,0,0.07);
+  }
+
+  /* --- Sheet Music --- */
+  #staff-wrapper {
+    width: 100%; max-width: 900px; margin-top: 14px;
+    background: #fdfdfd; border-radius: 14px; padding: 8px 10px 6px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08);
+  }
+  #staff-wrapper.hidden { display: none; }
+  #staff { width: 100%; height: auto; aspect-ratio: 900 / 330; touch-action: none;
+           background: transparent; box-shadow: none; border-radius: 0; }
+  
+  /* --- UI Helpers --- */
+  .hint { margin-top: 8px; font-size: 0.8em; color: #555; font-style: italic; }
+  .sustain-active { background-color: #FFB81C !important; color: #000; border-radius: 6px; padding: 2px 6px; }
+  label[for="autoplay-toggle"] { color: #008000; }
+  label[for="shepard-toggle"] { color: #d00; }
+  label[for="mobius-toggle"] { color: #800080; }
+  label[for="balanced-toggle"] { color: #005a8b; }
+</style>
+</head>
+<body>
+
+  <div id="splash">
+    <h1>Cyclic Pianos</h1>
+    <p>Bridges 2026 &mdash; N. Bushaw &mdash; (Updated 13 May 2026)</p>
+    <button id="start-btn">Start Exploring</button>
+  </div>
+
+  <header>
+    <h1>Cyclic Pianos</h1>
+    <p>N. Bushaw &mdash; Bridges2026 &mdash; <span id="contact"></span></p>
+  </header>
+
+  <div id="controls">
+    <div class="control-row">
+      <label>Notes (N): <strong id="n-val">12</strong></label>
+      <input type="range" id="n-slider" min="5" max="48" value="12">
+    </div>
+    <div class="control-row">
+      <label>Black Keys (K): <strong id="k-val">6</strong></label>
+      <input type="range" id="k-slider" min="1" max="24" value="6">
+    </div>
+    
+    <div class="control-group">
+      <div><input type="checkbox" id="qwerty-toggle"><label for="qwerty-toggle" style="cursor:pointer; font-size: 0.9em;">QWERTY</label></div>
+      <div><input type="checkbox" id="integer-toggle"><label for="integer-toggle" style="cursor:pointer; font-size: 0.9em;">Numbers</label></div>
+      <div><input type="checkbox" id="distances-toggle" checked><label for="distances-toggle" style="cursor:pointer; font-size: 0.9em;">Distances</label></div>
+      <div><input type="checkbox" id="polygons-toggle" checked><label for="polygons-toggle" style="cursor:pointer; font-size: 0.9em;">Polygons</label></div>
+      <div id="sustain-container"><input type="checkbox" id="sustain-toggle"><label for="sustain-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Sustain</label></div>
+      <div><input type="checkbox" id="autoplay-toggle"><label for="autoplay-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Auto-Play</label></div>
+      <div><input type="checkbox" id="shepard-toggle"><label for="shepard-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Shepard</label></div>
+      <div><input type="checkbox" id="mobius-toggle"><label for="mobius-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Möbius</label></div>
+      <div><input type="checkbox" id="balanced-toggle" checked><label for="balanced-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Balanced</label></div>
+      <div><input type="checkbox" id="compare-toggle"><label for="compare-toggle" style="cursor:pointer; font-size: 0.9em; font-weight: bold;">Compare Both</label></div>
+    </div>
+
+    <div class="control-group">
+      <label class="midi-btn" for="midi-file">Load MIDI&hellip;</label>
+      <input type="file" id="midi-file">
+      <button class="midi-btn" id="midi-demo">Demo Tune</button>
+      <button class="midi-btn" id="midi-play" disabled>Play</button>
+      <div><label for="midi-rate" style="font-size:0.9em;">Speed</label>
+           <input type="range" id="midi-rate" min="25" max="200" value="100" style="width:90px; vertical-align:middle;"></div>
+      <div><input type="checkbox" id="midi-loop" checked><label for="midi-loop" style="cursor:pointer; font-size: 0.9em;">Loop</label></div>
+    </div>
+    <div class="control-group">
+      <span style="font-size:0.9em; font-weight:bold; align-self:center;">Rationalizer:</span>
+      <button class="midi-btn" id="rat-consonant">Most Consonant</button>
+      <button class="midi-btn" id="rat-dissonant">Least Consonant</button>
+      <span id="midi-score"></span>
+    </div>
+    <div class="control-group">
+      <span style="font-size:0.9em; font-weight:bold; align-self:center;">Measure:</span>
+      <button class="midi-btn rat-on" id="met-euler">Euler &Gamma;</button>
+      <button class="midi-btn" id="met-entropy">Harmonic Entropy</button>
+      <div><input type="checkbox" id="staff-toggle" checked><label for="staff-toggle" style="cursor:pointer; font-size: 0.9em; font-weight:bold;">Sheet Music</label></div>
+    </div>
+    <div id="midi-status">No MIDI loaded. Every note is mapped onto the current keyboard &mdash; move the <strong>N</strong> slider while it plays.</div>
+
+    <div class="hint" id="search-note"></div>
+    <div class="hint">Toggle <strong>Möbius + Shepard + Auto-Play</strong> to see all the bells and whistles!</div>
+  </div>
+
+  <div id="canvas-container">
+    <div class="canvas-wrapper"><div class="canvas-caption">Keyboard</div><canvas id="keyboard" width="400" height="400" tabindex="0"></canvas></div>
+    <div class="canvas-wrapper"><div class="canvas-caption">Graph</div><canvas id="graph" width="400" height="400"></canvas></div>
+  </div>
+
+  <div id="compare-wrapper" class="hidden">
+    <div id="compare-caption" class="compare-caption"></div>
+    <div id="compare-canvases">
+      <div class="canvas-wrapper"><div class="canvas-caption">Keyboard</div><canvas id="keyboard2" width="400" height="400"></canvas></div>
+      <div class="canvas-wrapper"><div class="canvas-caption">Graph</div><canvas id="graph2" width="400" height="400"></canvas></div>
+    </div>
+  </div>
+
+  <div id="staff-wrapper" class="hidden">
+    <canvas id="staff" width="900" height="330"></canvas>
+  </div>
+
+  <script>
+    // --- Setup & Initialization ---
+    (function() {
+      const u = "nobushaw", d = "vcu.edu";
+      document.getElementById('contact').innerHTML = `<a href="mailto:${u}@${d}">${u}@${d}</a>`;
+    })();
+
+    let canvas = document.getElementById('keyboard'), ctx = canvas.getContext('2d');
+    let graphCanvas = document.getElementById('graph'), gCtx = graphCanvas.getContext('2d');
+    const mainCanvas = canvas, mainCtx = ctx, mainGraph = graphCanvas, mainGCtx = gCtx;
+
+    const nSlider = document.getElementById('n-slider'), kSlider = document.getElementById('k-slider');
+    const qwertyToggle = document.getElementById('qwerty-toggle'), integerToggle = document.getElementById('integer-toggle');
+    const distancesToggle = document.getElementById('distances-toggle'), polygonsToggle = document.getElementById('polygons-toggle');
+    const sustainToggle = document.getElementById('sustain-toggle'), sustainContainer = document.getElementById('sustain-container');
+    const compareToggle = document.getElementById('compare-toggle');
+    const compareWrapper = document.getElementById('compare-wrapper');
+    const canvas2 = document.getElementById('keyboard2'), ctx2 = canvas2.getContext('2d');
+    const graph2 = document.getElementById('graph2'), gCtx2 = graph2.getContext('2d');
+    const autoplayToggle = document.getElementById('autoplay-toggle'), shepardToggle = document.getElementById('shepard-toggle'), mobiusToggle = document.getElementById('mobius-toggle'), balancedToggle = document.getElementById('balanced-toggle');
+
+    let N = 12, K = 6;
+    let showQwerty = false, showInteger = false, showDistances = true, showPolygons = true, showMobius = false;
+    let showCompare = false, compareLayout = null;
+    let keys = [], isBlackArr = []; 
+
+    let audioCtx = null, audioUnlocked = false, nextVoiceId = 0;
+    const activeVoices = new Map(), sustainedVoices = new Set();
+    const pointerToVoice = new Map(), keyToVoice = new Map();
+    const activePointers = new Set(), pressedKeys = new Set();
+    let isSustainDown = false, autoplayInterval = null, arpIndex = 0, arpVoiceId = null;
+
+    const cx = 200, cy = 200, gx = 200, gy = 200, rGraph = 160;
+    const noteNames12 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+    // --- Graph Distance Logic ---
+    function getGraphDist(u, v) {
+      let limit = showMobius ? N * 2 : N;
+      let d_cycle = Math.min(Math.abs(u - v), limit - Math.abs(u - v));
+      if (showMobius) {
+        let u_jump = (u + N) % limit;
+        let d_jump = 1 + Math.min(Math.abs(u_jump - v), limit - Math.abs(u_jump - v));
+        return Math.min(d_cycle, d_jump);
+      }
+      return d_cycle;
+    }
+
+    /* Up to 24 notes per octave: a cycle has that many keys, a Mobius ladder
+       twice as many.  The exhaustive black-key search is fine up to about 36
+       keys (worst case ~0.26 s) but blows up beyond it — measured 1.9 s at 40
+       keys and 9.2 s at 44, which would freeze the page — so above the exact
+       limit we switch to a fast greedy + local-search placement and say so.  */
+    const MAX_NOTES_PER_OCTAVE = 24;
+    const MOBIUS_MAX_TOTAL_KEYS = 2 * MAX_NOTES_PER_OCTAVE;   // 48
+    const EXACT_SEARCH_MAX_KEYS = 36;
+    let lastSearchWasExact = true;
+
+    // Mobius-ladder distances, same rule as getGraphDist in Mobius mode.
+    function mobiusDistMatrix(ringSize){
+      const limit = 2 * ringSize;
+      const D = Array.from({length: limit}, () => new Array(limit).fill(0));
+      for (let i = 0; i < limit; i++)
+        for (let j = 0; j < limit; j++){
+          if (i === j) continue;
+          const dC = Math.min(Math.abs(i - j), limit - Math.abs(i - j));
+          const iJ = (i + ringSize) % limit;
+          const dJ = 1 + Math.min(Math.abs(iJ - j), limit - Math.abs(iJ - j));
+          D[i][j] = Math.min(dC, dJ);
+        }
+      return D;
+    }
+
+    /* Greedy placement followed by local search, used only when the exact
+       search would be too slow.  Same energy functional as the exact search
+       (sum of 1/d over pairs), same constraints: key 1 black, no two blacks
+       adjacent on the Mobius cycle, and — when Balanced is on — half the
+       blacks in each ring.  Deterministic, so the picture never flickers. */
+    function heuristicMobiusBlackKeys(ringSize, numBlack, preferBalanced){
+      const limit = 2 * ringSize;
+      const result = Array(limit).fill(false);
+      if (numBlack <= 0) return result;
+      const D = mobiusDistMatrix(ringSize);
+      const balanced = preferBalanced && numBlack % 2 === 0;
+      const adjacent = (a, b) => { const d = Math.abs(a - b); return d === 1 || d === limit - 1; };
+
+      const outer = v => v < ringSize;
+      const adjacentToSet = (set, v, skip) =>
+        set.some((u, k) => k !== skip && adjacent(u, v));
+
+      /* Seed with evenly spaced keys starting at 1.  Even spacing is close to
+         optimal for a 1/d energy and, unlike a greedy fill, always places the
+         full K: at the maximum K = limit/2 it lands exactly on the odd
+         positions, the unique independent set of that size containing key 1.
+         A purely greedy start could strand itself and place fewer than K.  */
+      const chosen = [];
+      for (let i = 0; i < numBlack; i++){
+        let v = (Math.round(i * limit / numBlack) + 1) % limit;
+        let guard = 0;
+        while ((chosen.includes(v) || adjacentToSet(chosen, v, -1)) && guard++ < limit)
+          v = (v + 1) % limit;
+        if (guard <= limit) chosen.push(v);
+      }
+      // if spacing could not place them all, top up with any legal slot
+      for (let v = 0; v < limit && chosen.length < numBlack; v++)
+        if (!chosen.includes(v) && !adjacentToSet(chosen, v, -1)) chosen.push(v);
+      if (!chosen.includes(1)){                    // keep the normalisation
+        const swap = chosen.findIndex(v => !adjacentToSet(chosen.filter(u => u !== v), 1, -1));
+        if (swap >= 0) chosen[swap] = 1;
+      }
+      // balance the two rings by swapping across if needed
+      if (balanced){
+        const half = numBlack / 2;
+        let guard = 0;
+        while (chosen.filter(outer).length !== half && guard++ < limit){
+          const tooMany = chosen.filter(outer).length > half;
+          const from = chosen.findIndex(v => outer(v) === tooMany && v !== 1);
+          if (from < 0) break;
+          let moved = false;
+          for (let v = 0; v < limit && !moved; v++){
+            if (outer(v) === tooMany) continue;
+            if (chosen.includes(v) || adjacentToSet(chosen, v, from)) continue;
+            chosen[from] = v; moved = true;
+          }
+          if (!moved) break;
+        }
+      }
+
+      // local search: move one black key at a time while it lowers the energy
+      const energy = set => {
+        let s = 0;
+        for (let a = 0; a < set.length; a++)
+          for (let b = a + 1; b < set.length; b++) s += 1 / D[set[a]][set[b]];
+        return s;
+      };
+      let improved = true, guard = 0;
+      while (improved && guard++ < 40){
+        improved = false;
+        for (let i = 1; i < chosen.length; i++){        // key 1 stays fixed
+          const cur = chosen[i];
+          let bestV = cur, bestE = energy(chosen);
+          for (let v = 0; v < limit; v++){
+            if (v === cur) continue;
+            chosen[i] = v;
+            const ok = !adjacentToSet(chosen, v, i) &&
+                       new Set(chosen).size === chosen.length &&
+                       (!balanced || chosen.filter(outer).length === numBlack / 2) &&
+                       chosen.includes(1);
+            if (ok){
+              const e = energy(chosen);
+              if (e < bestE - 1e-12){ bestE = e; bestV = v; }
+            }
+          }
+          chosen[i] = bestV;
+          if (bestV !== cur) improved = true;
+        }
+      }
+      chosen.forEach(v => { result[v] = true; });
+      return result;
+    }
+    const mobiusSearchCache = new Map();
+
+    function findOptimalMobiusBlackKeys(N, K, preferBalanced) {
+      if (2 * (N | 0) > EXACT_SEARCH_MAX_KEYS) {
+        lastSearchWasExact = false;
+        return heuristicMobiusBlackKeys(N | 0, K | 0, !!preferBalanced);
+      }
+      lastSearchWasExact = true;
+      const ringSize = N | 0;
+      const numBlack = K | 0;
+      const limit = 2 * ringSize;
+      const requireBalanced = !!preferBalanced && numBlack % 2 === 0;
+      const cacheKey = `${ringSize},${numBlack},${requireBalanced ? 'balanced' : 'unbalanced'}`;
+
+      if (mobiusSearchCache.has(cacheKey)) return mobiusSearchCache.get(cacheKey).slice();
+
+      const result = Array(limit).fill(false);
+      if (numBlack <= 0 || limit < 2) {
+        mobiusSearchCache.set(cacheKey, result.slice());
+        return result;
+      }
+
+      // Exact Möbius-ladder distances, matching getGraphDist in Möbius mode.
+      const distMap = Array(limit).fill(0).map(() => Array(limit).fill(0));
+      for (let i = 0; i < limit; i++) {
+        for (let j = 0; j < limit; j++) {
+          if (i === j) continue;
+          const dCycle = Math.min(Math.abs(i - j), limit - Math.abs(i - j));
+          const iJump = (i + ringSize) % limit;
+          const dJump = 1 + Math.min(Math.abs(iJump - j), limit - Math.abs(iJump - j));
+          distMap[i][j] = Math.min(dCycle, dJump);
+        }
+      }
+
+      // Symmetry normalization requested: key 0 is white and key 1 is black.
+      const chosen = [1];
+      const candidates = [];
+      for (let i = 2; i < limit; i++) candidates.push(i);
+
+      let bestEnergy = Infinity;
+      let bestChoice = null;
+      const EPS = 1e-12;
+
+      // Early discard: no two black keys may be consecutive in the Möbius cyclic order.
+      function areConsecutiveOnMobiusCycle(a, b) {
+        const delta = Math.abs(a - b);
+        return delta === 1 || delta === limit - 1;
+      }
+
+      function isAllowedByAdjacency(v) {
+        for (const u of chosen) {
+          if (areConsecutiveOnMobiusCycle(u, v)) return false;
+        }
+        return true;
+      }
+
+      function blackCountInOuterRing(choice) {
+        let count = 0;
+        for (const v of choice) if (v < ringSize) count++;
+        return count;
+      }
+
+      function search(start, remaining, currentEnergy) {
+        if (remaining === 0) {
+          if (requireBalanced && blackCountInOuterRing(chosen) !== numBlack / 2) return;
+          if (currentEnergy < bestEnergy - EPS) {
+            bestEnergy = currentEnergy;
+            bestChoice = chosen.slice();
+          }
+          return;
+        }
+
+        if (candidates.length - start < remaining) return;
+
+        if (requireBalanced) {
+          const outerChosen = blackCountInOuterRing(chosen);
+          const targetOuter = numBlack / 2;
+          if (outerChosen > targetOuter) return;
+
+          let outerAvailable = 0;
+          for (let c = start; c < candidates.length; c++) {
+            if (candidates[c] < ringSize) outerAvailable++;
+          }
+          if (outerChosen + outerAvailable < targetOuter) return;
+        }
+
+        for (let c = start; c <= candidates.length - remaining; c++) {
+          const v = candidates[c];
+          if (!isAllowedByAdjacency(v)) continue;
+
+          if (requireBalanced) {
+            const outerChosen = blackCountInOuterRing(chosen);
+            if (v < ringSize && outerChosen >= numBlack / 2) continue;
+          }
+
+          let addedEnergy = 0;
+          for (const u of chosen) addedEnergy += 1.0 / distMap[u][v];
+
+          chosen.push(v);
+          search(c + 1, remaining - 1, currentEnergy + addedEnergy);
+          chosen.pop();
+        }
+      }
+
+      search(0, numBlack - 1, 0);
+
+      if (bestChoice) bestChoice.forEach(i => { result[i] = true; });
+      else if (requireBalanced) return findOptimalMobiusBlackKeys(ringSize, numBlack, false);
+
+      mobiusSearchCache.set(cacheKey, result.slice());
+      return result;
+    }
+
+    // --- Audio System Unlock ---
+    const splash = document.getElementById('splash'), startBtn = document.getElementById('start-btn');
+    function unlockAudio() {
+      if (audioUnlocked) return;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
+      const buffer = audioCtx.createBuffer(1, 1, 22050), source = audioCtx.createBufferSource();
+      source.buffer = buffer; source.connect(audioCtx.destination); source.start(0);
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      audioUnlocked = true;
+    }
+
+    startBtn.addEventListener('click', () => {
+      unlockAudio();
+      splash.style.opacity = '0';
+      setTimeout(() => { splash.style.display = 'none'; }, 400); 
+    });
+
+    // --- Keyboard Math & Geometry ---
+    /* ---------------------------------------------------------------------
+       LAYOUT — pure function, no globals touched.
+
+       Given a TOTAL key count and a topology it returns everything needed to
+       draw one instrument.  Making this pure is what lets two pianos exist at
+       once: the comparison view calls it a second time with the opposite
+       topology and renders the result into its own canvases.
+
+       For a fixed total T the two instruments have the SAME number of keys
+       (and so the same number of graph vertices) but different topology and
+       different tuning:
+           cycle  C_T      : T notes to the octave, one ring
+           Mobius M_{T/2}  : T/2 notes to the octave, two rings, spanning two
+                             octaves and joined by the half-twist.
+       --------------------------------------------------------------------- */
+    const QW = {
+      wOut: ['a','s','d','f','g','h','j','k','l',';',"'"],
+      bOut: ['w','e','r','t','y','u','i','o','p','[',']'],
+      wIn:  ['z','x','c','v','b','n','m',',','.','/'],
+      bIn:  ['1','2','3','4','5','6','7','8','9','0','-','=']
+    };
+    const RING_PROPS = {
+      mobius: [ { rwOut: 190, rwIn: 114, rbOut: 154, rbIn: 114 },   // outer ring
+                { rwOut: 110, rwIn: 35,  rbOut: 110, rbIn: 70  } ], // inner ring
+      cycle:  [ { rwOut: 190, rwIn: 35,  rbOut: 110, rbIn: 35  } ]
+    };
+
+    function buildLayout(totalKeys, mobius, blackKeys, preferBalanced) {
+      const ringN = mobius ? totalKeys / 2 : totalKeys;   // keys per octave
+      const Kt = Math.min(blackKeys, Math.floor(totalKeys / 2));
+
+      let isBlack = Array(totalKeys).fill(false);
+      let standardPianoMap = null;
+
+      if (!mobius) {
+        if (ringN === 12 && Kt === 5) {
+          [1, 3, 6, 8, 10].forEach(i => isBlack[i] = true);
+          standardPianoMap = {0:'a',1:'w',2:'s',3:'e',4:'d',5:'f',6:'t',7:'g',8:'y',9:'h',10:'u',11:'j'};
+        } else {
+          for (let i = 0; i < Kt; i++) isBlack[(Math.floor((i * ringN) / Kt) + 1) % ringN] = true;
+        }
+      } else {
+        isBlack = findOptimalMobiusBlackKeys(ringN, Kt, preferBalanced);
+      }
+
+      const layoutKeys = [];
+      const rings = mobius ? 2 : 1;
+      const props = mobius ? RING_PROPS.mobius : RING_PROPS.cycle;
+
+      for (let ring = 0; ring < rings; ring++) {
+        // count blacks in THIS ring so uneven distributions still space evenly
+        let kRing = 0;
+        for (let i = 0; i < ringN; i++) if (isBlack[i + ring * ringN]) kRing++;
+        const W = ringN - kRing;
+        const angleW = (Math.PI * 2) / W;
+        const blackWidth = angleW * 0.55;
+        const rotationOffset = -angleW / 2;
+
+        let currentWhite = 0, wIdx = 0, bIdx = 0;
+        const pr = props[ring];
+
+        for (let i = 0; i < ringN; i++) {
+          const logicalIndex = i + ring * ringN;
+          const isB = isBlack[logicalIndex];
+          const ql = (ring === 0)
+            ? (standardPianoMap ? standardPianoMap[i] : (isB ? QW.bOut[bIdx++ % 11] : QW.wOut[wIdx++ % 11]))
+            : (isB ? QW.bIn[bIdx++ % 12] : QW.wIn[wIdx++ % 10]);
+
+          const labRad = isB ? pr.rbOut - 15
+                             : ((ring === 1 && mobius) ? pr.rwIn + 22 : pr.rwOut - 22);
+
+          if (isB) {
+            layoutKeys.push({ index: logicalIndex, isBlack: true,
+              center: currentWhite * angleW + rotationOffset, width: blackWidth,
+              rOuter: pr.rbOut, rInner: pr.rbIn, qwertyLabel: ql, labelRadius: labRad });
+          } else {
+            layoutKeys.push({ index: logicalIndex, isBlack: false,
+              start: currentWhite * angleW + rotationOffset,
+              end: (currentWhite + 1) * angleW + rotationOffset, whiteIndex: currentWhite,
+              rOuter: pr.rwOut, rInner: pr.rwIn, qwertyLabel: ql, labelRadius: labRad });
+            currentWhite++;
+          }
+        }
+      }
+      return { N: ringN, K: Kt, total: totalKeys, mobius, keys: layoutKeys, isBlackArr: isBlack };
+    }
+
+    function updateKeyboard() {
+      showMobius = mobiusToggle.checked;
+      const preferBalanced = balancedToggle.checked;
+      showQwerty = qwertyToggle.checked; showInteger = integerToggle.checked;
+      showDistances = distancesToggle.checked; showPolygons = polygonsToggle.checked;
+      showCompare = compareToggle.checked;
+
+      /* The slider is TOTAL keys.  Mobius always needs an even total (two
+         rings).  In comparison mode the two instruments are matched by
+         NOTES PER OCTAVE, not by total key count, so that both play the
+         SAME scale at the same pitches — matching totals instead would put
+         two different tunings side by side.  The Mobius partner therefore
+         has twice the keys of the cycle, spanning two octaves of the very
+         same n-note scale.  That caps the cycle at half the Mobius limit. */
+      let totalKeys = parseInt(nSlider.value);
+      const mobCap = Math.min(parseInt(nSlider.max), MOBIUS_MAX_TOTAL_KEYS);
+      if (showMobius) {
+        if (totalKeys > mobCap) totalKeys = mobCap;
+        if (totalKeys % 2 !== 0) totalKeys = (totalKeys + 1 <= mobCap) ? totalKeys + 1 : totalKeys - 1;
+        nSlider.value = totalKeys;
+      } else {
+        // a cycle's total IS its notes per octave; comparison needs a Mobius
+        // partner of twice the size, which is already within the same cap
+        const cap = MAX_NOTES_PER_OCTAVE;
+        if (totalKeys > cap) { totalKeys = cap; nSlider.value = totalKeys; }
+      }
+
+      const maxK = Math.floor(totalKeys / 2);
+      kSlider.max = maxK;
+      if (parseInt(kSlider.value) > maxK) kSlider.value = maxK;
+
+      const layout = buildLayout(totalKeys, showMobius, parseInt(kSlider.value), preferBalanced);
+      N = layout.N; K = layout.K; keys = layout.keys; isBlackArr = layout.isBlackArr;
+
+      document.getElementById('n-val').innerText = totalKeys;
+      document.getElementById('k-val').innerText = K;
+
+      /* The partner instrument: opposite topology, SAME notes per octave.
+         Its black keys are scaled to keep the same proportion, so the two
+         min-energy sets are genuinely comparable (the Mobius set is not
+         merely the cycle's set repeated — that is the point of looking). */
+      if (showCompare) {
+        const partnerTotal = showMobius ? N : 2 * N;      // same N per octave
+        const partnerK = showMobius ? Math.max(1, Math.round(K / 2))
+                                    : Math.min(2 * K, partnerTotal / 2);
+        compareLayout = buildLayout(partnerTotal, !showMobius, partnerK, preferBalanced);
+      } else {
+        compareLayout = null;
+      }
+      const exactEl = document.getElementById('search-note');
+      exactEl.textContent = (showMobius || showCompare)
+        ? (lastSearchWasExact ? 'black keys: exact minimum energy'
+                              : 'black keys: near-optimal (exhaustive search too slow above '
+                                + EXACT_SEARCH_MAX_KEYS + ' keys)')
+        : 'black keys: exact minimum energy';
+      compareWrapper.classList.toggle('hidden', !showCompare);
+      document.getElementById('compare-caption').innerHTML = showCompare
+        ? (compareLayout.mobius
+            ? `Möbius ladder M<sub>${compareLayout.N}</sub> &mdash; ${compareLayout.total} keys, `
+              + `<b>the same ${N} notes per octave</b>, spanning two octaves &nbsp;·&nbsp; ${compareLayout.K} black`
+            : `Cycle C<sub>${compareLayout.total}</sub> &mdash; ${compareLayout.total} keys, `
+              + `<b>the same ${N} notes per octave</b>, one octave &nbsp;·&nbsp; ${compareLayout.K} black`)
+        : '';
+
+      updateMidiStatus();
+      draw();
+    }
+
+    // --- Canvas Drawing Logic ---
+    function drawWedge(rInner, rOuter, logicalStart, logicalEnd, color) {
+      ctx.beginPath(); 
+      ctx.arc(cx, cy, rOuter, Math.PI / 2 - logicalEnd, Math.PI / 2 - logicalStart);
+      ctx.arc(cx, cy, rInner, Math.PI / 2 - logicalStart, Math.PI / 2 - logicalEnd, true);
+      ctx.closePath(); 
+      ctx.fillStyle = color; ctx.fill();
+      ctx.strokeStyle = '#222'; ctx.lineWidth = 2.5; ctx.stroke();
+    }
+
+    const drawArrowHead = (x, y, angle) => {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      
+      const stemOverhang = 2; 
+
+      ctx.beginPath();
+      ctx.moveTo(9, 0);
+      ctx.lineTo(0, -6);
+      ctx.lineTo(0, 6);
+      ctx.closePath();
+      ctx.fillStyle = '#111';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(8, 0);
+      ctx.lineTo(stemOverhang, -4);
+      ctx.lineTo(stemOverhang, 4);
+      ctx.closePath();
+      ctx.fillStyle = '#FFB81C';
+      ctx.fill();
+      
+      ctx.restore();
+    };
+
+    const drawDirectedHorizontalCurve = (from, to) => {
+      const dir = to.x >= from.x ? 1 : -1;
+      const cpOffset = Math.max(30, Math.abs(to.x - from.x) * 0.5);
+      const c1 = { x: from.x + dir * cpOffset, y: from.y };
+      const c2 = { x: to.x - dir * cpOffset, y: to.y };
+
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, to.x, to.y);
+      ctx.strokeStyle = '#111'; ctx.lineWidth = 6; ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, to.x, to.y);
+      ctx.strokeStyle = '#FFB81C'; ctx.lineWidth = 3; ctx.stroke();
+
+      drawArrowHead(to.x, to.y, Math.atan2(to.y - c2.y, to.x - c2.x));
+    };
+
+    function drawMobiusArrows() {
+      if (!showMobius) return;
+
+      const keyOutC = keys.find(k => k.index === 0);         
+      const keyOutB = keys.find(k => k.index === N - 1);    
+      const keyInC  = keys.find(k => k.index === N);         
+      const keyInB  = keys.find(k => k.index === 2 * N - 1); 
+
+      if (!keyOutC || !keyOutB || !keyInC || !keyInB) return;
+
+      const getCenterAngle = (k) => k.isBlack ? k.center : (k.start + k.end) / 2;
+      const getRadius = (k) => (k.rOuter + k.rInner) / 2; 
+      const getPoint = (k) => {
+        const ang = Math.PI / 2 - getCenterAngle(k);
+        const r = getRadius(k);
+        return { x: cx + Math.cos(ang) * r, y: cy + Math.sin(ang) * r };
+      };
+
+      const pOutC = getPoint(keyOutC), pOutB = getPoint(keyOutB);
+      const pInC  = getPoint(keyInC),  pInB  = getPoint(keyInB);
+
+      drawDirectedHorizontalCurve(pInB, pOutC);
+      drawDirectedHorizontalCurve(pOutB, pInC);
+    }
+
+    function drawLabels() {
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = 'bold 15px Georgia, serif'; 
+      for (let key of keys) {
+        const angle = key.isBlack ? key.center : (key.start + key.end) / 2;
+        const tx = cx + Math.cos(Math.PI/2 - angle) * key.labelRadius;
+        const ty = cy + Math.sin(Math.PI/2 - angle) * key.labelRadius;
+        ctx.fillStyle = key.isBlack ? '#f0f0f0' : '#333';
+        let lines = [];
+        if (showInteger) lines.push(N === 12 && !showMobius ? noteNames12[key.index % N] : key.index);
+        if (showQwerty) lines.push(key.qwertyLabel.toUpperCase());
+        if (lines.length === 1) ctx.fillText(lines[0], tx, ty);
+        else if (lines.length === 2) { ctx.fillText(lines[0], tx, ty - 8); ctx.fillText(lines[1], tx, ty + 8); }
+      }
+    }
+
+    function getNodePos(i) {
+      if (!showMobius) {
+        const a = Math.PI / 2 - i * (Math.PI * 2) / N;
+        return { x: gx + Math.cos(a) * rGraph, y: gy + Math.sin(a) * rGraph };
+      } else {
+        const R = rGraph - 25; 
+        const w = 35;          
+        const u = Math.PI / 2 - i * (Math.PI * 2) / N; 
+        const v = i * Math.PI / N;                     
+        const lx = (R + w * Math.cos(v)) * Math.cos(u);
+        const ly = (R + w * Math.cos(v)) * Math.sin(u);
+        const lz = w * Math.sin(v);
+        const tilt = 0.7; 
+        return { x: gx + lx, y: gy + ly * Math.cos(tilt) - lz * Math.sin(tilt) };
+      }
+    }
+
+    function drawGraph(activeIndices) {
+      gCtx.clearRect(0, 0, 400, 400);
+      const limit = showMobius ? N * 2 : N;
+
+      if (showMobius) {
+        gCtx.beginPath();
+        for (let i = 0; i < N; i++) {
+          const p1 = getNodePos(i); const p2 = getNodePos(i + N);
+          gCtx.moveTo(p1.x, p1.y); gCtx.lineTo(p2.x, p2.y);
+        }
+        gCtx.strokeStyle = 'rgba(34, 34, 34, 0.4)'; gCtx.lineWidth = 1.5; gCtx.stroke();
+      }
+
+      gCtx.beginPath();
+      for (let i = 0; i <= limit; i++) {
+        const p = getNodePos(i % limit);
+        i === 0 ? gCtx.moveTo(p.x, p.y) : gCtx.lineTo(p.x, p.y);
+      }
+      gCtx.strokeStyle = '#222'; gCtx.lineWidth = 2.5; gCtx.stroke();
+
+      const activeArr = Array.from(activeIndices).sort((a, b) => a - b);
+      if (activeArr.length > 1) {
+        let polyArea = 0, cxSum = 0, cySum = 0;
+        
+        if (showPolygons) {
+          gCtx.beginPath();
+          for (let i = 0; i < activeArr.length; i++) {
+            const uIdx = activeArr[i], p = getNodePos(uIdx);
+            cxSum += p.x; cySum += p.y;
+            i === 0 ? gCtx.moveTo(p.x, p.y) : gCtx.lineTo(p.x, p.y);
+            const a1 = Math.PI / 2 - uIdx * (Math.PI * 2) / limit;
+            const a2 = Math.PI / 2 - activeArr[(i + 1) % activeArr.length] * (Math.PI * 2) / limit;
+            polyArea += Math.sin(a1 - a2);
+          }
+          if (activeArr.length >= 3) { gCtx.closePath(); gCtx.fillStyle = 'rgba(255, 184, 28, 0.3)'; gCtx.fill(); }
+          gCtx.strokeStyle = '#FFB81C'; gCtx.lineWidth = 2.5; gCtx.stroke();
+        }
+        
+        if (showDistances) {
+          activeArr.forEach((u, i) => {
+            activeArr.slice(i+1).forEach(v => {
+              const p1 = getNodePos(u), p2 = getNodePos(v);
+              gCtx.beginPath(); gCtx.moveTo(p1.x, p1.y); gCtx.lineTo(p2.x, p2.y);
+              gCtx.strokeStyle = '#FFB81C'; gCtx.stroke();
+              
+              const dist = getGraphDist(u, v);
+              const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
+              
+              gCtx.beginPath(); gCtx.arc(mx, my, 8, 0, Math.PI*2); gCtx.fillStyle='#fff'; gCtx.fill();
+              gCtx.strokeStyle='#FFB81C'; gCtx.lineWidth=1.5; gCtx.stroke();
+              gCtx.fillStyle='#FFB81C'; gCtx.font='bold 10px sans-serif'; gCtx.textAlign='center'; gCtx.fillText(dist, mx, my+3);
+            });
+          });
+        }
+        
+        if (showPolygons && activeArr.length >= 3) {
+          const finalArea = Math.abs(polyArea * 0.5), text = `A=${finalArea.toFixed(2)}`;
+          const polyCX = cxSum / activeArr.length, polyCY = cySum / activeArr.length;
+          
+          gCtx.font = 'bold 12px sans-serif';
+          const textWidth = gCtx.measureText(text).width;
+          
+          gCtx.beginPath();
+          gCtx.arc(polyCX - textWidth / 2, polyCY, 10, Math.PI / 2, Math.PI * 1.5);
+          gCtx.arc(polyCX + textWidth / 2, polyCY, 10, Math.PI * 1.5, Math.PI / 2);
+          gCtx.closePath();
+          
+          gCtx.fillStyle = '#fff'; gCtx.fill();
+          gCtx.strokeStyle = '#FFB81C'; gCtx.lineWidth = 1.5; gCtx.stroke();
+          gCtx.fillStyle = '#FFB81C'; gCtx.textAlign = 'center'; gCtx.textBaseline = 'middle'; gCtx.fillText(text, polyCX, polyCY);
+        }
+      }
+
+      const vRad = Math.max(6, Math.min(18, (rGraph * Math.PI / limit) * 0.7));
+      for (let i = 0; i < limit; i++) {
+        const p = getNodePos(i);
+        gCtx.beginPath(); gCtx.arc(p.x, p.y, vRad, 0, Math.PI * 2);
+        
+        const active = activeIndices.has(i), isB = isBlackArr[i];
+        gCtx.fillStyle = isB ? (active ? '#D49A18' : '#222') : (active ? '#FFB81C' : '#fff'); gCtx.fill(); 
+        gCtx.strokeStyle = active ? (isB ? '#fff' : '#111') : '#222'; gCtx.lineWidth = active ? 3 : 2; gCtx.stroke();
+        
+        if (vRad >= 10) {
+          gCtx.fillStyle = isB ? (active ? '#fff' : '#ddd') : (active ? '#000' : '#444');
+          gCtx.font = `bold ${Math.max(9, vRad - 4)}px sans-serif`; gCtx.textAlign = 'center'; gCtx.fillText(i, p.x, p.y + 4);
+        }
+      }
+    }
+
+    // Draw one instrument into the currently-selected contexts.
+    function drawInstrument(activeIndices) {
+      ctx.clearRect(0, 0, 400, 400);
+      keys.filter(k => !k.isBlack).forEach(k =>
+        drawWedge(k.rInner, k.rOuter, k.start, k.end, activeIndices.has(k.index) ? '#FFB81C' : '#fff'));
+      keys.filter(k => k.isBlack).forEach(k =>
+        drawWedge(k.rInner, k.rOuter, k.center - k.width/2, k.center + k.width/2,
+                  activeIndices.has(k.index) ? '#D49A18' : '#222'));
+      drawMobiusArrows();
+      if (showQwerty || showInteger) drawLabels();
+      drawGraph(activeIndices);
+    }
+
+    /* ---------------------------------------------------------------------
+       Carry a sounding note from one instrument to the other BY FREQUENCY.
+       Key j on an instrument with n notes per octave sounds 261.63*2^(j/n),
+       so the same pitch sits at j' = j * n' / n on the other, rounded to the
+       nearest key and reduced modulo its total.
+
+       In comparison mode the partner shares n, so this reduces to j' = j mod
+       total' — EXACTLY the same pitch, never a retuning.  The cycle's single
+       octave is the Mobius ladder's two octaves folded in half: keys j and
+       j + n of the ladder both land on cycle key j, an octave apart on one
+       instrument and the same key on the other.  The general formula is kept
+       so the function stays correct if the two n ever differ again.
+       --------------------------------------------------------------------- */
+    function carryIndex(j, nFrom, nTo, totalTo) {
+      const t = Math.round(j * nTo / nFrom);
+      return ((t % totalTo) + totalTo) % totalTo;
+    }
+
+    function draw() {
+      const activeIndices = new Set(Array.from(activeVoices.values()).map(v => v.index));
+      drawInstrument(activeIndices);
+
+      if (!showCompare || !compareLayout) return;
+
+      // Render the opposite topology by pointing the drawing code at the
+      // comparison canvases and its layout, then putting everything back.
+      const sN = N, sMobius = showMobius, sKeys = keys, sBlack = isBlackArr;
+      const sCtx2 = ctx, sG = gCtx;
+      const carried = new Set();
+      for (const j of activeIndices)
+        carried.add(carryIndex(j, sN, compareLayout.N, compareLayout.total));
+
+      N = compareLayout.N; showMobius = compareLayout.mobius;
+      keys = compareLayout.keys; isBlackArr = compareLayout.isBlackArr;
+      ctx = ctx2; gCtx = gCtx2;
+      try {
+        drawInstrument(carried);
+      } finally {
+        N = sN; showMobius = sMobius; keys = sKeys; isBlackArr = sBlack;
+        ctx = sCtx2; gCtx = sG;
+      }
+    }
+
+    // --- Web Audio Synthesis Engine ---
+    function startVoice(index) {
+      if (!audioUnlocked) unlockAudio();
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+
+      const masterGain = audioCtx.createGain();
+      masterGain.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+      
+      masterGain.gain.setValueAtTime(0, now);
+      const targetVolume = shepardToggle.checked ? 0.05 : 0.15;
+      masterGain.gain.setTargetAtTime(targetVolume * midiGainScale(), now, 0.01);
+
+      const oscillators = [];
+      const baseFreq = 261.63 * Math.pow(2, index / N);
+
+      if (showMobius && shepardToggle.checked) {
+        for (let i = -2; i <= 2; i++) {
+          const freq = baseFreq * Math.pow(4, i); 
+          const osc = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          const lfreq = Math.log2(freq / 261.63);
+          const volume = Math.exp(-0.5 * Math.pow(lfreq / 2.0, 2)); 
+          osc.type = 'sine'; osc.frequency.value = freq; g.gain.value = volume;
+          osc.connect(g); g.connect(masterGain); osc.start(now);
+          oscillators.push(osc);
+        }
+      } else if (shepardToggle.checked) {
+        for (let i = -3; i <= 3; i++) {
+          const freq = baseFreq * Math.pow(2, i);
+          const osc = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          const lfreq = Math.log2(freq / 261.63);
+          const volume = Math.exp(-0.5 * Math.pow(lfreq / 1.5, 2)); 
+          osc.type = 'sine'; osc.frequency.value = freq; g.gain.value = volume;
+          osc.connect(g); g.connect(masterGain); osc.start(now);
+          oscillators.push(osc);
+        }
+      } else {
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine'; osc.frequency.value = baseFreq;
+        osc.connect(masterGain); osc.start(now);
+        oscillators.push(osc);
+      }
+
+      const voiceId = nextVoiceId++;
+      activeVoices.set(voiceId, { oscillators, gain: masterGain, index });
+      requestAnimationFrame(draw); 
+      return voiceId;
+    }
+
+    function stopVoice(voiceId) {
+      if (!activeVoices.has(voiceId)) return;
+      const { oscillators, gain } = activeVoices.get(voiceId);
+      const now = audioCtx.currentTime;
+      gain.gain.cancelScheduledValues(now);
+      gain.gain.setValueAtTime(gain.gain.value, now);
+      gain.gain.linearRampToValueAtTime(0.0001, now + 0.1); 
+      oscillators.forEach(o => o.stop(now + 0.15));
+      activeVoices.delete(voiceId);
+      sustainedVoices.delete(voiceId);
+      requestAnimationFrame(draw);
+    }
+
+    function releaseVoice(voiceId) {
+      if (isSustainDown) sustainedVoices.add(voiceId);
+      else stopVoice(voiceId);
+    }
+
+    function handleSustainChange(active) {
+      isSustainDown = active; sustainToggle.checked = active;
+      if (active) sustainContainer.classList.add('sustain-active');
+      else {
+        sustainContainer.classList.remove('sustain-active');
+        const held = new Set([...pointerToVoice.values(), ...keyToVoice.values(), ...midiHeldVoiceIds()]);
+        if (arpVoiceId !== null) held.add(arpVoiceId);
+        sustainedVoices.forEach(id => { if (!held.has(id)) stopVoice(id); });
+      }
+    }
+
+    function handleAutoplayChange(active) {
+      if (active) {
+        if (!audioUnlocked) unlockAudio();
+        if (midi.playing) midiStop();          // MIDI and the arpeggiator are mutually exclusive
+        arpIndex = 0;
+        autoplayInterval = setInterval(() => {
+          if (arpVoiceId !== null) releaseVoice(arpVoiceId);
+          let limit = showMobius ? N * 2 : N;
+          if (arpIndex >= limit) arpIndex = 0;
+          arpVoiceId = startVoice(arpIndex);
+          arpIndex++;
+        }, 350); 
+      } else {
+        clearInterval(autoplayInterval);
+        autoplayInterval = null;
+        if (arpVoiceId !== null) { releaseVoice(arpVoiceId); arpVoiceId = null; }
+      }
+    }
+
+    /* =====================================================================
+       MIDI PLAYBACK ON THE CYCLIC KEYBOARD
+       ---------------------------------------------------------------------
+       Key index j sounds 261.63 * 2^(j/N) Hz, so the instrument is N equal
+       steps per octave; in Möbius mode indices run 0..2N-1 and the ladder
+       spans TWO octaves.  A MIDI note m (frequency 440*2^((m-69)/12), with
+       middle C = 60 anchored on key 0) therefore sits at exact position
+
+            x(m) = (m - 60) * N / 12       [in keyboard steps]
+
+       and we take  index = round(x(m)) mod L,  L = total keys.
+
+         * If 12 | N then x(m) is an integer: the 12-EDO lattice embeds in
+           the N-EDO lattice and every MIDI note lands EXACTLY on a key
+           (this is the "representative" case; mod L is the octave loop).
+         * Otherwise round to the nearest key in log-frequency (cents),
+           which is the musically correct reading of "nearest frequency"
+           and the only one invariant under octave transposition.
+
+       Rounding is the identity on integers, so one formula covers both.
+       Since x(m+12) = x(m) + N exactly, the map is octave-invariant.
+       ===================================================================== */
+
+    const MIDI_ANCHOR = 60;                       // middle C sits on key 0
+
+    const midi = {
+      song: null, playing: false, timer: null,
+      t0: 0, i: 0, rate: 1, loop: true,
+      live: [],                                   // {voiceId, endTime, midiNote}
+      skipDrums: true                             // channel 10 (index 9)
+    };
+
+    function totalKeyCount(){ return showMobius ? N * 2 : N; }
+
+    // exact position of MIDI note m in keyboard steps
+    function midiExactPos(m){ return (m - MIDI_ANCHOR) * N / 12; }
+
+    // MIDI note -> key index on the CURRENT keyboard
+    function midiToIndex(m){
+      const L = totalKeyCount();
+      const j = Math.round(midiExactPos(m));
+      return ((j % L) + L) % L;
+    }
+
+    // signed tuning error in cents (identically 0 when 12 | N)
+    function midiErrorCents(m){
+      return (Math.round(midiExactPos(m)) - midiExactPos(m)) * (1200 / N);
+    }
+
+    // keep the mix sane when a dense MIDI file stacks many voices
+    function midiGainScale(){
+      if (!midi.playing) return 1;
+      return 1 / Math.sqrt(Math.max(1, midi.live.length));
+    }
+
+    function midiHeldVoiceIds(){ return midi.live.map(v => v.voiceId); }
+
+    /* ------------------------- Standard MIDI File ------------------------ */
+
+    function parseMidi(buffer){
+      const d = new DataView(buffer), U8 = new Uint8Array(buffer);
+      let p = 0;
+      const str = n => { let s = ""; for (let i = 0; i < n; i++) s += String.fromCharCode(U8[p++]); return s; };
+      const u32 = () => { const v = d.getUint32(p); p += 4; return v; };
+      const u16 = () => { const v = d.getUint16(p); p += 2; return v; };
+
+      if (str(4) !== "MThd") throw new Error("not a MIDI file (no MThd header)");
+      const hlen = u32(); u16(); const ntrk = u16(); const div = u16();
+      p += hlen - 6;                                    // tolerate long headers
+      if (div & 0x8000) throw new Error("SMPTE time division is not supported");
+      const TPQ = div;                                  // ticks per quarter note
+
+      const events = [];
+      const tempos = [{ tick: 0, us: 500000 }];         // default 120 bpm
+
+      for (let t = 0; t < ntrk; t++){
+        if (p + 8 > U8.length || str(4) !== "MTrk") break;
+        const len = u32(), end = Math.min(p + len, U8.length);
+        let tick = 0, status = 0;
+        while (p < end){
+          let dt = 0, b;
+          do { b = U8[p++]; dt = (dt << 7) | (b & 0x7f); } while (b & 0x80);   // VLQ
+          tick += dt;
+
+          let cmd = U8[p];
+          if (cmd & 0x80){ p++; status = cmd; } else { cmd = status; }         // running status
+          const hi = cmd & 0xf0, ch = cmd & 0x0f;
+
+          if (cmd === 0xff){                             // meta
+            const type = U8[p++];
+            let ln = 0; do { b = U8[p++]; ln = (ln << 7) | (b & 0x7f); } while (b & 0x80);
+            if (type === 0x51 && ln === 3)
+              tempos.push({ tick, us: (U8[p] << 16) | (U8[p+1] << 8) | U8[p+2] });
+            p += ln;
+          } else if (cmd === 0xf0 || cmd === 0xf7){      // sysex
+            let ln = 0; do { b = U8[p++]; ln = (ln << 7) | (b & 0x7f); } while (b & 0x80);
+            p += ln;
+          } else if (hi === 0x90 || hi === 0x80){        // note on / off
+            const note = U8[p++], vel = U8[p++];
+            events.push({ tick, on: (hi === 0x90 && vel > 0), note, vel, ch });
+          } else if (hi === 0xa0 || hi === 0xb0 || hi === 0xe0){ p += 2; }
+          else if (hi === 0xc0 || hi === 0xd0){ p += 1; }
+          else { p += 1; }
+        }
+        p = end;
+      }
+
+      // ---- tick -> seconds via the tempo map ----
+      tempos.sort((a,b) => a.tick - b.tick);
+      const marks = []; let sec = 0, prev = tempos[0];
+      marks.push({ tick: 0, sec: 0, us: prev.us });
+      for (let i = 1; i < tempos.length; i++){
+        const cur = tempos[i];
+        sec += (cur.tick - prev.tick) / TPQ * (prev.us / 1e6);
+        marks.push({ tick: cur.tick, sec, us: cur.us });
+        prev = cur;
+      }
+      const toSec = tick => {
+        let m = marks[0];
+        for (let i = 1; i < marks.length && marks[i].tick <= tick; i++) m = marks[i];
+        return m.sec + (tick - m.tick) / TPQ * (m.us / 1e6);
+      };
+
+      // ---- pair note-ons with note-offs ----
+      events.sort((a,b) => a.tick - b.tick || (a.on ? 1 : 0) - (b.on ? 1 : 0));
+      const open = new Map(), notes = [];
+      for (const e of events){
+        const key = e.ch * 128 + e.note;
+        if (e.on){
+          if (!open.has(key)) open.set(key, []);
+          open.get(key).push(e);
+        } else {
+          const stack = open.get(key);
+          if (stack && stack.length){
+            const s = stack.shift();
+            notes.push({ note: e.note, ch: e.ch, vel: s.vel, time: toSec(s.tick),
+                         dur: Math.max(0.05, toSec(e.tick) - toSec(s.tick)) });
+          }
+        }
+      }
+      for (const [, stack] of open) for (const s of stack)
+        notes.push({ note: s.note, ch: s.ch, vel: s.vel, time: toSec(s.tick), dur: 0.5 });
+
+      notes.sort((a,b) => a.time - b.time);
+      if (!notes.length) throw new Error("no notes found in that file");
+      groupChords(notes);
+      const duration = notes.reduce((mx,n) => Math.max(mx, n.time + n.dur), 0);
+      return { notes, duration };
+    }
+
+    /* =====================================================================
+       THE RATIONALIZER
+       ---------------------------------------------------------------------
+       A MIDI note whose exact position x(m) is not an integer falls strictly
+       between two keys, floor(x) and ceil(x).  For a chord of m simultaneous
+       notes that is 2^m possible spellings.  We score each spelling by the
+       total consonance of its intervals and take the best (or the worst).
+
+       CONSONANCE = EULER'S GRADUS SUAVITATIS (Tentamen novae theoriae
+       musicae, 1739).  For a ratio p/q in lowest terms with pq = prod p_i^e_i,
+
+              Gamma(p/q) = 1 + sum_i e_i (p_i - 1).
+
+       Small values are sweet: Gamma(1/1)=1, Gamma(2/1)=2, Gamma(3/2)=4,
+       Gamma(4/3)=5, Gamma(5/4)=7, Gamma(16/15)=11.  A tempered interval is
+       not a ratio, so each interval is first approximated by the rational
+       p/q of least gradus lying within TOL cents of it (ties broken by
+       smaller tuning error); intervals with no simple neighbour get a flat
+       penalty, which is what makes "least consonant" seek them out.
+
+       Since every interval on this keyboard is a whole number of steps, the
+       whole calculation collapses to a lookup table indexed by step
+       difference, rebuilt only when N changes.
+
+       NOTE: Gamma(1/1) = 1 is the global minimum, so "most consonant" may
+       deliberately fuse two voices onto one key.  That is intended here.
+       ===================================================================== */
+
+    // How far a ratio may be mistuned before we refuse to hear it AS that
+    // ratio.  Tied to the instrument's own resolution (half a keyboard step),
+    // so it tightens automatically as N grows: with a fixed 45c window, a
+    // one-step interval on N=31 (38.7c) would be "interpreted" as a unison.
+    function gradusTol(){ return Math.max(600 / N, 12); }
+    const GRADUS_MAXTERM = 32;      // largest numerator/denominator considered
+    const GRADUS_PENALTY = 20;      // score for an interval with no simple ratio
+    let gradusTable = null, gradusTableKey = "";
+
+    function gcd(a, b){ while (b){ const t = a % b; a = b; b = t; } return a; }
+
+    function eulerGradus(p, q){
+      let n = p * q, s = 1;
+      for (let f = 2; f * f <= n; f++){
+        while (n % f === 0){ s += (f - 1); n /= f; }
+      }
+      if (n > 1) s += (n - 1);
+      return s;
+    }
+
+    // least-gradus rational within the tolerance of the given interval
+    function bestGradusForCents(cents){
+      let tol = gradusTol();
+      for (let attempt = 0; attempt < 6; attempt++, tol *= 1.6){
+        let best = null;
+        for (let q = 1; q <= GRADUS_MAXTERM; q++){
+          for (let p = q; p <= GRADUS_MAXTERM * 2; p++){
+            if (gcd(p, q) !== 1) continue;
+            const c = 1200 * Math.log2(p / q);
+            if (c < cents - tol) continue;
+            if (c > cents + tol) break;                   // c increases with p
+            const g = eulerGradus(p, q), err = Math.abs(c - cents);
+            if (!best || g < best.g || (g === best.g && err < best.err))
+              best = { p, q, g, err };
+          }
+        }
+        if (best) return best;
+      }
+      return { p: 0, q: 0, g: GRADUS_PENALTY, err: 0 };
+    }
+
+    // table[d] = gradus of the interval spanning d keyboard steps
+    function buildGradusTable(){
+      const L = totalKeyCount(), key = N + ":" + L;
+      if (gradusTableKey === key && gradusTable) return gradusTable;
+      const t = new Array(L + 1);
+      for (let d = 0; d <= L; d++) t[d] = bestGradusForCents(d * 1200 / N).g;
+      gradusTable = t; gradusTableKey = key;
+      return t;
+    }
+
+    /* ---------------------------------------------------------------------
+       SECOND MEASURE: harmonic entropy (Erlich).  Instead of committing to
+       one rational interpretation, put a Gaussian of width SIGMA cents over
+       the tempered interval, weight every Farey ratio p/q (q <= HE_MAXQ) by
+       1/sqrt(pq), normalise, and take the Shannon entropy of the resulting
+       distribution.  A tempered interval sitting squarely on a simple ratio
+       has one dominant interpretation and LOW entropy; an ambiguous interval
+       spreads its probability over many complex ratios and scores HIGH.
+
+       Both measures therefore point the same way — smaller = more consonant
+       — so the Most/Least Consonant buttons need no sign change.  Unlike
+       Euler's Gamma it is continuous in the interval and needs no tolerance
+       parameter, but it gives real-valued scores rather than integers.
+       --------------------------------------------------------------------- */
+
+    const HE_MAXQ = 40, HE_SIGMA = 17;      // Farey depth; Gaussian width, cents
+    let heRatios = null;
+    function heRatioList(){
+      if (heRatios) return heRatios;
+      heRatios = [];
+      for (let q = 1; q <= HE_MAXQ; q++)
+        for (let p = q; p <= 2 * q; p++)
+          if (gcd(p, q) === 1)
+            heRatios.push({ c: 1200 * Math.log2(p / q), w: 1 / Math.sqrt(p * q) });
+      return heRatios;
+    }
+    function harmonicEntropy(cents){
+      const rs = heRatioList();
+      let Z = 0; const ws = new Array(rs.length);
+      for (let i = 0; i < rs.length; i++){
+        const d = (rs[i].c - cents) / HE_SIGMA;
+        const w = rs[i].w * Math.exp(-0.5 * d * d);
+        ws[i] = w; Z += w;
+      }
+      if (Z <= 0) return 5;
+      let H = 0;
+      for (let i = 0; i < rs.length; i++){
+        const pr = ws[i] / Z;
+        if (pr > 1e-12) H -= pr * Math.log(pr);
+      }
+      return H;
+    }
+
+    let ratMetric = 'euler';        // 'euler' | 'entropy'
+    let heTable = null, heTableKey = "";
+    function buildEntropyTable(){
+      const L = totalKeyCount(), key = N + ":" + L;
+      if (heTableKey === key && heTable) return heTable;
+      const t = new Array(L + 1);
+      for (let d = 0; d <= L; d++)
+        t[d] = harmonicEntropy(((d * 1200 / N) % 1200 + 1200) % 1200);  // octave-reduced
+      heTable = t; heTableKey = key;
+      return t;
+    }
+
+    // total score of a spelling under the selected measure (lower = sweeter)
+    function chordScore(indices){
+      const t = (ratMetric === 'entropy') ? buildEntropyTable() : buildGradusTable();
+      let s = 0;
+      for (let a = 0; a < indices.length; a++)
+        for (let b = a + 1; b < indices.length; b++)
+          s += t[Math.abs(indices[b] - indices[a])];
+      return s;
+    }
+
+    let ratMode = 'off';            // 'off' | 'consonant' | 'dissonant'
+    let lastChordScore = null;
+
+    // Choose keys for a set of simultaneous MIDI notes.
+    // preview = true: used by the sheet-music view, must not disturb the
+    // live score readout for the chord actually sounding.
+    function spellChord(midiNotes, preview){
+      const L = totalKeyCount();
+      const wrap = j => ((j % L) + L) % L;
+      if (ratMode === 'off' || midiNotes.length === 0)
+        return midiNotes.map(m => midiToIndex(m));
+
+      const cands = midiNotes.map(m => {
+        const x = midiExactPos(m), lo = Math.floor(x), hi = Math.ceil(x);
+        return (lo === hi) ? [wrap(lo)] : [wrap(lo), wrap(hi)];
+      });
+      // 2^m spellings; fall back to nearest for very dense chords
+      let total = 1; for (const c of cands) total *= c.length;
+      if (total > 4096){ if (!preview) lastChordScore = null; return midiNotes.map(m => midiToIndex(m)); }
+
+      let best = null;
+      for (let mask = 0; mask < total; mask++){
+        let rem = mask; const pick = [];
+        for (const c of cands){ pick.push(c[rem % c.length]); rem = Math.floor(rem / c.length); }
+        const s = chordScore(pick);
+        if (!best || (ratMode === 'consonant' ? s < best.s : s > best.s)) best = { s, pick };
+      }
+      if (!preview) lastChordScore = best.s;
+      return best.pick;
+    }
+
+    // Notes whose onsets fall within CHORD_WINDOW of each other are treated
+    // as simultaneous, and so are spelled together by the rationalizer.
+    const CHORD_WINDOW = 0.035;     // seconds
+    function groupChords(notes){
+      let g = 0, anchor = notes[0].time;
+      for (const n of notes){
+        if (n.time - anchor > CHORD_WINDOW){ g++; anchor = n.time; }
+        n.group = g;
+      }
+    }
+
+    /* =====================================================================
+       THE RATIONALIZER  —  Euler's gradus suavitatis (Tentamen, 1739)
+       ---------------------------------------------------------------------
+       When 12 does not divide N, a MIDI note falls strictly between two
+       keys a = floor(x) and b = ceil(x), so an m-note simultaneity has 2^m
+       possible realisations.  We score each realisation by the total
+       "degree of sweetness" of its intervals and take the best (or, for the
+       Least Consonant button, the worst).
+
+       For a ratio p/q in lowest terms Euler's function is
+            Gamma(pq) = 1 + sum_i e_i (p_i - 1),   pq = prod p_i^{e_i},
+       giving Gamma = 1,2,4,5,7,8,11 for 1/1, 2/1, 3/2, 4/3, 5/4, 6/5,
+       16/15 — lower is sweeter.  (Verified against Euler's own table.)
+
+       A tempered interval is not a ratio, so we interpret it as the
+       SIMPLEST ratio (least Gamma) lying within half a keyboard step of it
+       — the instrument's own resolution, so the tolerance tightens
+       automatically as N grows.  Intervals are octave-reduced, matching the
+       cyclic (and, in Shepard mode, genuinely circular) pitch structure.
+
+       A chord's score is the sum of Gamma over all pairs, including pairs
+       against notes still sounding.  Unisons score Gamma = 1, so chords are
+       allowed to fuse onto a single key.
+       ===================================================================== */
+
+    /* =====================================================================
+       LIVE SHEET MUSIC
+       ---------------------------------------------------------------------
+       A scrolling grand staff.  Diatonic staff position is what matters, so
+       each MIDI note is split into a natural degree plus an optional sharp:
+       pitch class -> degree in C major, with 1,3,6,8,10 drawn as sharps of
+       the degree below.  Writing s for the number of diatonic steps above
+       middle C, every line and space satisfies
+
+            y(s) = y(E4) - (s - 2) * (lineGap / 2),
+
+       which places the treble lines at s = 2,4,6,8,10, the bass lines at
+       s = -2,-4,...,-10, and middle C on its own ledger at s = 0 — the
+       familiar grand staff, from one formula.
+
+       Under each notehead we print the KEY INDEX it will actually sound on.
+       Those numbers change when you move N or press a Rationalizer button,
+       which is the whole point: the score stays fixed while its realisation
+       on the cyclic keyboard shifts underneath it.
+       ===================================================================== */
+
+    const staffCanvas = document.getElementById('staff');
+    const sCtx = staffCanvas.getContext('2d');
+    const staffWrapper = document.getElementById('staff-wrapper');
+    const STAFF_WINDOW = 5.5;          // seconds visible
+    const STAFF_PLAYHEAD = 0.28;       // playhead position across the width
+
+    const DEGREE = [0,0,1,1,2,3,3,4,4,5,5,6];      // pitch class -> diatonic degree
+    const IS_SHARP = [false,true,false,true,false,false,true,false,true,false,true,false];
+
+    // diatonic steps above middle C
+    function staffStep(midiNote){
+      const pc = ((midiNote % 12) + 12) % 12;
+      const octave = Math.floor(midiNote / 12) - 5;      // middle C (60) -> 0
+      return DEGREE[pc] + 7 * octave;
+    }
+
+    /* Clefs.  Musical Unicode (U+1D11E) is missing from most iOS system
+       fonts, so these are drawn as vector paths and always render.  Both are
+       anchored to the line they name: the G clef spirals on G4 (s = 4), the
+       F clef's two dots straddle F3 (s = -4).                              */
+    function drawTrebleClef(y, g){
+      const x = 62, yG = y(4);              // spiral centre sits on the G line
+      const u = g / 2.15;                   // scale unit
+      sCtx.save();
+      sCtx.translate(x, yG);
+      sCtx.strokeStyle = '#333'; sCtx.lineWidth = 1.9;
+      sCtx.lineCap = 'round'; sCtx.lineJoin = 'round';
+      sCtx.beginPath();
+      sCtx.moveTo(-0.2*u, 1.2*u);                                  // inner spiral
+      sCtx.bezierCurveTo(-2.4*u, 1.6*u, -2.6*u, -1.2*u, -0.3*u, -1.4*u);
+      sCtx.bezierCurveTo( 2.2*u, -1.6*u,  2.6*u,  1.6*u,  0.5*u,  2.6*u);
+      sCtx.bezierCurveTo(-1.9*u,  3.7*u, -3.1*u,  1.2*u, -2.2*u, -1.9*u);
+      sCtx.bezierCurveTo(-1.4*u, -4.6*u,  0.9*u, -6.0*u,  1.0*u, -8.2*u);
+      sCtx.bezierCurveTo( 1.05*u,-9.9*u, -0.5*u,-10.6*u, -1.1*u, -9.2*u);
+      sCtx.bezierCurveTo(-1.9*u, -7.3*u,  0.1*u, -5.2*u,  1.0*u, -3.6*u);
+      sCtx.bezierCurveTo( 2.6*u, -0.8*u,  3.0*u,  2.6*u,  1.2*u,  5.0*u);
+      sCtx.bezierCurveTo( 0.2*u,  6.3*u, -1.6*u,  6.4*u, -2.1*u,  5.2*u);
+      sCtx.stroke();
+      sCtx.beginPath();                                            // tail dot
+      sCtx.arc(-2.3*u, 5.9*u, 0.75*u, 0, Math.PI*2);
+      sCtx.fillStyle = '#333'; sCtx.fill();
+      sCtx.restore();
+    }
+
+    function drawBassClef(y, g){
+      const x = 60, yF = y(-4);             // the F line, between the two dots
+      const u = g / 2.0;
+      sCtx.save();
+      sCtx.translate(x, yF);
+      sCtx.strokeStyle = '#333'; sCtx.lineWidth = 2.2;
+      sCtx.lineCap = 'round';
+      sCtx.beginPath();
+      sCtx.arc(0, 0, 0.95*u, -Math.PI*0.95, Math.PI*0.42);          // head
+      sCtx.bezierCurveTo(0.9*u, 2.1*u, -0.6*u, 3.4*u, -2.0*u, 3.9*u); // tail
+      sCtx.stroke();
+      sCtx.fillStyle = '#333';
+      for (const dy of [-1.0, 1.0]){                                 // the two dots
+        sCtx.beginPath(); sCtx.arc(1.9*u, dy*u, 0.42*u, 0, Math.PI*2); sCtx.fill();
+      }
+      sCtx.restore();
+    }
+
+    /* ---------------------------------------------------------------------
+       A traditional 12-tone keyboard under the staff, for comparison: it
+       shows the piece's ORIGINAL pitches on the instrument it was written
+       for, while the cyclic pianos above show where those pitches land on an
+       n-note keyboard.  Lit keys are the MIDI notes currently sounding.
+       --------------------------------------------------------------------- */
+    const WHITE_PC = [0,2,4,5,7,9,11];
+    function drawLinearKeyboard(){
+      const W = 900, top = 214, h = 96;
+      if (!midi.song) return;
+      let lo = 127, hi = 0;
+      for (const n of midi.song.notes){ if (n.note < lo) lo = n.note; if (n.note > hi) hi = n.note; }
+      lo = Math.floor(lo / 12) * 12;                       // whole octaves
+      hi = Math.ceil((hi + 1) / 12) * 12 - 1;
+      if (hi - lo < 23) hi = lo + 23;                      // at least two octaves
+      if (hi - lo > 71){ hi = lo + 71; }                   // at most six
+
+      const whites = [];
+      for (let m = lo; m <= hi; m++) if (WHITE_PC.includes(m % 12)) whites.push(m);
+      const x0 = 44, wW = (W - x0 - 14) / whites.length;
+
+      const sounding = new Set(midi.live.map(v => v.midiNote));
+
+      // white keys
+      sCtx.strokeStyle = '#333'; sCtx.lineWidth = 1;
+      whites.forEach((m, i) => {
+        const x = x0 + i * wW;
+        sCtx.fillStyle = sounding.has(m) ? '#FFB81C' : '#fff';
+        sCtx.fillRect(x, top, wW, h);
+        sCtx.strokeRect(x + 0.5, top + 0.5, wW, h);
+        if (m % 12 === 0){                                  // label each C
+          sCtx.fillStyle = '#888'; sCtx.font = '9px sans-serif'; sCtx.textAlign = 'center';
+          sCtx.fillText('C' + (Math.floor(m / 12) - 1), x + wW / 2, top + h - 4);
+        }
+      });
+      // black keys sit between their neighbouring whites
+      const bW = wW * 0.62, bH = h * 0.62;
+      whites.forEach((m, i) => {
+        if (![0,2,5,7,9].includes(m % 12)) return;          // C D F G A carry a sharp
+        const sharp = m + 1;
+        if (sharp > hi) return;
+        const x = x0 + (i + 1) * wW - bW / 2;
+        sCtx.fillStyle = sounding.has(sharp) ? '#D49A18' : '#222';
+        sCtx.fillRect(x, top, bW, bH);
+        sCtx.strokeStyle = '#111'; sCtx.strokeRect(x + 0.5, top + 0.5, bW, bH);
+      });
+
+      sCtx.fillStyle = '#888'; sCtx.font = '11px sans-serif'; sCtx.textAlign = 'left';
+      sCtx.fillText('the score on a traditional 12-note keyboard', x0, top - 6);
+    }
+
+    function drawStaff(){
+      const W = 900, H = 200;
+      sCtx.clearRect(0, 0, W, H);
+      if (!midi.song) return;
+
+      const g = 12;                                  // gap between staff lines
+      const yE4 = 74;                                // treble bottom line
+      const y = s => yE4 - (s - 2) * (g / 2);
+      const xPlay = W * STAFF_PLAYHEAD;
+      const pxPerSec = (W - xPlay) / STAFF_WINDOW;
+
+      // staff lines
+      sCtx.strokeStyle = '#333'; sCtx.lineWidth = 1;
+      for (const base of [2, -2]){
+        for (let i = 0; i < 5; i++){
+          const s = base + (base > 0 ? 2 * i : -2 * i);
+          sCtx.beginPath(); sCtx.moveTo(40, y(s) + 0.5); sCtx.lineTo(W - 10, y(s) + 0.5); sCtx.stroke();
+        }
+      }
+      // brace-ish left edge
+      sCtx.lineWidth = 3;
+      sCtx.beginPath(); sCtx.moveTo(41, y(10)); sCtx.lineTo(41, y(-10)); sCtx.stroke();
+      drawTrebleClef(y, g);
+      drawBassClef(y, g);
+
+      // current position in the song
+      const t = midi.playing ? (audioCtx.currentTime - midi.t0) * midi.rate : 0;
+
+      // playhead
+      sCtx.strokeStyle = '#FFB81C'; sCtx.lineWidth = 2.5;
+      sCtx.beginPath(); sCtx.moveTo(xPlay, y(12)); sCtx.lineTo(xPlay, y(-12)); sCtx.stroke();
+
+      // spellings are decided per chord group, so preview each visible group
+      const groupIdx = new Map();
+      const visible = midi.song.notes.filter(n => n.time > t - 1.6 && n.time < t + STAFF_WINDOW);
+      const byGroup = new Map();
+      for (const n of visible){
+        if (!byGroup.has(n.group)) byGroup.set(n.group, []);
+        byGroup.get(n.group).push(n);
+      }
+      for (const [gid, notes] of byGroup){
+        groupIdx.set(gid, spellChord(notes.map(n => n.note), true));
+      }
+
+      sCtx.textAlign = 'center';
+      for (const [gid, notes] of byGroup){
+        const idxs = groupIdx.get(gid) || notes.map(n => midiToIndex(n.note));
+        notes.forEach((n, j) => {
+          const x = xPlay + (n.time - t) * pxPerSec;
+          if (x < 88 || x > W - 6) return;   // clear of the clefs (x <= 79)
+          const s = staffStep(n.note), ny = y(s);
+          const sounding = (t >= n.time && t < n.time + n.dur);
+          const past = t >= n.time + n.dur;
+
+          // ledger lines
+          sCtx.strokeStyle = '#333'; sCtx.lineWidth = 1;
+          if (s >= -1 && s <= 1){                      // middle C region
+            sCtx.beginPath(); sCtx.moveTo(x - 11, y(0) + 0.5); sCtx.lineTo(x + 11, y(0) + 0.5); sCtx.stroke();
+          }
+          for (let ls = 12; ls <= s; ls += 2){          // above treble
+            sCtx.beginPath(); sCtx.moveTo(x - 11, y(ls) + 0.5); sCtx.lineTo(x + 11, y(ls) + 0.5); sCtx.stroke();
+          }
+          for (let ls = -12; ls >= s; ls -= 2){         // below bass
+            sCtx.beginPath(); sCtx.moveTo(x - 11, y(ls) + 0.5); sCtx.lineTo(x + 11, y(ls) + 0.5); sCtx.stroke();
+          }
+
+          // notehead
+          sCtx.save();
+          sCtx.translate(x, ny); sCtx.rotate(-0.32);
+          sCtx.beginPath(); sCtx.ellipse(0, 0, 7.5, 5.4, 0, 0, Math.PI * 2);
+          sCtx.fillStyle = sounding ? '#FFB81C' : (past ? '#bbb' : '#222');
+          sCtx.fill();
+          if (sounding){ sCtx.strokeStyle = '#111'; sCtx.lineWidth = 2; sCtx.stroke(); }
+          sCtx.restore();
+
+          // sharp
+          if (IS_SHARP[((n.note % 12) + 12) % 12]){
+            sCtx.fillStyle = sounding ? '#A87510' : (past ? '#bbb' : '#222');
+            sCtx.font = 'bold 15px Georgia, serif';
+            sCtx.fillText('\u266F', x - 15, ny + 5);
+          }
+
+          // which key it lands on
+          sCtx.fillStyle = sounding ? '#A87510' : (past ? '#ccc' : '#888');
+          sCtx.font = 'bold 10px sans-serif';
+          sCtx.fillText(idxs[j], x, y(-12) + 16);
+        });
+      }
+
+      sCtx.textAlign = 'left';
+      sCtx.fillStyle = '#888'; sCtx.font = '11px sans-serif';
+      sCtx.fillText('numbers = key each note sounds on the cyclic piano', 44, 196);
+
+      drawLinearKeyboard();
+    }
+
+    function staffLoop(){
+      if (staffToggle.checked && midi.song) drawStaff();
+      requestAnimationFrame(staffLoop);
+    }
+
+    /* ---------------------------- transport ------------------------------ */
+
+    const midiFileInput = document.getElementById('midi-file');
+    const midiPlayBtn = document.getElementById('midi-play');
+    const midiDemoBtn = document.getElementById('midi-demo');
+    const midiRate = document.getElementById('midi-rate');
+    const midiLoop = document.getElementById('midi-loop');
+    const midiStatusEl = document.getElementById('midi-status');
+
+    function midiReleaseAll(){
+      midi.live.forEach(v => releaseVoice(v.voiceId));
+      midi.live = [];
+    }
+
+    function midiStop(){
+      clearInterval(midi.timer); midi.timer = null;
+      midi.playing = false;
+      midiReleaseAll();
+      midiPlayBtn.textContent = 'Play';
+      midiPlayBtn.classList.remove('playing');
+      updateMidiStatus();
+    }
+
+    function midiStart(){
+      if (!midi.song) return;
+      if (!audioUnlocked) unlockAudio();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      if (autoplayToggle.checked){ autoplayToggle.checked = false; handleAutoplayChange(false); }
+      midi.i = 0;
+      midi.t0 = audioCtx.currentTime + 0.1;
+      midi.playing = true;
+      midi.timer = setInterval(midiTick, 12);       // ~12 ms grid: sound and
+      midiPlayBtn.textContent = 'Stop';             // highlight fire together
+      midiPlayBtn.classList.add('playing');
+      updateMidiStatus();
+    }
+
+    // Notes are triggered in real time (not pre-scheduled) so that each one
+    // uses the keyboard as it exists at that instant — move the N or K
+    // sliders mid-song and the mapping follows immediately.
+    function midiTick(){
+      const now = audioCtx.currentTime;
+
+      for (let i = midi.live.length - 1; i >= 0; i--){
+        if (midi.live[i].endTime <= now){ releaseVoice(midi.live[i].voiceId); midi.live.splice(i,1); }
+      }
+
+      const notes = midi.song.notes;
+      while (midi.i < notes.length){
+        const n0 = notes[midi.i];
+        if (midi.t0 + n0.time / midi.rate > now) break;
+
+        // gather the whole chord, then spell it as a unit
+        const chord = [];
+        while (midi.i < notes.length && notes[midi.i].group === n0.group){
+          const n = notes[midi.i++];
+          if (!(midi.skipDrums && n.ch === 9)) chord.push(n);   // skip percussion
+        }
+        if (!chord.length) continue;
+
+        const idxs = spellChord(chord.map(n => n.note));
+        chord.forEach((n, j) => {
+          const vid = startVoice(idxs[j]);
+          midi.live.push({ voiceId: vid, endTime: now + Math.max(0.08, n.dur / midi.rate), midiNote: n.note });
+        });
+        if (ratMode !== 'off') updateMidiStatus();
+      }
+
+      if (midi.i >= notes.length && midi.live.length === 0 &&
+          now > midi.t0 + midi.song.duration / midi.rate){
+        if (midi.loop){ midi.i = 0; midi.t0 = now + 0.05; }
+        else midiStop();
+      }
+    }
+
+    /* ------------------------- mapping readout --------------------------- */
+
+    function updateMidiStatus(){
+      const L = totalKeyCount();
+      const exact = (N % 12 === 0);
+      let worst = 0; const image = new Set();
+      for (let c = 0; c < 12; c++){
+        worst = Math.max(worst, Math.abs(midiErrorCents(MIDI_ANCHOR + c)));
+        image.add(midiToIndex(MIDI_ANCHOR + c));
+      }
+      const collapsed = 12 - image.size;
+
+      let math = exact
+        ? `<b>12 divides ${N}</b> &mdash; every MIDI note lands exactly on a key (its representative), looping by octave.`
+        : `<b>12 &#8740; ${N}</b> &mdash; each MIDI note snaps to the nearest key by frequency; worst error <b>${worst.toFixed(1)}&cent;</b>` +
+          (collapsed > 0 ? `, and ${collapsed} of the 12 pitch classes collapse together.` : `, all 12 pitch classes stay distinct.`);
+      if (showMobius) math += ` Möbius: ${L} keys spanning two octaves, so melodies cross the twist.`;
+
+      let head;
+      if (!midi.song) head = `No MIDI loaded. `;
+      else if (midi.playing) head = `<b>Playing</b> &mdash; ${midi.song.notes.length} notes. `;
+      else head = `Loaded: ${midi.song.notes.length} notes, ${midi.song.duration.toFixed(1)}s. `;
+
+      midiStatusEl.innerHTML = head + math;
+
+      // rationalizer readout
+      const scoreEl = document.getElementById('midi-score');
+      document.getElementById('rat-consonant').classList.toggle('rat-on', ratMode === 'consonant');
+      document.getElementById('rat-dissonant').classList.toggle('rat-on', ratMode === 'dissonant');
+      if (ratMode === 'off') scoreEl.textContent = '';
+      else if (exact) scoreEl.textContent = '(nothing to choose: 12 | ' + N + ')';
+      else if (lastChordScore === null)
+        scoreEl.textContent = (ratMetric === 'entropy') ? 'Σ entropy per chord' : 'Euler ΣΓ per chord';
+      else scoreEl.textContent = (ratMetric === 'entropy')
+             ? 'Σ H = ' + lastChordScore.toFixed(2)
+             : 'ΣΓ = ' + lastChordScore;
+    }
+
+    /* ----------------------------- wiring -------------------------------- */
+
+    midiFileInput.addEventListener('change', (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          if (midi.playing) midiStop();
+          midi.song = parseMidi(reader.result);
+          midiPlayBtn.disabled = false;
+          staffWrapper.classList.toggle('hidden', !staffToggle.checked);
+          updateMidiStatus();
+          midiStatusEl.innerHTML = `Loaded <b>${f.name}</b> &mdash; ` + midiStatusEl.innerHTML;
+        } catch (err){
+          midiStatusEl.innerHTML = `Could not read that file (${err.message}).`;
+        }
+      };
+      reader.onerror = () => { midiStatusEl.textContent = 'Could not read that file.'; };
+      reader.readAsArrayBuffer(f);
+    });
+
+    // A built-in tune so the page is usable with no file at hand.
+    midiDemoBtn.addEventListener('click', () => {
+      const seq = [
+        [60,0,0.45],[64,0.5,0.45],[67,1.0,0.45],[72,1.5,0.9],
+        [71,2.5,0.45],[67,3.0,0.45],[64,3.5,0.45],[60,4.0,0.9],
+        [62,5.0,0.45],[65,5.5,0.45],[69,6.0,0.45],[74,6.5,0.9],
+        [72,7.5,0.45],[69,8.0,0.45],[65,8.5,0.45],[62,9.0,0.9],
+        [60,10.0,1.6],[64,10.0,1.6],[67,10.0,1.6],[72,10.0,1.6]
+      ];
+      if (midi.playing) midiStop();
+      const demoNotes = seq.map(([note,time,dur]) => ({ note, ch:0, vel:100, time, dur }));
+      groupChords(demoNotes);                    // required: midiTick keys off n.group
+      midi.song = { notes: demoNotes, duration: 11.8 };
+      midiPlayBtn.disabled = false;
+      staffWrapper.classList.toggle('hidden', !staffToggle.checked);
+      updateMidiStatus();
+    });
+
+    // Rationalizer buttons: each toggles its mode on/off (they are exclusive).
+    function setRatMode(mode){
+      ratMode = (ratMode === mode) ? 'off' : mode;
+      lastChordScore = null;
+      updateMidiStatus();
+    }
+    document.getElementById('rat-consonant').addEventListener('click', () => setRatMode('consonant'));
+    document.getElementById('rat-dissonant').addEventListener('click', () => setRatMode('dissonant'));
+
+    // Which measure of consonance the rationalizer optimises.
+    const metEuler = document.getElementById('met-euler');
+    const metEntropy = document.getElementById('met-entropy');
+    function setMetric(m){
+      ratMetric = m;
+      lastChordScore = null;
+      metEuler.classList.toggle('rat-on', m === 'euler');
+      metEntropy.classList.toggle('rat-on', m === 'entropy');
+      updateMidiStatus();
+    }
+    metEuler.addEventListener('click', () => setMetric('euler'));
+    metEntropy.addEventListener('click', () => setMetric('entropy'));
+
+    const staffToggle = document.getElementById('staff-toggle');
+    staffToggle.addEventListener('change', () => {
+      staffWrapper.classList.toggle('hidden', !(staffToggle.checked && midi.song));
+    });
+    requestAnimationFrame(staffLoop);
+
+    midiPlayBtn.addEventListener('click', () => { midi.playing ? midiStop() : midiStart(); });
+    midiRate.addEventListener('input', (e) => { midi.rate = parseInt(e.target.value) / 100; });
+    midiLoop.addEventListener('change', (e) => { midi.loop = e.target.checked; });
+
+    // --- Input Handling ---
+    function getIndexFromClick(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) * (400/rect.width) - cx, y = (e.clientY - rect.top) * (400/rect.height) - cy;
+      const dist = Math.sqrt(x*x + y*y);
+      if (dist < 35) return -1; 
+      let ang = Math.PI/2 - Math.atan2(y, x);
+      if (ang < 0) ang += Math.PI*2; if (ang >= Math.PI*2) ang -= Math.PI*2;
+      
+      for (let k of keys) {
+        if (k.isBlack && dist <= k.rOuter && dist >= k.rInner) {
+          let d = Math.abs(ang - k.center); if (d > Math.PI) d = 2*Math.PI - d;
+          if (d <= k.width/2) return k.index;
+        }
+      }
+      
+      for (let k of keys) {
+        if (!k.isBlack && dist <= k.rOuter && dist >= k.rInner) {
+          let st = k.start % (2 * Math.PI); if (st < 0) st += 2 * Math.PI;
+          let en = k.end % (2 * Math.PI); if (en < 0) en += 2 * Math.PI;
+          let inSlice = false;
+          if (st < en) inSlice = (ang >= st && ang < en);
+          else inSlice = (ang >= st || ang < en);
+          if (inSlice) return k.index;
+        }
+      }
+      return -1;
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+      activePointers.add(e.pointerId); canvas.setPointerCapture(e.pointerId);
+      const idx = getIndexFromClick(e); if (idx !== -1) pointerToVoice.set(e.pointerId, startVoice(idx));
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!activePointers.has(e.pointerId)) return;
+      const nIdx = getIndexFromClick(e), oVid = pointerToVoice.get(e.pointerId);
+      const cIdx = oVid !== undefined ? activeVoices.get(oVid).index : -1;
+      if (nIdx !== cIdx) { 
+        if (oVid !== undefined) { releaseVoice(oVid); pointerToVoice.delete(e.pointerId); }
+        if (nIdx !== -1) pointerToVoice.set(e.pointerId, startVoice(nIdx));
+      }
+    });
+    canvas.addEventListener('pointerup', (e) => {
+      activePointers.delete(e.pointerId); const vid = pointerToVoice.get(e.pointerId);
+      if (vid !== undefined) { releaseVoice(vid); pointerToVoice.delete(e.pointerId); }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.repeat || e.metaKey || e.ctrlKey) return;
+      if (e.key === ' ') { handleSustainChange(true); e.preventDefault(); return; }
+      const matched = keys.find(k => k.qwertyLabel === e.key.toLowerCase());
+      if (matched && !pressedKeys.has(e.key.toLowerCase())) {
+        pressedKeys.add(e.key.toLowerCase());
+        keyToVoice.set(e.key.toLowerCase(), startVoice(matched.index));
+      }
+    });
+    window.addEventListener('keyup', (e) => {
+      if (e.key === ' ') { handleSustainChange(false); return; }
+      const char = e.key.toLowerCase();
+      if (pressedKeys.has(char)) {
+        pressedKeys.delete(char); const vid = keyToVoice.get(char);
+        if (vid !== undefined) { releaseVoice(vid); keyToVoice.delete(char); }
+      }
+    });
+
+    nSlider.oninput = updateKeyboard; kSlider.oninput = updateKeyboard;
+    qwertyToggle.onchange = updateKeyboard; integerToggle.onchange = updateKeyboard;
+    distancesToggle.onchange = updateKeyboard; polygonsToggle.onchange = updateKeyboard;
+    sustainToggle.onchange = (e) => handleSustainChange(e.target.checked);
+    autoplayToggle.onchange = (e) => handleAutoplayChange(e.target.checked);
+    shepardToggle.onchange = updateKeyboard; 
+    balancedToggle.onchange = updateKeyboard;
+    compareToggle.onchange = updateKeyboard;
+    
+    mobiusToggle.onchange = (e) => {
+      if (e.target.checked) {
+        shepardToggle.checked = true;
+        let requestedTotal = parseInt(nSlider.value);
+        if (requestedTotal > MOBIUS_MAX_TOTAL_KEYS) requestedTotal = MOBIUS_MAX_TOTAL_KEYS;
+        if (requestedTotal % 2 !== 0) requestedTotal += 1;
+        if (requestedTotal > MOBIUS_MAX_TOTAL_KEYS) requestedTotal -= 2;
+        nSlider.value = requestedTotal;
+
+        const maxK = Math.floor(requestedTotal / 2);
+        let requestedK = Math.min(parseInt(kSlider.value), maxK);
+        if (requestedK % 2 !== 0) {
+          requestedK = requestedK + 1 <= maxK ? requestedK + 1 : requestedK - 1;
+          if (requestedK < 1) requestedK = 1;
+        }
+        kSlider.value = requestedK;
+      }
+      updateKeyboard();
+    };
+    
+    updateKeyboard();
+  </script>
+</body>
+</html>
