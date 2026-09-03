@@ -187,15 +187,16 @@ def publication_views(pubs, topics):
     ]
 
     known = {topic["id"] for topic in topics}
-    missing = [pub["key"] for pub in pubs if not pub.get("topic")]
-    unknown = sorted({pub["topic"] for pub in pubs if pub.get("topic")} - known)
+    missing = [pub["key"] for pub in pubs if not pub.get("topics")]
+    assigned = {topic_id for pub in pubs for topic_id in pub.get("topics", [])}
+    unknown = sorted(assigned - known)
     if missing:
-        raise ValueError("Publication(s) missing topic: %s" % ", ".join(missing))
+        raise ValueError("Publication(s) missing topics: %s" % ", ".join(missing))
     if unknown:
         raise ValueError("Unknown publication topic(s): %s" % ", ".join(unknown))
 
     for topic in topics:
-        grouped = [pub for pub in pubs if pub.get("topic") == topic["id"]]
+        grouped = [pub for pub in pubs if topic["id"] in pub["topics"]]
         if not grouped:
             continue
         out.append('      <section class="pub-topic" aria-labelledby="pub-topic-%s">\n'

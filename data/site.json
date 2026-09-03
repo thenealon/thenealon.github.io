@@ -52,14 +52,19 @@
      },
      "publicationTopics": [
       {
-       "id": "extremal",
-       "label": "Extremal graph and hypergraph theory",
-       "description": "Forbidden configurations, saturation, intersection theorems, and the structure of graphs and hypergraphs."
+       "id": "extremal-graphs",
+       "label": "Extremal problems for graphs",
+       "description": "Forbidden configurations, saturation, intersection problems, and structural graph theory."
       },
       {
-       "id": "percolation-probability",
-       "label": "Percolation, probability, and stochastic processes",
-       "description": "Threshold phenomena and probabilistic behavior in grids, graphs, and random processes."
+       "id": "extremal-hypergraphs",
+       "label": "Extremal problems for hypergraphs",
+       "description": "Turán-type and saturation questions for hypergraphs and Berge configurations."
+      },
+      {
+       "id": "additive-number-theory",
+       "label": "Additive number theory",
+       "description": "Zero-sum, sum-free, and related problems in finite abelian groups."
       },
       {
        "id": "automated-conjecturing",
@@ -67,14 +72,24 @@
        "description": "Using computation to discover mathematical patterns, formulate conjectures, and support teaching."
       },
       {
-       "id": "music-energy",
-       "label": "Graph energy, invariants, and mathematical music",
-       "description": "Discrete measures of balance and spacing, with applications to rhythm, tuning, and graph invariants."
+       "id": "mathematical-music",
+       "label": "Mathematical music theory",
+       "description": "Discrete models of rhythm, tuning, balance, and maximal evenness."
       },
       {
-       "id": "additive",
-       "label": "Additive combinatorics",
-       "description": "Zero-sum and sum-free phenomena in finite abelian groups."
+       "id": "bootstrap-percolation",
+       "label": "Bootstrap percolation",
+       "description": "Percolation thresholds and contagious processes on grids, tilings, and graphs."
+      },
+      {
+       "id": "probability-processes",
+       "label": "Probability and random processes",
+       "description": "Threshold phenomena, stochastic processes, and probabilistic methods."
+      },
+      {
+       "id": "graph-invariants",
+       "label": "Graph invariants and optimization",
+       "description": "Extremal values of graph parameters, vertex configurations, and colorings."
       }
      ],
      "talksNote": "In August 2022 this was declared a &ldquo;highlights&rdquo; section, and is no longer guaranteed to be exhaustive. There are talks which are lost to the sands of time &mdash; if you have a hint of a memory of a vision of seeing me give a talk somewhere and it isn't in this list, it is best to assume it probably happened. Or you could invite me for a repeat."
