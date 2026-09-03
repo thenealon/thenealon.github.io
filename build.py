@@ -456,10 +456,9 @@ WHO = """    <p class="lede">I'm an Associate Professor in the
 #
 # The gallery scans the apps/ folder at build time.  Drop a self-contained
 # .html file in there and it appears here on the next build, with its name
-# taken from the file's <title> and a thumbnail generated from that name --
-# a small random geometric graph, the same object as the site background,
-# seeded so each app gets its own stable little picture.  No screenshots, no
-# image files, nothing to write by hand.
+# taken from the file's <title>.  Put a matching screenshot at
+# assets/demos/<filename>.jpg; otherwise the build supplies a stable random
+# geometric graph motif as a fallback.
 
 import glob
 import re as _re
@@ -522,6 +521,15 @@ def _thumb(name):
     return "".join(parts)
 
 
+def _preview(title, src=""):
+    """A real screenshot when one is available, with the graph as fallback."""
+    if src:
+        return ('<img class="thumb" src="%s" alt="Preview of %s" '
+                'width="320" height="176" loading="lazy" decoding="async">'
+                % (src, title))
+    return _thumb(title)
+
+
 def block_gallery(sec):
     demos = [i for i in load("more.json")
              if i.get("kind") == "demo" and not i.get("draft")]
@@ -540,7 +548,8 @@ def block_gallery(sec):
             '      <li><a class="app" href="%s">\n'
             '        %s\n'
             '        <span class="app-name">%s</span>\n'
-            '      </a></li>\n' % (href, _thumb(title), title))
+            '      </a></li>\n'
+            % (href, _preview(title, demo.get("thumbnail", "")), title))
     if not files and not cards:
         return ('    <p class="note">Nothing here yet. Drop a self-contained '
                 '<code>.html</code> file into the <code>apps/</code> folder and '
@@ -548,11 +557,14 @@ def block_gallery(sec):
     for path in files:
         href = "apps/" + os.path.basename(path)
         title = _title_of(path)
+        preview = "assets/demos/%s.jpg" % os.path.splitext(os.path.basename(path))[0]
+        if not os.path.exists(os.path.join(HERE, preview)):
+            preview = ""
         cards.append(
             '      <li><a class="app" href="%s">\n'
             '        %s\n'
             '        <span class="app-name">%s</span>\n'
-            '      </a></li>\n' % (href, _thumb(title), title))
+            '      </a></li>\n' % (href, _preview(title, preview), title))
     return ('    <ul class="gallery">\n' + "".join(cards) +
             '    </ul>\n')
 

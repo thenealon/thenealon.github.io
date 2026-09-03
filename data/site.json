@@ -170,18 +170,36 @@
      "intro": ""
     },
     {
-     "id": "genealogy",
-     "rail": "Genealogy",
-     "heading": "Genealogy",
-     "block": "genealogy",
-     "intro": "Data from the <a href=\"https://www.mathgenealogy.org/\">Mathematics Genealogy Project</a>."
-    },
-    {
      "id": "links",
      "rail": "Links",
      "heading": "Links",
      "block": "links",
      "intro": "Things I am interested in or find useful. I am in no way affiliated with any of these sites, and placement here should not be taken as any kind of endorsement."
+    }
+   ]
+  },
+  {
+   "file": "genealogy.html",
+   "title": "Mathematical genealogy &mdash; Neal Bushaw",
+   "description": "The mathematical advisor graph of Neal Bushaw, with portraits, biographies, and selected papers.",
+   "masthead": {
+    "h1": "Mathematical genealogy",
+    "role": "My advisor graph",
+    "dept": "The other extras are <a href=\"more.html\">on the extras page</a>.",
+    "affiliation": []
+   },
+   "jump": {
+    "href": "more.html#gallery",
+    "label": "&larr; Demos / Slop",
+    "gloss": "Back to the extras"
+   },
+   "sections": [
+    {
+     "id": "genealogy",
+     "rail": "Genealogy",
+     "heading": "Genealogy",
+     "block": "genealogy",
+     "intro": "Data from the <a href=\"https://www.mathgenealogy.org/\">Mathematics Genealogy Project</a>."
     }
    ]
   }

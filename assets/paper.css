@@ -494,7 +494,8 @@ dialog#abstract-dialog::backdrop { background: rgba(20, 19, 15, 0.35); }
        transition: border-color 0.15s ease, transform 0.15s ease; }
 .app:hover, .app:focus-visible {
   border-color: var(--gold); color: var(--ink); transform: translateY(-2px); }
-.app .thumb { display: block; width: 100%; height: auto;
+.app .thumb { display: block; width: 100%; height: auto; aspect-ratio: 320 / 176;
+              object-fit: cover;
               background: var(--graph-bg);
               border-bottom: 1px solid var(--rule-faint); }
 .app .thumb line { stroke: var(--graph-edge); stroke-width: 1;
