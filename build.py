@@ -544,12 +544,15 @@ def block_gallery(sec):
         title = demo.get("name")
         if not href or not title:
             continue
+        preview = demo.get("thumbnail", "")
+        if preview and not os.path.exists(os.path.join(HERE, preview)):
+            preview = ""
         cards.append(
             '      <li><a class="app" href="%s">\n'
             '        %s\n'
             '        <span class="app-name">%s</span>\n'
             '      </a></li>\n'
-            % (href, _preview(title, demo.get("thumbnail", "")), title))
+            % (href, _preview(title, preview), title))
     if not files and not cards:
         return ('    <p class="note">Nothing here yet. Drop a self-contained '
                 '<code>.html</code> file into the <code>apps/</code> folder and '

@@ -42,7 +42,12 @@ jobs:
           npm ci
           npx playwright install --with-deps chromium
 
-      - name: Capture app screenshots
+      - name: Test app screenshots
+        if: github.event_name == 'pull_request'
+        run: npm run screenshots -- --force
+
+      - name: Capture changed app screenshots
+        if: github.event_name == 'push'
         run: npm run screenshots
 
       - name: Regenerate the pages
