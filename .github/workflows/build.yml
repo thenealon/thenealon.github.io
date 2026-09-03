@@ -1,9 +1,9 @@
 # Rebuild the site whenever anything is pushed.
 #
-# What it does: runs `python3 build.py`, which regenerates index.html and
-# more.html from the data files and the apps/ folder, then commits the result
-# back if it changed.  So you can add a web app by uploading one .html file to
-# apps/ straight on github.com -- this rebuilds the gallery for you.
+# What it does: captures a thumbnail for every new or changed app, then runs
+# `python3 build.py`, which regenerates the public pages from the data files and
+# the apps/ folder.  So you can add a web app by uploading one .html file to
+# apps/ straight on github.com -- its gallery card and screenshot are automatic.
 #
 # It will NOT loop: commits made with the built-in GITHUB_TOKEN do not start
 # another workflow run.
@@ -22,12 +22,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.x"
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install screenshot tools
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Capture app screenshots
+        run: npm run screenshots
 
       - name: Regenerate the pages
         run: python3 build.py
@@ -36,7 +50,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html more.html assets/genealogy-data.js
+          git add index.html more.html genealogy.html assets/genealogy-data.js assets/demos
           if git diff --staged --quiet; then
             echo "Nothing changed."
           else

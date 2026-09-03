@@ -1,0 +1,10 @@
+{
+  "name": "thenealon-github-pages",
+  "private": true,
+  "scripts": {
+    "screenshots": "node scripts/capture-demo-screenshots.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

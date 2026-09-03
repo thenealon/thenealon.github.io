@@ -1,3 +1,5 @@
 .mgp-cache/
 .DS_Store
+node_modules/
+.cache/
 __pycache__/
