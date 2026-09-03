@@ -121,6 +121,38 @@
     }
   }());
 
+  /* ---- publication arrangement -----------------------------------
+     Chronological is complete without JavaScript.  Once scripting is
+     available, reveal the switch and remember the reader's preferred view. */
+  (function () {
+    var switcher = document.querySelector('[data-publication-switcher]');
+    if (!switcher) { return; }
+    var buttons = switcher.querySelectorAll('[data-publication-view]');
+    var panels = document.querySelectorAll('[data-publication-panel]');
+    if (buttons.length !== 2 || panels.length !== 2) { return; }
+
+    function show(view, remember) {
+      for (var i = 0; i < buttons.length; i++) {
+        var selected = buttons[i].getAttribute('data-publication-view') === view;
+        buttons[i].classList.toggle('is-active', selected);
+        buttons[i].setAttribute('aria-pressed', selected ? 'true' : 'false');
+      }
+      for (var j = 0; j < panels.length; j++) {
+        panels[j].hidden = panels[j].getAttribute('data-publication-panel') !== view;
+      }
+      if (remember) { set('nb-publications', view); }
+    }
+
+    switcher.hidden = false;
+    var initial = get('nb-publications') === 'thematic' ? 'thematic' : 'chronological';
+    show(initial, false);
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].addEventListener('click', function () {
+        show(this.getAttribute('data-publication-view'), true);
+      });
+    }
+  }());
+
   /* ---- the address ------------------------------------------------
      Assembled here rather than written into the HTML.  Harvesters that do
      not run JavaScript see only the spelled-out form; everyone else gets a
