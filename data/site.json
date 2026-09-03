@@ -50,6 +50,7 @@
       "talksFold": "Research talks",
      "outreachFold": "Outreach talks"
      },
+     "publicationTopicsNote": "In the &ldquo;By topic&rdquo; view, papers may appear under more than one heading.",
      "publicationTopics": [
       {
        "id": "extremal-graphs",
@@ -199,7 +200,7 @@
      "rail": "Genealogy",
      "heading": "Genealogy",
      "block": "genealogy",
-     "intro": "Data from the <a href=\"https://www.mathgenealogy.org/\">Mathematics Genealogy Project</a>."
+     "intro": "Data from the <a href=\"https://www.mathgenealogy.org/\">Mathematics Genealogy Project</a>.<br>The selected papers shown for each mathematician are more-or-less arbitrary."
     }
    ]
   }

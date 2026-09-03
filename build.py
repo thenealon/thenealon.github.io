@@ -166,7 +166,7 @@ def biblio(pubs):
     return "".join(out)
 
 
-def publication_views(pubs, topics):
+def publication_views(pubs, topics, topic_note=""):
     """Render one bibliography in chronological and thematic arrangements."""
     out = [
         '    <div class="pub-switcher" data-publication-switcher hidden '
@@ -184,9 +184,9 @@ def publication_views(pubs, topics):
         '    </div>\n',
         '    <div class="pub-view pub-view--thematic" '
         'data-publication-panel="thematic" hidden>\n',
-        '      <p class="note pub-view-note">Papers may appear in more than '
-        'one section in this view.</p>\n',
     ]
+    if topic_note:
+        out.append('      <p class="note pub-view-note">%s</p>\n' % topic_note)
 
     known = {topic["id"] for topic in topics}
     missing = [pub["key"] for pub in pubs if not pub.get("topics")]
@@ -262,7 +262,8 @@ def block_research(sec):
     out.append("    <h3>%s</h3>\n" % sub(sec, "upcoming"))
     out.append(entries([(w, t) for w, t, _ in talks["upcoming"]]))
     out.append("    <h3>%s</h3>\n" % sub(sec, "publications"))
-    out.append(publication_views(pubs, sec["publicationTopics"]))
+    out.append(publication_views(
+        pubs, sec["publicationTopics"], sec.get("publicationTopicsNote", "")))
     out.append("    <h3>%s</h3>\n" % sub(sec, "talks"))
     note = ('    <p class="note">%s</p>\n' % sec["talksNote"]) if sec.get("talksNote") else ""
     out.append(fold(sub(sec, "talksFold"), note + entries(talks["talks"])))
