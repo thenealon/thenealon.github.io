@@ -166,6 +166,51 @@ def biblio(pubs):
     return "".join(out)
 
 
+def publication_views(pubs, topics):
+    """Render one bibliography in chronological and thematic arrangements."""
+    out = [
+        '    <div class="pub-switcher" data-publication-switcher hidden '
+        'role="group" aria-label="Arrange publications">\n',
+        '      <span class="pub-switcher-label">Arrange</span>\n',
+        '      <button type="button" class="pub-view-button is-active" '
+        'data-publication-view="chronological" aria-pressed="true">'
+        'Newest first</button>\n',
+        '      <button type="button" class="pub-view-button" '
+        'data-publication-view="thematic" aria-pressed="false">'
+        'By topic</button>\n',
+        '    </div>\n',
+        '    <div class="pub-view" data-publication-panel="chronological">\n',
+        biblio(pubs),
+        '    </div>\n',
+        '    <div class="pub-view pub-view--thematic" '
+        'data-publication-panel="thematic" hidden>\n',
+    ]
+
+    known = {topic["id"] for topic in topics}
+    missing = [pub["key"] for pub in pubs if not pub.get("topic")]
+    unknown = sorted({pub["topic"] for pub in pubs if pub.get("topic")} - known)
+    if missing:
+        raise ValueError("Publication(s) missing topic: %s" % ", ".join(missing))
+    if unknown:
+        raise ValueError("Unknown publication topic(s): %s" % ", ".join(unknown))
+
+    for topic in topics:
+        grouped = [pub for pub in pubs if pub.get("topic") == topic["id"]]
+        if not grouped:
+            continue
+        out.append('      <section class="pub-topic" aria-labelledby="pub-topic-%s">\n'
+                   % topic["id"])
+        out.append('        <h4 id="pub-topic-%s">%s</h4>\n'
+                   % (topic["id"], topic["label"]))
+        if topic.get("description"):
+            out.append('        <p class="pub-topic-note">%s</p>\n'
+                       % topic["description"])
+        out.append(biblio(grouped))
+        out.append('      </section>\n')
+    out.append('    </div>\n')
+    return "".join(out)
+
+
 def entries(items, plain=False):
     cls = "entries entries--plain" if plain else "entries"
     out = ['    <ul class="%s">\n' % cls]
@@ -214,7 +259,7 @@ def block_research(sec):
     out.append("    <h3>%s</h3>\n" % sub(sec, "upcoming"))
     out.append(entries([(w, t) for w, t, _ in talks["upcoming"]]))
     out.append("    <h3>%s</h3>\n" % sub(sec, "publications"))
-    out.append(biblio(pubs))
+    out.append(publication_views(pubs, sec["publicationTopics"]))
     out.append("    <h3>%s</h3>\n" % sub(sec, "talks"))
     note = ('    <p class="note">%s</p>\n' % sec["talksNote"]) if sec.get("talksNote") else ""
     out.append(fold(sub(sec, "talksFold"), note + entries(talks["talks"])))

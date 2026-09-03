@@ -48,8 +48,35 @@
       "publications": "Publications and preprints",
       "talks": "Talks",
       "talksFold": "Research talks",
-      "outreachFold": "Outreach talks"
+     "outreachFold": "Outreach talks"
      },
+     "publicationTopics": [
+      {
+       "id": "extremal",
+       "label": "Extremal graph and hypergraph theory",
+       "description": "Forbidden configurations, saturation, intersection theorems, and the structure of graphs and hypergraphs."
+      },
+      {
+       "id": "percolation-probability",
+       "label": "Percolation, probability, and stochastic processes",
+       "description": "Threshold phenomena and probabilistic behavior in grids, graphs, and random processes."
+      },
+      {
+       "id": "automated-conjecturing",
+       "label": "Automated conjecturing",
+       "description": "Using computation to discover mathematical patterns, formulate conjectures, and support teaching."
+      },
+      {
+       "id": "music-energy",
+       "label": "Graph energy, invariants, and mathematical music",
+       "description": "Discrete measures of balance and spacing, with applications to rhythm, tuning, and graph invariants."
+      },
+      {
+       "id": "additive",
+       "label": "Additive combinatorics",
+       "description": "Zero-sum and sum-free phenomena in finite abelian groups."
+      }
+     ],
      "talksNote": "In August 2022 this was declared a &ldquo;highlights&rdquo; section, and is no longer guaranteed to be exhaustive. There are talks which are lost to the sands of time &mdash; if you have a hint of a memory of a vision of seeing me give a talk somewhere and it isn't in this list, it is best to assume it probably happened. Or you could invite me for a repeat."
     },
     {

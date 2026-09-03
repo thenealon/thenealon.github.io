@@ -1,6 +1,7 @@
 [
  {
   "key": "bushaw-clifton-3nbr",
+  "topic": "percolation-probability",
   "status": "preprint",
   "year": 2026,
   "authors": "N. Bushaw and A. Clifton",
@@ -10,6 +11,7 @@
  },
  {
   "key": "bushaw-cyclic-mobius-pianos",
+  "topic": "music-energy",
   "status": "published",
   "year": 2026,
   "authors": "N. Bushaw",
@@ -20,6 +22,7 @@
  },
  {
   "key": "bushaw-danielsson-hurlbert-ekr",
+  "topic": "extremal",
   "status": "preprint",
   "year": 2025,
   "authors": "N. Bushaw, J. Danielsson and G. Hurlbert",
@@ -29,6 +32,7 @@
  },
  {
   "key": "bardenova-etal-wiener",
+  "topic": "music-energy",
   "status": "preprint",
   "year": 2025,
   "authors": "V. Bardenova, N. Bushaw, B. Cody, P. Fay and M. Tennant",
@@ -38,6 +42,7 @@
  },
  {
   "key": "bushaw-etal-berge-stars",
+  "topic": "extremal",
   "status": "preprint",
   "year": 2025,
   "authors": "N. Bushaw, S. English, E. Heath, D. P. Johnston and P. Rombach",
@@ -47,6 +52,7 @@
  },
  {
   "key": "bednar-bushaw-rainbow-turan",
+  "topic": "extremal",
   "status": "published",
   "year": 2025,
   "authors": "V. Bednar and N. Bushaw",
@@ -58,6 +64,7 @@
  },
  {
   "key": "bushaw-cody-leffler-energy",
+  "topic": "music-energy",
   "status": "published",
   "year": 2025,
   "authors": "N. Bushaw, B. Cody and C. Leffler",
@@ -68,6 +75,7 @@
  },
  {
   "key": "bushaw-kettle-pebbling",
+  "topic": "percolation-probability",
   "status": "published",
   "year": 2025,
   "authors": "N. Bushaw and N. Kettle",
@@ -77,6 +85,7 @@
  },
  {
   "key": "bushaw-larson-vancleemput-primus",
+  "topic": "automated-conjecturing",
   "status": "published",
   "year": 2025,
   "authors": "N. Bushaw, C. E. Larson and N. Van Cleemput",
@@ -85,6 +94,7 @@
  },
  {
   "key": "bushaw-etal-hamiltonicity",
+  "topic": "automated-conjecturing",
   "status": "published",
   "year": 2025,
   "authors": "N. Bushaw, V. Gupta, C. E. Larson, S. Loeb, M. Norge, J. Parrish, N. Van Cleemput, J. Yirka and G. Wu",
@@ -93,6 +103,7 @@
  },
  {
   "key": "bushaw-hurlbert-crossnumber",
+  "topic": "additive",
   "status": "published",
   "year": 2024,
   "authors": "N. Bushaw and G. Hurlbert",
@@ -104,6 +115,7 @@
  },
  {
   "key": "bushaw-etal-bridges-evenness",
+  "topic": "music-energy",
   "status": "published",
   "year": 2024,
   "authors": "N. Bushaw, B. Cody, L. Freeman and T. Whitaker",
@@ -115,6 +127,7 @@
  },
  {
   "key": "bushaw-etal-bootstrap-conjecturing",
+  "topic": "automated-conjecturing",
   "status": "published",
   "year": 2023,
   "authors": "N. Bushaw, B. Conka, V. Gupta, A. Kierans, H. LaFayette, C. E. Larson, K. McCall, A. Mulyar, C. Sullivan, S. Taylor, E. Wainright, E. Wilson, G. Wu and S. Loeb",
@@ -123,6 +136,7 @@
  },
  {
   "key": "bushaw-johnston-rombach-rainbow-sat",
+  "topic": "extremal",
   "status": "published",
   "year": 2022,
   "authors": "N. Bushaw, D. Johnston and P. Rombach",
@@ -132,6 +146,7 @@
  },
  {
   "key": "bushaw-kettle-forestable",
+  "topic": "extremal",
   "status": "published",
   "year": 2020,
   "authors": "N. Bushaw and N. Kettle",
@@ -140,6 +155,7 @@
  },
  {
   "key": "bushaw-cranston-tilings",
+  "topic": "percolation-probability",
   "status": "published",
   "year": 2019,
   "authors": "N. Bushaw and D. W. Cranston",
@@ -151,6 +167,7 @@
  },
  {
   "key": "bushaw-larson-vancleemput-acvii",
+  "topic": "automated-conjecturing",
   "status": "preprint",
   "year": 2018,
   "authors": "N. Bushaw, C. E. Larson and N. Van Cleemput",
@@ -160,6 +177,7 @@
  },
  {
   "key": "bushaw-czygrinow-yie-even-cycles",
+  "topic": "extremal",
   "status": "preprint",
   "year": 2018,
   "authors": "N. Bushaw, A. Czygrinow and J. Yie",
@@ -169,6 +187,7 @@
  },
  {
   "key": "balogh-etal-typical-structure",
+  "topic": "extremal",
   "status": "published",
   "year": 2017,
   "authors": "J. Balogh, N. Bushaw, M. Collares, H. Liu, R. Morris and M. Sharifzadeh",
@@ -178,6 +197,7 @@
  },
  {
   "key": "bushaw-gunderson-kalikow-markov",
+  "topic": "percolation-probability",
   "status": "published",
   "year": 2016,
   "authors": "N. Bushaw, K. Gunderson and S. Kalikow",
@@ -187,6 +207,7 @@
  },
  {
   "key": "bushaw-etal-sumfree",
+  "topic": "additive",
   "status": "published",
   "year": 2015,
   "authors": "N. Bushaw, M. Collares, R. Morris and P. Smith",
@@ -196,6 +217,7 @@
  },
  {
   "key": "bushaw-kettle-hypergraph-paths",
+  "topic": "extremal",
   "status": "published",
   "year": 2014,
   "authors": "N. Bushaw and N. Kettle",
@@ -205,6 +227,7 @@
  },
  {
   "key": "bushaw-thesis",
+  "topic": "extremal",
   "status": "thesis",
   "year": 2012,
   "authors": "N. Bushaw",
@@ -215,6 +238,7 @@
  },
  {
   "key": "bushaw-etal-large-matchings",
+  "topic": "extremal",
   "status": "preprint",
   "year": 2012,
   "authors": "N. Bushaw, P. Csorba, L. Erickson, D. Gerbner, D. Piguet, A. Riet, T. Terpai and D. K. Vu",
@@ -224,6 +248,7 @@
  },
  {
   "key": "bushaw-kettle-multiple-paths",
+  "topic": "extremal",
   "status": "published",
   "year": 2011,
   "authors": "N. Bushaw and N. Kettle",
