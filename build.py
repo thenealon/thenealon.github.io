@@ -525,9 +525,11 @@ def _thumb(name):
 def block_gallery(sec):
     demos = [i for i in load("more.json")
              if i.get("kind") == "demo" and not i.get("draft")]
+    demo_hrefs = {i.get("href") for i in demos if i.get("href")}
     files = sorted(glob.glob(os.path.join(HERE, "apps", "*.html")))
     files = [f for f in files
-             if os.path.basename(f).lower() not in ("index.html",)]
+             if os.path.basename(f).lower() not in ("index.html",)
+             and "apps/" + os.path.basename(f) not in demo_hrefs]
     demo_list = ""
     if demos:
         demo_list = block_items({"kind": "demo"})

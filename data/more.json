@@ -2,7 +2,7 @@
  {
   "kind": "demo",
   "name": "Cyclic Pianos",
-  "href": "bridges26.html",
+  "href": "apps/bridges26-midi-3.html",
   "when": "2026",
   "meta": "Browser · no dependencies · works offline",
   "what": "A playable keyboard whose keys are the vertices of a cycle or of a Möbius ladder, with anywhere up to 24 notes to the octave. The black-key set is chosen to minimise energy on the underlying graph, and the geometry of whatever you are playing is drawn live beside the keys. It will also read a MIDI file and play it back on the current tuning, naming the chords and scrolling the score as it goes."
@@ -10,7 +10,7 @@
  {
   "kind": "demo",
   "name": "Cyclic Sequences",
-  "href": "seq.html",
+  "href": "apps/seq.html",
   "when": "2026",
   "meta": "Browser · no dependencies",
   "what": "Companion page to the Bridges 2026 work: minimum-energy sets on cycles and Möbius ladders, and the sequences the keyboards are built from."
