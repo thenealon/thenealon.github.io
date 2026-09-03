@@ -29,7 +29,9 @@ window.GENEALOGY = [
   "note": "Two doctorates: Budapest in 1967 under Fejes Tóth and Erdős, Cambridge in 1972 under Adams.",
   "thesis": "Banach Algebras and the Theory of Numerical Ranges",
   "mgp": 22719,
-  "mactutor": "Bollobas"
+  "mactutor": "Bollobas",
+  "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/B%C3%A9la_Bollob%C3%A1s.jpg/330px-B%C3%A9la_Bollob%C3%A1s.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:B%C3%A9la_Bollob%C3%A1s.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
  },
  {
   "id": "erdos",
@@ -41,7 +43,9 @@ window.GENEALOGY = [
    "fejer"
   ],
   "wiki": "Paul Erdős",
-  "mgp": 19470
+  "mgp": 19470,
+  "photo": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Erdos_budapest_fall_1992_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Erdos_budapest_fall_1992_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
  },
  {
   "id": "fejestoth",
@@ -63,7 +67,9 @@ window.GENEALOGY = [
    "wylie"
   ],
   "wiki": "Frank Adams",
-  "mgp": 24507
+  "mgp": 24507,
+  "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Frank_Adams_Aug_1988_%28cropped%29.png/330px-Frank_Adams_Aug_1988_%28cropped%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Frank_Adams_Aug_1988_%28cropped%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
  },
  {
   "id": "wylie",
@@ -73,7 +79,9 @@ window.GENEALOGY = [
   "advisors": [
    "lefschetz"
   ],
-  "wiki": "Shaun Wylie"
+  "wiki": "Shaun Wylie",
+  "photo": "https://upload.wikimedia.org/wikipedia/en/c/c1/Shaun_Wylie.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Shaun_Wylie.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
  },
  {
   "id": "lefschetz",
@@ -84,14 +92,18 @@ window.GENEALOGY = [
   "advisors": [
    "story"
   ],
-  "wiki": "Solomon Lefschetz"
+  "wiki": "Solomon Lefschetz",
+  "photo": "https://upload.wikimedia.org/wikipedia/en/0/0a/Solomon_Lefschetz.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Solomon_Lefschetz.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
  },
  {
   "id": "story",
   "name": "William Edward Story",
   "life": "1850–1930",
   "inst": "Universität Leipzig",
-  "wiki": "William Edward Story"
+  "wiki": "William Edward Story",
+  "photo": "https://upload.wikimedia.org/wikipedia/commons/9/96/William_Edward_Story_%281850-1930%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:William_Edward_Story_%281850-1930%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
  },
  {
   "id": "fejer",
@@ -103,7 +115,9 @@ window.GENEALOGY = [
    "schwarz"
   ],
   "wiki": "Lipót Fejér",
-  "mgp": 7488
+  "mgp": 7488,
+  "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Fej%C3%A9r_Lip%C3%B3t.jpg/330px-Fej%C3%A9r_Lip%C3%B3t.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Fej%C3%A9r_Lip%C3%B3t.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
  },
  {
   "id": "schwarz",
@@ -118,7 +132,9 @@ window.GENEALOGY = [
   "mgp": 7487,
   "wiki": "Hermann Schwarz",
   "thesis": "De superficiebus in planum explicabilibus primorum septem ordinum",
-  "mactutor": "Schwarz"
+  "mactutor": "Schwarz",
+  "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Hermann_Amand_Schwarz_%281843-1921%29_by_Louis_Zipfel.jpg/330px-Hermann_Amand_Schwarz_%281843-1921%29_by_Louis_Zipfel.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Hermann_Amand_Schwarz_%281843-1921%29_by_Louis_Zipfel.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
  },
  {
   "id": "weierstrass",
@@ -130,7 +146,9 @@ window.GENEALOGY = [
   ],
   "wiki": "Karl Weierstrass",
   "note": "Honorary doctorate, 1854; he had studied under Gudermann at Münster.",
-  "mgp": 7486
+  "mgp": 7486,
+  "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Karl_Weierstrass.jpg/330px-Karl_Weierstrass.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Karl_Weierstrass.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
  },
  {
   "id": "kummer",
@@ -138,7 +156,9 @@ window.GENEALOGY = [
   "life": "1810–1893",
   "inst": "Universität Halle",
   "wiki": "Ernst Kummer",
-  "mgp": 18331
+  "mgp": 18331,
+  "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Ernst_Eduard_Kummer_photo.jpg/330px-Ernst_Eduard_Kummer_photo.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Ernst_Eduard_Kummer_photo.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
  },
  {
   "id": "gudermann",
@@ -159,7 +179,9 @@ window.GENEALOGY = [
   "advisors": [
    "pfaff"
   ],
-  "wiki": "Carl Friedrich Gauss"
+  "wiki": "Carl Friedrich Gauss",
+  "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Carl_Friedrich_Gauss_1840_by_Jensen.jpg/330px-Carl_Friedrich_Gauss_1840_by_Jensen.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Carl_Friedrich_Gauss_1840_by_Jensen.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
  },
  {
   "id": "pfaff",
@@ -170,7 +192,9 @@ window.GENEALOGY = [
   "advisors": [
    "kastner"
   ],
-  "wiki": "Johann Friedrich Pfaff"
+  "wiki": "Johann Friedrich Pfaff",
+  "photo": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Johann_Friedrich_Pfaff.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Johann_Friedrich_Pfaff.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
  },
  {
   "id": "kastner",
@@ -181,7 +205,9 @@ window.GENEALOGY = [
   "advisors": [
    "hausen"
   ],
-  "wiki": "Abraham Gotthelf Kästner"
+  "wiki": "Abraham Gotthelf Kästner",
+  "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Abraham_Gotthelf_K%C3%A4stner.jpg/330px-Abraham_Gotthelf_K%C3%A4stner.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Abraham_Gotthelf_K%C3%A4stner.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
  },
  {
   "id": "hausen",
@@ -192,7 +218,9 @@ window.GENEALOGY = [
   "advisors": [
    "wichmannshausen"
   ],
-  "wiki": "Christian August Hausen"
+  "wiki": "Christian August Hausen",
+  "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Christian-August-Hausen-d_J.jpg/330px-Christian-August-Hausen-d_J.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Christian-August-Hausen-d_J.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
  },
  {
   "id": "wichmannshausen",
@@ -203,7 +231,9 @@ window.GENEALOGY = [
   "advisors": [
    "mencke"
   ],
-  "wiki": "Johann Christoph Wichmannshausen"
+  "wiki": "Johann Christoph Wichmannshausen",
+  "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Johann-Christoph-Wichmannsh.jpg/330px-Johann-Christoph-Wichmannsh.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Johann-Christoph-Wichmannsh.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
  },
  {
   "id": "mencke",
@@ -212,7 +242,9 @@ window.GENEALOGY = [
   "year": 1665,
   "inst": "Universität Leipzig",
   "wiki": "Otto Mencke",
-  "note": "Founded Acta Eruditorum, the first scientific journal in the German lands. The trail goes cold here."
+  "note": "Founded Acta Eruditorum, the first scientific journal in the German lands. The trail goes cold here.",
+  "photo": "https://upload.wikimedia.org/wikipedia/commons/5/5e/Otto_Mencke.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Otto_Mencke.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
  },
  {
   "id": "balister",

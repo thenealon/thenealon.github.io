@@ -131,17 +131,9 @@
    },
    "sections": [
     {
-     "id": "demos",
-     "rail": "Demos",
-     "heading": "Demos",
-     "block": "items",
-     "kind": "demo",
-     "intro": ""
-    },
-    {
      "id": "gallery",
-     "rail": "Web apps",
-     "heading": "Web apps",
+     "rail": "Demos / Slop",
+     "heading": "Demos / Slop",
      "block": "gallery",
      "intro": ""
     },

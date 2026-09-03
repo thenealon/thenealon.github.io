@@ -184,6 +184,8 @@ def publication_views(pubs, topics):
         '    </div>\n',
         '    <div class="pub-view pub-view--thematic" '
         'data-publication-panel="thematic" hidden>\n',
+        '      <p class="note pub-view-note">Papers may appear in more than '
+        'one section in this view.</p>\n',
     ]
 
     known = {topic["id"] for topic in topics}
@@ -521,13 +523,18 @@ def _thumb(name):
 
 
 def block_gallery(sec):
+    demos = [i for i in load("more.json")
+             if i.get("kind") == "demo" and not i.get("draft")]
     files = sorted(glob.glob(os.path.join(HERE, "apps", "*.html")))
     files = [f for f in files
              if os.path.basename(f).lower() not in ("index.html",)]
+    demo_list = ""
+    if demos:
+        demo_list = block_items({"kind": "demo"})
     if not files:
         return ('    <p class="note">Nothing here yet. Drop a self-contained '
                 '<code>.html</code> file into the <code>apps/</code> folder and '
-                'it will appear here automatically.</p>\n')
+                'it will appear here automatically.</p>\n' + demo_list)
     cards = []
     for path in files:
         href = "apps/" + os.path.basename(path)
@@ -537,7 +544,8 @@ def block_gallery(sec):
             '        %s\n'
             '        <span class="app-name">%s</span>\n'
             '      </a></li>\n' % (href, _thumb(title), title))
-    return ('    <ul class="gallery">\n' + "".join(cards) + '    </ul>\n')
+    return (demo_list + '    <ul class="gallery">\n' + "".join(cards) +
+            '    </ul>\n')
 
 
 

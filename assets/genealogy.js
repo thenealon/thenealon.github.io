@@ -7,10 +7,9 @@
  *  doctorates and so has three advisors, Schwarz had two, and Erdos and
  *  Fejes Toth were both students of Fejer, which closes a diamond.
  *
- *  Portraits are pulled at view time from the Wikipedia REST summary API,
- *  which is public, keyless and CORS-enabled.  Nothing is bundled and no
- *  image is hotlinked from a guessed URL; if the request fails, or a person
- *  has no article, the node keeps its initials and everything still works.
+ *  Stored portrait URLs are painted when the graph opens.  A missing portrait
+ *  is requested from Wikipedia only when that person is selected; if the
+ *  request fails, the node keeps its initials and everything still works.
  */
 (function () {
   'use strict';
@@ -295,9 +294,29 @@
     return out;
   }
 
+  /* Only vertices lying on a directed path to me should light up. */
+  function ancestors(id) {
+    var out = {}, stack = [id];
+    while (stack.length) {
+      var cur = stack.pop();
+      if (out[cur]) { continue; }
+      out[cur] = 1;
+      var advisors = byId[cur] ? (byId[cur].advisors || []) : [];
+      for (var k = 0; k < advisors.length; k++) { stack.push(advisors[k]); }
+    }
+    return out;
+  }
+
+  var reachesMe = ancestors(ME.id);
+
   function select(id) {
-    var lit = descendants(id);
+    var below = descendants(id), lit = {};
     var k;
+    for (k in below) {
+      if (Object.prototype.hasOwnProperty.call(below, k) && reachesMe[k]) {
+        lit[k] = 1;
+      }
+    }
     for (k in nodeEls) {
       if (Object.prototype.hasOwnProperty.call(nodeEls, k)) {
         nodeEls[k].g.classList.toggle('is-lit', !!lit[k]);
@@ -313,7 +332,29 @@
   }
 
   function link(href, label) {
-    return '<a class="tag" href="' + href + '" rel="noopener">' + label + '</a>';
+    var a = document.createElement('a');
+    a.className = 'tag';
+    a.href = href;
+    a.rel = 'noopener';
+    a.textContent = label;
+    return a;
+  }
+
+  function para(cls, text) {
+    var p = document.createElement('p');
+    p.className = cls;
+    p.textContent = text;
+    return p;
+  }
+
+  function relation(label, names) {
+    var p = document.createElement('p');
+    p.className = 'gen-prel';
+    var span = document.createElement('span');
+    span.textContent = label;
+    p.appendChild(span);
+    p.appendChild(document.createTextNode(' ' + names.join(', ')));
+    return p;
   }
 
   function showPanel(p) {
@@ -336,6 +377,21 @@
     }
 
     var links = [];
+    if (p.website) {
+      links.push(link(p.website, 'website'));
+    }
+    if (p.most_cited) {
+      var paperUrl = p.most_cited.journal_url || p.most_cited.arxiv_url;
+      if (paperUrl) {
+        var paperLink = link(paperUrl, 'most-cited paper');
+        if (p.most_cited.title) {
+          paperLink.title = p.most_cited.title;
+          paperLink.setAttribute('aria-label', 'Most-cited paper: ' +
+                                 p.most_cited.title);
+        }
+        links.push(paperLink);
+      }
+    }
     if (p.wiki) {
       links.push(link('https://en.wikipedia.org/wiki/' +
         encodeURIComponent(p.wiki.replace(/ /g, '_')), 'wikipedia'));
@@ -349,26 +405,41 @@
         p.mactutor + '/', 'mactutor'));
     }
 
-    var html = '<div class="gen-portrait" id="gen-portrait"><span>' +
-               initials(p.name) + '</span></div>' +
-               '<p class="gen-pname">' + p.name + '</p>';
-    if (meta.length) { html += '<p class="gen-pmeta">' + meta.join(' &middot; ') + '</p>'; }
+    panel.textContent = '';
+    var portraitBox = document.createElement('div');
+    portraitBox.className = 'gen-portrait';
+    portraitBox.id = 'gen-portrait';
+    var portraitInitials = document.createElement('span');
+    portraitInitials.textContent = initials(p.name);
+    portraitBox.appendChild(portraitInitials);
+    panel.appendChild(portraitBox);
+    panel.appendChild(para('gen-pname', p.name));
+    if (meta.length) { panel.appendChild(para('gen-pmeta', meta.join(' · '))); }
     if (p.thesis) {
-      html += '<p class="gen-pthesis"><span>thesis</span> <i>' + p.thesis + '</i></p>';
+      var thesis = document.createElement('p');
+      thesis.className = 'gen-pthesis';
+      var thesisLabel = document.createElement('span');
+      thesisLabel.textContent = 'thesis';
+      var thesisTitle = document.createElement('i');
+      thesisTitle.textContent = p.thesis;
+      thesis.appendChild(thesisLabel);
+      thesis.appendChild(document.createTextNode(' '));
+      thesis.appendChild(thesisTitle);
+      panel.appendChild(thesis);
     }
-    if (adv.length) {
-      html += '<p class="gen-prel"><span>advised by</span> ' + adv.join(', ') + '</p>';
-    }
-    if (kids.length) {
-      html += '<p class="gen-prel"><span>advised</span> ' + kids.join(', ') + '</p>';
-    }
-    if (p.note) { html += '<p class="gen-pnote">' + p.note + '</p>'; }
+    if (adv.length) { panel.appendChild(relation('advised by', adv)); }
+    if (kids.length) { panel.appendChild(relation('advised', kids)); }
+    if (p.note) { panel.appendChild(para('gen-pnote', p.note)); }
     if (p.photo && p.photo_credit) {
       links.push(link(p.photo_credit, 'portrait credit'));
     }
-    if (links.length) { html += '<div class="linkrow">' + links.join('') + '</div>'; }
-    panel.innerHTML = html;
-    if (p.wiki) { portrait(p, document.getElementById('gen-portrait')); }
+    if (links.length) {
+      var linkrow = document.createElement('div');
+      linkrow.className = 'linkrow';
+      for (k = 0; k < links.length; k++) { linkrow.appendChild(links[k]); }
+      panel.appendChild(linkrow);
+    }
+    if (p.wiki) { portrait(p, portraitBox); }
   }
 
   /* ---- portraits, fetched lazily from Wikipedia --------------------- */
@@ -424,26 +495,10 @@
     n.ini.style.display = 'none';
   }
 
-  /* Prefetch everyone, gently, so the graph fills in with faces. */
+  /* Paint the portraits resolved by the maintenance script. */
   for (var pp = 0; pp < people.length; pp++) {
     if (people[pp].photo) { badge(people[pp].id, people[pp].photo); }
   }
-
-  var queue = people.filter(function (p) { return p.wiki && !p.photo; });
-  (function drain() {
-    var p = queue.shift();
-    if (!p) { return; }
-    fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' +
-          encodeURIComponent(p.wiki.replace(/ /g, '_')))
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (d) {
-        var src = d && d.thumbnail && d.thumbnail.source;
-        cache[p.id] = src || null;
-        if (src) { badge(p.id, src); }
-      })
-      .catch(function () { cache[p.id] = null; })
-      .then(function () { setTimeout(drain, 90); });
-  }());
 
   /* ---- pan and zoom --------------------------------------------------
      The viewBox is kept equal to the element's pixel size, so one unit is
@@ -504,10 +559,13 @@
     ly = e.clientY;
     apply();
   });
-  root.addEventListener('pointerup', function () {
+  function endDrag() {
     dragging = false;
     root.classList.remove('is-dragging');
-  });
+  }
+  root.addEventListener('pointerup', endDrag);
+  root.addEventListener('pointercancel', endDrag);
+  root.addEventListener('lostpointercapture', endDrag);
   root.addEventListener('wheel', function (e) {
     e.preventDefault();
     var f = e.deltaY < 0 ? 1.12 : 1 / 1.12;
@@ -544,24 +602,17 @@
   });
   bind('gen-reset', function () { select('bushaw'); focusOn('bushaw', 1, 0.62); });
   bind('gen-fit', fitAll);
-  bind('gen-in', function () {
-    scale = Math.min(4, scale * 1.25);
-    focusKeep();
-  });
-  bind('gen-out', function () {
-    scale = Math.max(0.25, scale / 1.25);
-    focusKeep();
-  });
-
-  /* zoom about the centre of the view */
-  var lastCx = null, lastCy = null;
-  function focusKeep() {
-    var cx = lastCx === null ? VW / 2 : lastCx;
-    var cy = lastCy === null ? VH / 2 : lastCy;
-    tx = cx - (cx - tx);
-    ty = cy - (cy - ty);
+  function zoomAtCenter(factor) {
+    var next = Math.min(4, Math.max(0.25, scale * factor));
+    var ratio = next / scale;
+    var cx = VW / 2, cy = VH / 2;
+    tx = cx - (cx - tx) * ratio;
+    ty = cy - (cy - ty) * ratio;
+    scale = next;
     apply();
   }
+  bind('gen-in', function () { zoomAtCenter(1.25); });
+  bind('gen-out', function () { zoomAtCenter(1 / 1.25); });
 
   /* Open on Bollobas rather than on me: he is the hub, so this frames my
      row of academic siblings below and the three grandadvisors above. */

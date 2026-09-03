@@ -18,7 +18,7 @@
  {
   "kind": "demo",
   "name": "Mathematical genealogy",
-  "href": "genealogy.html",
+  "href": "more.html#genealogy",
   "when": "2026",
   "meta": "Browser · portraits from Wikipedia",
   "what": "My advisor graph, back through Bollobás, Erdős, Fejér, Weierstraß and Gauß to seventeenth-century Leipzig. Click anyone to light up every path from them down to me. It is a graph and not a tree, which is the fun of it."
