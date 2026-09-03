@@ -184,18 +184,21 @@ def publication_views(pubs, topics):
         '    </div>\n',
         '    <div class="pub-view pub-view--thematic" '
         'data-publication-panel="thematic" hidden>\n',
+        '      <p class="note pub-view-note">Papers may appear in more than '
+        'one section in this view.</p>\n',
     ]
 
     known = {topic["id"] for topic in topics}
-    missing = [pub["key"] for pub in pubs if not pub.get("topic")]
-    unknown = sorted({pub["topic"] for pub in pubs if pub.get("topic")} - known)
+    missing = [pub["key"] for pub in pubs if not pub.get("topics")]
+    assigned = {topic_id for pub in pubs for topic_id in pub.get("topics", [])}
+    unknown = sorted(assigned - known)
     if missing:
-        raise ValueError("Publication(s) missing topic: %s" % ", ".join(missing))
+        raise ValueError("Publication(s) missing topics: %s" % ", ".join(missing))
     if unknown:
         raise ValueError("Unknown publication topic(s): %s" % ", ".join(unknown))
 
     for topic in topics:
-        grouped = [pub for pub in pubs if pub.get("topic") == topic["id"]]
+        grouped = [pub for pub in pubs if topic["id"] in pub["topics"]]
         if not grouped:
             continue
         out.append('      <section class="pub-topic" aria-labelledby="pub-topic-%s">\n'
@@ -520,13 +523,20 @@ def _thumb(name):
 
 
 def block_gallery(sec):
+    demos = [i for i in load("more.json")
+             if i.get("kind") == "demo" and not i.get("draft")]
+    demo_hrefs = {i.get("href") for i in demos if i.get("href")}
     files = sorted(glob.glob(os.path.join(HERE, "apps", "*.html")))
     files = [f for f in files
-             if os.path.basename(f).lower() not in ("index.html",)]
+             if os.path.basename(f).lower() not in ("index.html",)
+             and "apps/" + os.path.basename(f) not in demo_hrefs]
+    demo_list = ""
+    if demos:
+        demo_list = block_items({"kind": "demo"})
     if not files:
         return ('    <p class="note">Nothing here yet. Drop a self-contained '
                 '<code>.html</code> file into the <code>apps/</code> folder and '
-                'it will appear here automatically.</p>\n')
+                'it will appear here automatically.</p>\n' + demo_list)
     cards = []
     for path in files:
         href = "apps/" + os.path.basename(path)
@@ -536,7 +546,8 @@ def block_gallery(sec):
             '        %s\n'
             '        <span class="app-name">%s</span>\n'
             '      </a></li>\n' % (href, _thumb(title), title))
-    return ('    <ul class="gallery">\n' + "".join(cards) + '    </ul>\n')
+    return (demo_list + '    <ul class="gallery">\n' + "".join(cards) +
+            '    </ul>\n')
 
 
 
