@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Parse Boolean sentences, build truth tables, and discover logically equivalent formulas.">
+<meta name="color-scheme" content="light dark">
+<title>Boolean Sentence Lab</title>
+<style>
+  :root {
+    --paper: #f5f3ed;
+    --paper-2: #ebe8df;
+    --ink: #17202a;
+    --muted: #626a70;
+    --line: #cbc7bb;
+    --blue: #174f75;
+    --blue-soft: #dbeaf3;
+    --amber: #9a5b00;
+    --amber-soft: #f4e6c9;
+    --red: #9e3d32;
+    --true: #17633b;
+    --true-bg: #dcecdf;
+    --false: #8a352e;
+    --false-bg: #f0deda;
+    --shadow: 0 18px 50px rgba(28, 36, 40, .11);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #171b1e;
+      --paper-2: #20262a;
+      --ink: #edf0ef;
+      --muted: #aeb7ba;
+      --line: #3b4448;
+      --blue: #82bde0;
+      --blue-soft: #17384c;
+      --amber: #efb859;
+      --amber-soft: #44351d;
+      --red: #f28d80;
+      --true: #8bd2a7;
+      --true-bg: #173c2b;
+      --false: #ee9d92;
+      --false-bg: #472622;
+      --shadow: 0 18px 50px rgba(0, 0, 0, .3);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { min-width: 320px; background: var(--paper-2); }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background:
+      linear-gradient(90deg, transparent 31px, rgba(154, 91, 0, .11) 32px, transparent 33px),
+      repeating-linear-gradient(0deg, transparent 0 31px, rgba(23, 79, 117, .055) 31px 32px),
+      var(--paper);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 16px;
+    line-height: 1.45;
+  }
+
+  button, textarea, select, input { font: inherit; }
+  button, select { color: inherit; }
+  button { cursor: pointer; }
+
+  .page { width: min(1440px, 100%); margin: 0 auto; padding: 24px 28px 56px 54px; }
+  header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 18px;
+  }
+  h1 { margin: 0; font-size: clamp(1.75rem, 4vw, 3.25rem); line-height: 1; letter-spacing: -.035em; }
+  .kicker {
+    margin: 0 0 5px;
+    color: var(--blue);
+    font: 700 .75rem/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+  }
+  .header-note { max-width: 36rem; margin: 0; color: var(--muted); text-align: right; font-size: .95rem; }
+
+  .composer {
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--blue);
+    background: color-mix(in srgb, var(--paper) 94%, transparent);
+    box-shadow: var(--shadow);
+    padding: 18px;
+  }
+  label { display: block; font-weight: 700; margin-bottom: 7px; }
+  textarea {
+    display: block;
+    width: 100%;
+    min-height: 92px;
+    resize: vertical;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    color: var(--ink);
+    background: var(--paper);
+    padding: 15px;
+    font: 1.2rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  textarea:focus, button:focus-visible, select:focus-visible, input:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--blue) 35%, transparent);
+    outline-offset: 2px;
+  }
+  .symbol-row, .example-row, .actions, .summary, .equiv-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .symbol-row { margin-top: 10px; }
+  .symbol-button, .example, .secondary, .copy-one {
+    border: 1px solid var(--line);
+    background: var(--paper);
+    border-radius: 2px;
+    padding: 6px 10px;
+  }
+  .symbol-button { min-width: 38px; color: var(--blue); font: 700 1.05rem/1 ui-monospace, monospace; }
+  .symbol-button:hover, .example:hover, .secondary:hover, .copy-one:hover { border-color: var(--blue); }
+  .syntax { margin: 9px 0 0; color: var(--muted); font-size: .9rem; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .example-row { margin-top: 12px; }
+  .example { color: var(--muted); font-size: .86rem; }
+  .example-row span { color: var(--muted); font-size: .86rem; font-weight: 700; }
+  .actions { justify-content: space-between; margin-top: 15px; }
+  .action-left { display: flex; align-items: center; gap: 9px; }
+  .primary {
+    border: 1px solid var(--blue);
+    border-radius: 2px;
+    padding: 9px 18px;
+    color: var(--paper);
+    background: var(--blue);
+    font-weight: 700;
+  }
+  .primary:hover { filter: brightness(1.1); }
+  select, .search {
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: var(--paper);
+    padding: 8px 10px;
+  }
+  .limit-label { margin: 0; font-size: .9rem; font-weight: 400; color: var(--muted); }
+  .limit-label select { margin-left: 5px; }
+  .error { min-height: 1.4em; margin: 9px 0 0; color: var(--red); font-weight: 700; }
+
+  .summary { margin: 18px 0; }
+  .pill {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--paper);
+    padding: 5px 10px;
+    font: 700 .82rem/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .pill strong { color: var(--blue); }
+
+  .workspace { display: grid; grid-template-columns: minmax(480px, .9fr) minmax(480px, 1.1fr); gap: 18px; align-items: start; }
+  .panel { min-width: 0; border: 1px solid var(--line); background: var(--paper); box-shadow: var(--shadow); }
+  .panel-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    border-bottom: 1px solid var(--line);
+    padding: 13px 15px;
+    background: var(--paper-2);
+  }
+  h2 { margin: 0; font-size: 1.18rem; }
+  .panel-head p { margin: 0; color: var(--muted); font-size: .85rem; text-align: right; }
+
+  .table-wrap { overflow: auto; max-height: 680px; }
+  table { width: 100%; border-collapse: collapse; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  th, td { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 8px 10px; text-align: center; white-space: nowrap; }
+  th { position: sticky; top: 0; z-index: 1; color: var(--blue); background: var(--paper-2); font-size: .82rem; }
+  th:last-child, td:last-child { border-right: 0; }
+  td { font-weight: 700; }
+  td.truth-true { color: var(--true); background: var(--true-bg); }
+  td.truth-false { color: var(--false); background: var(--false-bg); }
+
+  .equiv-body { padding: 12px; }
+  .equiv-tools { margin-bottom: 10px; }
+  .search { flex: 1; min-width: 180px; }
+  .equiv-list { margin: 0; padding: 0; list-style: none; max-height: 630px; overflow: auto; border-top: 1px solid var(--line); }
+  .equiv-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; border-bottom: 1px solid var(--line); padding: 10px 4px 10px 8px; }
+  .formula { min-width: 0; overflow-wrap: anywhere; font: 1rem/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .source { display: inline-block; margin-left: 8px; color: var(--amber); font: 700 .68rem/1 ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; }
+  .copy-one { align-self: start; padding: 5px 8px; color: var(--muted); font-size: .78rem; }
+  .empty { padding: 28px 16px; color: var(--muted); text-align: center; }
+  footer { margin-top: 20px; color: var(--muted); font-size: .88rem; }
+
+  @media (max-width: 1020px) {
+    .workspace { grid-template-columns: 1fr; }
+    .table-wrap, .equiv-list { max-height: 520px; }
+  }
+  @media (max-width: 650px) {
+    .page { padding: 18px 12px 40px 30px; }
+    header { display: block; }
+    .header-note { margin-top: 10px; text-align: left; }
+    .composer { padding: 13px; }
+    .actions { align-items: stretch; }
+    .action-left { width: 100%; }
+    .primary { flex: 1; }
+    .limit-label { width: 100%; }
+    .panel-head { display: block; }
+    .panel-head p { margin-top: 3px; text-align: left; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<main class="page">
+  <header>
+    <div>
+      <p class="kicker">Finite logic workbench</p>
+      <h1>Boolean Sentence Lab</h1>
+    </div>
+    <p class="header-note">Every displayed equivalent is checked against the same truth function. There are infinitely many syntactic equivalents, so the search is capped at a useful finite number.</p>
+  </header>
+
+  <section class="composer" aria-labelledby="sentence-label">
+    <label id="sentence-label" for="sentence">Boolean sentence</label>
+    <textarea id="sentence" spellcheck="false" aria-describedby="syntax error">(P → Q) ∧ (Q → R)</textarea>
+    <div class="symbol-row" aria-label="Insert a logical symbol">
+      <button class="symbol-button" type="button" data-insert="¬" title="not">¬</button>
+      <button class="symbol-button" type="button" data-insert=" ∧ " title="and">∧</button>
+      <button class="symbol-button" type="button" data-insert=" ∨ " title="or">∨</button>
+      <button class="symbol-button" type="button" data-insert=" ⊕ " title="exclusive or">⊕</button>
+      <button class="symbol-button" type="button" data-insert=" → " title="implies">→</button>
+      <button class="symbol-button" type="button" data-insert=" ↔ " title="if and only if">↔</button>
+      <button class="symbol-button" type="button" data-insert=" ↑ " title="nand">↑</button>
+      <button class="symbol-button" type="button" data-insert=" ↓ " title="nor">↓</button>
+      <button class="symbol-button" type="button" data-insert="(" title="left parenthesis">(</button>
+      <button class="symbol-button" type="button" data-insert=")" title="right parenthesis">)</button>
+    </div>
+    <p class="syntax" id="syntax">Also accepts <code>not</code>, <code>and</code>, <code>or</code>, <code>xor</code>, <code>nand</code>, <code>nor</code>, <code>implies</code>, <code>iff</code>, <code>if P then Q</code>, and symbols such as <code>!</code>, <code>&amp;&amp;</code>, <code>||</code>, <code>-&gt;</code>, and <code>&lt;-&gt;</code>. Use up to six variables.</p>
+    <div class="example-row" aria-label="Examples">
+      <span>Try</span>
+      <button class="example" type="button" data-example="¬(P ∧ Q) ↔ (¬P ∨ ¬Q)">De Morgan</button>
+      <button class="example" type="button" data-example="(P → Q) ∧ (Q → R)">Implication chain</button>
+      <button class="example" type="button" data-example="(P ⊕ Q) ∨ R">Exclusive or</button>
+      <button class="example" type="button" data-example="if P and Q then R">Words</button>
+    </div>
+    <div class="actions">
+      <div class="action-left">
+        <button class="primary" id="analyze" type="button">Analyze sentence</button>
+        <button class="secondary" id="clear" type="button">Clear</button>
+      </div>
+      <label class="limit-label" for="limit">Equivalent-form limit
+        <select id="limit">
+          <option value="50">50</option>
+          <option value="100" selected>100</option>
+          <option value="250">250</option>
+        </select>
+      </label>
+    </div>
+    <p class="error" id="error" role="alert" aria-live="polite"></p>
+  </section>
+
+  <div class="summary" id="summary" aria-live="polite"></div>
+
+  <div class="workspace" id="workspace" hidden>
+    <section class="panel" aria-labelledby="truth-heading">
+      <div class="panel-head">
+        <h2 id="truth-heading">Truth table</h2>
+        <p id="truth-caption"></p>
+      </div>
+      <div class="table-wrap" id="truth-table"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="equiv-heading">
+      <div class="panel-head">
+        <h2 id="equiv-heading">Equivalent sentences</h2>
+        <p id="equiv-caption"></p>
+      </div>
+      <div class="equiv-body">
+        <div class="equiv-tools">
+          <input class="search" id="filter" type="search" placeholder="Filter formulas" aria-label="Filter equivalent formulas">
+          <button class="secondary" id="copy-all" type="button">Copy all</button>
+        </div>
+        <ol class="equiv-list" id="equiv-list"></ol>
+      </div>
+    </section>
+  </div>
+
+  <footer>Truth values are shown with all variables true first. Variables are case-sensitive; words such as <code>and</code> and <code>iff</code> are reserved.</footer>
+</main>
+
+<script id="logic-core">
+(function (root) {
+  "use strict";
+
+  var BINARY = {
+    IFF:  { precedence: 1, symbol: "↔" },
+    IMP:  { precedence: 2, symbol: "→", right: true },
+    OR:   { precedence: 3, symbol: "∨" },
+    NOR:  { precedence: 3, symbol: "↓" },
+    XOR:  { precedence: 4, symbol: "⊕" },
+    AND:  { precedence: 5, symbol: "∧" },
+    NAND: { precedence: 5, symbol: "↑" }
+  };
+
+  function LogicError(message, position) {
+    this.name = "LogicError";
+    this.message = message;
+    this.position = position;
+  }
+  LogicError.prototype = Object.create(Error.prototype);
+
+  function tokenize(source) {
+    var tokens = [];
+    var i = 0;
+    var words = {
+      not: "NOT", and: "AND", or: "OR", xor: "XOR", nand: "NAND", nor: "NOR",
+      implies: "IMP", iff: "IFF", true: "CONST_TRUE", false: "CONST_FALSE",
+      if: "IF", then: "THEN"
+    };
+    var multi = [["<=>", "IFF"], ["<->", "IFF"], ["=>", "IMP"], ["->", "IMP"], ["&&", "AND"], ["||", "OR"]];
+    var single = {
+      "¬": "NOT", "!": "NOT", "~": "NOT", "∧": "AND", "&": "AND",
+      "∨": "OR", "|": "OR", "⊕": "XOR", "^": "XOR", "→": "IMP",
+      "↔": "IFF", "↑": "NAND", "↓": "NOR", "(": "LPAREN", ")": "RPAREN"
+    };
+
+    while (i < source.length) {
+      if (/\s/.test(source[i])) { i += 1; continue; }
+      var found = false;
+      for (var m = 0; m < multi.length; m += 1) {
+        if (source.slice(i, i + multi[m][0].length) === multi[m][0]) {
+          tokens.push({ type: multi[m][1], text: multi[m][0], pos: i });
+          i += multi[m][0].length;
+          found = true;
+          break;
+        }
+      }
+      if (found) continue;
+      if (single[source[i]]) {
+        tokens.push({ type: single[source[i]], text: source[i], pos: i });
+        i += 1;
+        continue;
+      }
+      if (source[i] === "0" || source[i] === "1" || source[i] === "⊤" || source[i] === "⊥") {
+        tokens.push({ type: (source[i] === "1" || source[i] === "⊤") ? "CONST_TRUE" : "CONST_FALSE", text: source[i], pos: i });
+        i += 1;
+        continue;
+      }
+      var match = /^[A-Za-z][A-Za-z0-9_]*/.exec(source.slice(i));
+      if (match) {
+        var lower = match[0].toLowerCase();
+        tokens.push({ type: words[lower] || "VAR", text: match[0], pos: i });
+        i += match[0].length;
+        continue;
+      }
+      throw new LogicError("I do not recognize ‘" + source[i] + "’", i);
+    }
+    tokens.push({ type: "EOF", text: "", pos: source.length });
+    return tokens;
+  }
+
+  function parse(source) {
+    if (!source.trim()) throw new LogicError("Enter a Boolean sentence.", 0);
+    var tokens = tokenize(source);
+    var at = 0;
+    function peek() { return tokens[at]; }
+    function take(type, message) {
+      var token = peek();
+      if (token.type !== type) throw new LogicError(message || ("Expected " + type), token.pos);
+      at += 1;
+      return token;
+    }
+    function expression(minimum) {
+      var left = unary();
+      while (BINARY[peek().type] && BINARY[peek().type].precedence >= minimum) {
+        var operator = tokens[at++];
+        var info = BINARY[operator.type];
+        var right = expression(info.precedence + (info.right ? 0 : 1));
+        left = { type: operator.type, left: left, right: right };
+      }
+      return left;
+    }
+    function unary() {
+      var token = peek();
+      if (token.type === "NOT") {
+        at += 1;
+        return { type: "NOT", child: unary() };
+      }
+      if (token.type === "IF") {
+        at += 1;
+        var condition = expression(1);
+        take("THEN", "Expected ‘then’ after the condition");
+        return { type: "IMP", left: condition, right: expression(BINARY.IMP.precedence) };
+      }
+      if (token.type === "LPAREN") {
+        at += 1;
+        var inside = expression(1);
+        take("RPAREN", "Expected a closing parenthesis");
+        return inside;
+      }
+      if (token.type === "VAR") { at += 1; return { type: "VAR", name: token.text }; }
+      if (token.type === "CONST_TRUE" || token.type === "CONST_FALSE") {
+        at += 1;
+        return { type: "CONST", value: token.type === "CONST_TRUE" };
+      }
+      throw new LogicError("Expected a variable, constant, negation, or parenthesis", token.pos);
+    }
+    var tree = expression(1);
+    if (peek().type !== "EOF") {
+      var message = peek().type === "THEN" ? "Unexpected ‘then’" : "Expected a logical operator";
+      throw new LogicError(message, peek().pos);
+    }
+    return tree;
+  }
+
+  function precedence(node) {
+    if (node.type === "VAR" || node.type === "CONST") return 8;
+    if (node.type === "NOT") return 7;
+    return BINARY[node.type].precedence;
+  }
+
+  function format(node, parent, side) {
+    parent = parent || 0;
+    if (node.type === "VAR") return node.name;
+    if (node.type === "CONST") return node.value ? "⊤" : "⊥";
+    if (node.type === "NOT") {
+      var child = format(node.child, 7, "right");
+      if (precedence(node.child) < 7) child = "(" + format(node.child) + ")";
+      return "¬" + child;
+    }
+    var info = BINARY[node.type];
+    var left = format(node.left, info.precedence, "left");
+    var right = format(node.right, info.precedence, "right");
+    var lp = precedence(node.left);
+    var rp = precedence(node.right);
+    if (lp < info.precedence || (node.type === "IMP" && lp === info.precedence)) left = "(" + format(node.left) + ")";
+    if (rp < info.precedence || (!info.right && rp === info.precedence && node.right.type !== node.type)) right = "(" + format(node.right) + ")";
+    var text = left + " " + info.symbol + " " + right;
+    if (info.precedence < parent || (side === "left" && node.type === "IMP" && info.precedence === parent)) return "(" + text + ")";
+    return text;
+  }
+
+  function variables(node, set) {
+    set = set || new Set();
+    if (node.type === "VAR") set.add(node.name);
+    else if (node.type === "NOT") variables(node.child, set);
+    else if (node.left) { variables(node.left, set); variables(node.right, set); }
+    return Array.from(set).sort(function (a, b) { return a.localeCompare(b, undefined, { numeric: true }); });
+  }
+
+  function evaluate(node, assignment) {
+    switch (node.type) {
+      case "VAR": return Boolean(assignment[node.name]);
+      case "CONST": return node.value;
+      case "NOT": return !evaluate(node.child, assignment);
+      case "AND": return evaluate(node.left, assignment) && evaluate(node.right, assignment);
+      case "OR": return evaluate(node.left, assignment) || evaluate(node.right, assignment);
+      case "XOR": return evaluate(node.left, assignment) !== evaluate(node.right, assignment);
+      case "IMP": return !evaluate(node.left, assignment) || evaluate(node.right, assignment);
+      case "IFF": return evaluate(node.left, assignment) === evaluate(node.right, assignment);
+      case "NAND": return !(evaluate(node.left, assignment) && evaluate(node.right, assignment));
+      case "NOR": return !(evaluate(node.left, assignment) || evaluate(node.right, assignment));
+      default: throw new Error("Unknown node type " + node.type);
+    }
+  }
+
+  function assignmentFor(index, names) {
+    var assignment = {};
+    for (var i = 0; i < names.length; i += 1) {
+      assignment[names[i]] = Boolean(index & (1 << (names.length - i - 1)));
+    }
+    return assignment;
+  }
+
+  function maskOf(node, names) {
+    var mask = 0n;
+    var count = 1 << names.length;
+    for (var i = 0; i < count; i += 1) {
+      if (evaluate(node, assignmentFor(i, names))) mask |= 1n << BigInt(i);
+    }
+    return mask;
+  }
+
+  function collectSubexpressions(node, list, seen) {
+    list = list || [];
+    seen = seen || new Set();
+    if (node.type === "NOT") collectSubexpressions(node.child, list, seen);
+    else if (node.left) { collectSubexpressions(node.left, list, seen); collectSubexpressions(node.right, list, seen); }
+    if (node.type !== "VAR" && node.type !== "CONST") {
+      var key = format(node);
+      if (!seen.has(key)) { seen.add(key); list.push(node); }
+    }
+    return list;
+  }
+
+  function canonicalDNF(node, names) {
+    var terms = [];
+    var count = 1 << names.length;
+    for (var i = 0; i < count; i += 1) {
+      var assignment = assignmentFor(i, names);
+      if (!evaluate(node, assignment)) continue;
+      var literals = names.map(function (name) { return assignment[name] ? name : "¬" + name; });
+      terms.push(literals.length > 1 ? "(" + literals.join(" ∧ ") + ")" : literals[0] || "⊤");
+    }
+    if (!terms.length) return "⊥";
+    if (terms.length === count) return "⊤";
+    return terms.join(" ∨ ");
+  }
+
+  function canonicalCNF(node, names) {
+    var clauses = [];
+    var count = 1 << names.length;
+    for (var i = 0; i < count; i += 1) {
+      var assignment = assignmentFor(i, names);
+      if (evaluate(node, assignment)) continue;
+      var literals = names.map(function (name) { return assignment[name] ? "¬" + name : name; });
+      clauses.push(literals.length > 1 ? "(" + literals.join(" ∨ ") + ")" : literals[0] || "⊥");
+    }
+    if (!clauses.length) return "⊤";
+    if (clauses.length === count) return "⊥";
+    return clauses.join(" ∧ ");
+  }
+
+  function eliminate(node) {
+    if (node.type === "VAR" || node.type === "CONST") return node;
+    if (node.type === "NOT") return { type: "NOT", child: eliminate(node.child) };
+    var a = eliminate(node.left);
+    var b = eliminate(node.right);
+    if (node.type === "AND" || node.type === "OR") return { type: node.type, left: a, right: b };
+    if (node.type === "IMP") return { type: "OR", left: { type: "NOT", child: a }, right: b };
+    if (node.type === "IFF") return { type: "OR", left: { type: "AND", left: a, right: b }, right: { type: "AND", left: { type: "NOT", child: a }, right: { type: "NOT", child: b } } };
+    if (node.type === "XOR") return { type: "AND", left: { type: "OR", left: a, right: b }, right: { type: "NOT", child: { type: "AND", left: a, right: b } } };
+    if (node.type === "NAND") return { type: "NOT", child: { type: "AND", left: a, right: b } };
+    return { type: "NOT", child: { type: "OR", left: a, right: b } };
+  }
+
+  function nnf(node, negated) {
+    if (node.type === "VAR") return negated ? { type: "NOT", child: node } : node;
+    if (node.type === "CONST") return { type: "CONST", value: negated ? !node.value : node.value };
+    if (node.type === "NOT") return nnf(node.child, !negated);
+    var type = node.type;
+    if (negated) type = type === "AND" ? "OR" : "AND";
+    return { type: type, left: nnf(node.left, negated), right: nnf(node.right, negated) };
+  }
+
+  function key(node) { return format(node); }
+  function simplify(node) {
+    if (node.type === "VAR" || node.type === "CONST") return node;
+    if (node.type === "NOT") {
+      var child = simplify(node.child);
+      if (child.type === "CONST") return { type: "CONST", value: !child.value };
+      if (child.type === "NOT") return simplify(child.child);
+      return { type: "NOT", child: child };
+    }
+    var a = simplify(node.left);
+    var b = simplify(node.right);
+    if (node.type !== "AND" && node.type !== "OR") return simplify(eliminate({ type: node.type, left: a, right: b }));
+    if (key(a) === key(b)) return a;
+    if (node.type === "AND") {
+      if ((a.type === "CONST" && !a.value) || (b.type === "CONST" && !b.value)) return { type: "CONST", value: false };
+      if (a.type === "CONST" && a.value) return b;
+      if (b.type === "CONST" && b.value) return a;
+    } else {
+      if ((a.type === "CONST" && a.value) || (b.type === "CONST" && b.value)) return { type: "CONST", value: true };
+      if (a.type === "CONST" && !a.value) return b;
+      if (b.type === "CONST" && !b.value) return a;
+    }
+    return { type: node.type, left: a, right: b };
+  }
+
+  function nandText(node) {
+    if (node.type === "VAR" || node.type === "CONST") return format(node);
+    if (node.type === "NOT") { var x = nandText(node.child); return "(" + x + " ↑ " + x + ")"; }
+    var a = nandText(node.left), b = nandText(node.right);
+    if (node.type === "AND") { var n = "(" + a + " ↑ " + b + ")"; return "(" + n + " ↑ " + n + ")"; }
+    return "((" + a + " ↑ " + a + ") ↑ (" + b + " ↑ " + b + "))";
+  }
+
+  function norText(node) {
+    if (node.type === "VAR" || node.type === "CONST") return format(node);
+    if (node.type === "NOT") { var x = norText(node.child); return "(" + x + " ↓ " + x + ")"; }
+    var a = norText(node.left), b = norText(node.right);
+    if (node.type === "OR") { var n = "(" + a + " ↓ " + b + ")"; return "(" + n + " ↓ " + n + ")"; }
+    return "((" + a + " ↓ " + a + ") ↓ (" + b + " ↓ " + b + "))";
+  }
+
+  function enumerate(target, names, limit, addResult) {
+    var levels = [];
+    var retained = new Map();
+    var all = (1n << BigInt(1 << names.length)) - 1n;
+    var operations = 0;
+    var budget = limit >= 250 ? 700000 : limit >= 100 ? 420000 : 220000;
+    var perMask = names.length <= 3 ? 5 : 3;
+
+    function retain(formula) {
+      var maskKey = formula.mask.toString();
+      var list = retained.get(maskKey) || [];
+      if (list.some(function (item) { return item.text === formula.text; })) return;
+      if (formula.mask === target) addResult(formula.text, "truth-function search");
+      if (list.length >= perMask) return;
+      list.push(formula);
+      retained.set(maskKey, list);
+      (levels[formula.cost] || (levels[formula.cost] = [])).push(formula);
+    }
+
+    names.forEach(function (name, variableIndex) {
+      var mask = 0n;
+      for (var row = 0; row < (1 << names.length); row += 1) {
+        if (row & (1 << (names.length - variableIndex - 1))) mask |= 1n << BigInt(row);
+      }
+      retain({ text: name, mask: mask, cost: 1 });
+    });
+    retain({ text: "⊥", mask: 0n, cost: 1 });
+    retain({ text: "⊤", mask: all, cost: 1 });
+
+    var ops = [
+      { symbol: "∧", commutative: true, apply: function (a, b) { return a & b; } },
+      { symbol: "∨", commutative: true, apply: function (a, b) { return a | b; } },
+      { symbol: "⊕", commutative: true, apply: function (a, b) { return a ^ b; } },
+      { symbol: "→", commutative: false, apply: function (a, b) { return ((all ^ a) | b) & all; } },
+      { symbol: "↔", commutative: true, apply: function (a, b) { return all ^ (a ^ b); } }
+    ];
+
+    for (var cost = 2; cost <= 9 && operations < budget; cost += 1) {
+      var previous = levels[cost - 1] || [];
+      for (var u = 0; u < previous.length && operations < budget; u += 1) {
+        operations += 1;
+        retain({ text: "¬(" + previous[u].text + ")", mask: all ^ previous[u].mask, cost: cost });
+      }
+      for (var leftCost = 1; leftCost <= cost - 2 && operations < budget; leftCost += 1) {
+        var rightCost = cost - leftCost - 1;
+        var lefts = levels[leftCost] || [];
+        var rights = levels[rightCost] || [];
+        for (var i = 0; i < lefts.length && operations < budget; i += 1) {
+          for (var j = 0; j < rights.length && operations < budget; j += 1) {
+            for (var o = 0; o < ops.length && operations < budget; o += 1) {
+              var op = ops[o];
+              if (op.commutative && lefts[i].text > rights[j].text) continue;
+              operations += 1;
+              retain({
+                text: "(" + lefts[i].text + " " + op.symbol + " " + rights[j].text + ")",
+                mask: op.apply(lefts[i].mask, rights[j].mask),
+                cost: cost
+              });
+            }
+          }
+        }
+      }
+    }
+    return operations;
+  }
+
+  function equivalents(node, names, limit) {
+    var target = maskOf(node, names);
+    var results = [];
+    var seen = new Set();
+    function add(text, source) {
+      if (!text || seen.has(text) || results.length >= limit) return;
+      try {
+        if (maskOf(parse(text), names) !== target) return;
+      } catch (error) { return; }
+      seen.add(text);
+      results.push({ text: text, source: source });
+    }
+
+    var basis = eliminate(node);
+    var normal = nnf(basis, false);
+    add(format(node), "original");
+    add(format(simplify(basis)), "simplified");
+    add(format(basis), "implication-free");
+    add(format(normal), "negation normal form");
+    add(canonicalDNF(node, names), "canonical DNF");
+    add(canonicalCNF(node, names), "canonical CNF");
+    if (names.length && format(basis).length < 180) {
+      add(nandText(basis), "NAND only");
+      add(norText(basis), "NOR only");
+    }
+    enumerate(target, names, limit, add);
+
+    var cursor = 0;
+    while (results.length < limit && cursor < results.length) {
+      var f = results[cursor++].text;
+      if (f.length > 420) continue;
+      var wrappers = [
+        "¬¬(" + f + ")", "(" + f + " ∧ ⊤)", "(⊤ ∧ " + f + ")",
+        "(" + f + " ∨ ⊥)", "(⊥ ∨ " + f + ")", "(" + f + " ∧ " + f + ")",
+        "(" + f + " ∨ " + f + ")", "(" + f + " ↔ ⊤)", "(⊤ → " + f + ")",
+        "(¬(" + f + ") → ⊥)", "(" + f + " ⊕ ⊥)"
+      ];
+      if (names.length) {
+        names.forEach(function (name) {
+          wrappers.push("(" + f + " ∧ (" + name + " ∨ ¬" + name + "))");
+          wrappers.push("(" + f + " ∨ (" + name + " ∧ ¬" + name + "))");
+          wrappers.push("((" + f + " ∧ " + name + ") ∨ (" + f + " ∧ ¬" + name + "))");
+          wrappers.push("((" + f + " ∨ " + name + ") ∧ (" + f + " ∨ ¬" + name + "))");
+        });
+      }
+      wrappers.forEach(function (text) { add(text, "identity expansion"); });
+    }
+    return results;
+  }
+
+  function analyze(source, limit) {
+    var tree = parse(source);
+    var names = variables(tree);
+    if (names.length > 6) throw new LogicError("Use at most six distinct variables (this sentence has " + names.length + ").", 0);
+    var mask = maskOf(tree, names);
+    var rows = 1 << names.length;
+    var trueCount = 0;
+    for (var i = 0; i < rows; i += 1) if (mask & (1n << BigInt(i))) trueCount += 1;
+    return {
+      tree: tree,
+      variables: names,
+      mask: mask,
+      trueCount: trueCount,
+      rowCount: rows,
+      classification: trueCount === rows ? "tautology" : trueCount === 0 ? "contradiction" : "contingency",
+      subexpressions: collectSubexpressions(tree),
+      equivalents: equivalents(tree, names, limit)
+    };
+  }
+
+  root.LogicCore = {
+    LogicError: LogicError,
+    parse: parse,
+    format: format,
+    variables: variables,
+    evaluate: evaluate,
+    assignmentFor: assignmentFor,
+    maskOf: maskOf,
+    canonicalDNF: canonicalDNF,
+    canonicalCNF: canonicalCNF,
+    equivalents: equivalents,
+    analyze: analyze
+  };
+}(typeof window === "undefined" ? globalThis : window));
+</script>
+
+<script>
+(function () {
+  "use strict";
+  var core = window.LogicCore;
+  var sentence = document.getElementById("sentence");
+  var error = document.getElementById("error");
+  var workspace = document.getElementById("workspace");
+  var summary = document.getElementById("summary");
+  var tableHost = document.getElementById("truth-table");
+  var truthCaption = document.getElementById("truth-caption");
+  var equivCaption = document.getElementById("equiv-caption");
+  var equivList = document.getElementById("equiv-list");
+  var filter = document.getElementById("filter");
+  var limit = document.getElementById("limit");
+  var current = [];
+
+  function addCell(row, tag, text, className) {
+    var cell = document.createElement(tag);
+    cell.textContent = text;
+    if (className) cell.className = className;
+    row.appendChild(cell);
+  }
+
+  function renderTable(analysis) {
+    var table = document.createElement("table");
+    var thead = document.createElement("thead");
+    var head = document.createElement("tr");
+    analysis.variables.forEach(function (name) { addCell(head, "th", name); });
+    analysis.subexpressions.forEach(function (node) { addCell(head, "th", core.format(node)); });
+    thead.appendChild(head);
+    table.appendChild(thead);
+    var tbody = document.createElement("tbody");
+    for (var index = analysis.rowCount - 1; index >= 0; index -= 1) {
+      var assignment = core.assignmentFor(index, analysis.variables);
+      var row = document.createElement("tr");
+      analysis.variables.forEach(function (name) {
+        var value = assignment[name];
+        addCell(row, "td", value ? "T" : "F", value ? "truth-true" : "truth-false");
+      });
+      analysis.subexpressions.forEach(function (node) {
+        var value = core.evaluate(node, assignment);
+        addCell(row, "td", value ? "T" : "F", value ? "truth-true" : "truth-false");
+      });
+      tbody.appendChild(row);
+    }
+    table.appendChild(tbody);
+    tableHost.replaceChildren(table);
+    truthCaption.textContent = analysis.rowCount + " assignments · subexpressions included";
+  }
+
+  function sourceLabel(source) {
+    return source === "truth-function search" ? "search" : source;
+  }
+
+  function renderEquivalents(query) {
+    var needle = (query || "").trim().toLocaleLowerCase();
+    var shown = current.filter(function (item) {
+      return !needle || item.text.toLocaleLowerCase().includes(needle) || item.source.toLocaleLowerCase().includes(needle);
+    });
+    equivList.replaceChildren();
+    if (!shown.length) {
+      var empty = document.createElement("li");
+      empty.className = "empty";
+      empty.textContent = "No formulas match that filter.";
+      equivList.appendChild(empty);
+      return;
+    }
+    shown.forEach(function (item) {
+      var li = document.createElement("li");
+      var formula = document.createElement("div");
+      formula.className = "formula";
+      var text = document.createElement("span");
+      text.textContent = item.text;
+      var source = document.createElement("span");
+      source.className = "source";
+      source.textContent = sourceLabel(item.source);
+      formula.append(text, source);
+      var copy = document.createElement("button");
+      copy.type = "button";
+      copy.className = "copy-one";
+      copy.textContent = "copy";
+      copy.addEventListener("click", function () { copyText(item.text, copy); });
+      li.append(formula, copy);
+      equivList.appendChild(li);
+    });
+  }
+
+  function copyText(text, button) {
+    function done() {
+      if (!button) return;
+      var before = button.textContent;
+      button.textContent = "copied";
+      setTimeout(function () { button.textContent = before; }, 900);
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done);
+      return;
+    }
+    var helper = document.createElement("textarea");
+    helper.value = text;
+    helper.style.position = "fixed";
+    helper.style.opacity = "0";
+    document.body.appendChild(helper);
+    helper.select();
+    document.execCommand("copy");
+    helper.remove();
+    done();
+  }
+
+  function pill(label, value) {
+    var span = document.createElement("span");
+    span.className = "pill";
+    span.append(document.createTextNode(label + " "));
+    var strong = document.createElement("strong");
+    strong.textContent = value;
+    span.appendChild(strong);
+    return span;
+  }
+
+  function analyze() {
+    error.textContent = "";
+    try {
+      var result = core.analyze(sentence.value, Number(limit.value));
+      current = result.equivalents;
+      summary.replaceChildren(
+        pill("variables", result.variables.length ? result.variables.join(", ") : "none"),
+        pill("rows", String(result.rowCount)),
+        pill("true", result.trueCount + "/" + result.rowCount),
+        pill("type", result.classification)
+      );
+      renderTable(result);
+      filter.value = "";
+      renderEquivalents("");
+      equivCaption.textContent = current.length + " verified formulas · shorter forms first";
+      workspace.hidden = false;
+    } catch (problem) {
+      var position = typeof problem.position === "number" ? " at character " + (problem.position + 1) : "";
+      error.textContent = (problem.message || String(problem)) + position + ".";
+      workspace.hidden = true;
+      summary.replaceChildren();
+    }
+  }
+
+  document.getElementById("analyze").addEventListener("click", analyze);
+  document.getElementById("clear").addEventListener("click", function () {
+    sentence.value = "";
+    error.textContent = "";
+    workspace.hidden = true;
+    summary.replaceChildren();
+    sentence.focus();
+  });
+  document.querySelectorAll("[data-insert]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var start = sentence.selectionStart;
+      var end = sentence.selectionEnd;
+      var insertion = button.getAttribute("data-insert");
+      sentence.setRangeText(insertion, start, end, "end");
+      sentence.focus();
+    });
+  });
+  document.querySelectorAll("[data-example]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      sentence.value = button.getAttribute("data-example");
+      analyze();
+    });
+  });
+  sentence.addEventListener("keydown", function (event) {
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") { event.preventDefault(); analyze(); }
+  });
+  limit.addEventListener("change", analyze);
+  filter.addEventListener("input", function () { renderEquivalents(filter.value); });
+  document.getElementById("copy-all").addEventListener("click", function (event) {
+    copyText(current.map(function (item) { return item.text; }).join("\n"), event.currentTarget);
+  });
+
+  analyze();
+}());
+</script>
+</body>
+</html>

@@ -50,6 +50,9 @@ jobs:
         if: github.event_name == 'push'
         run: npm run screenshots
 
+      - name: Test Boolean sentence logic
+        run: node test/boolean-sentences.js
+
       - name: Regenerate the pages
         run: python3 build.py
 
