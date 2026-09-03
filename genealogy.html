@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" data-bg="graph">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mathematical genealogy &mdash; Neal Bushaw</title>
+<meta name="description" content="The mathematical advisor graph of Neal Bushaw, with portraits, biographies, and selected papers.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="assets/paper.css">
+<script>try{var g=localStorage.getItem('nb-bg');if(g){document.documentElement.setAttribute('data-bg',g);}}catch(e){}</script>
+<noscript><style>.controls{display:none}</style></noscript>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<canvas id="tidal-graph" aria-hidden="true"></canvas>
+
+<div class="shell">
+
+<nav class="rail" aria-label="Contents">
+  <div class="rail-inner">
+    <p class="who"><a href="index.html">Neal Bushaw</a></p>
+    <p class="where"><a href="http://math.vcu.edu">Department of Mathematics and Statistics</a><br><a href="https://chs.vcu.edu">College of Humanities and Sciences</a><br><a href="http://www.vcu.edu">Virginia Commonwealth University</a></p>
+    <img class="plate" src="assets/portrait.jpg" alt="Neal Bushaw, holding a large tuxedo cat" width="400" height="300"
+         loading="lazy" decoding="async">
+
+    <ol>
+      <li><a href="#genealogy">Genealogy</a></li>
+    </ol>
+    <div class="jump-wrap"><p class="jump"><a href="more.html#gallery">&larr; Demos / Slop</a><span class="gloss">Back to the extras</span></p></div>
+  </div>
+</nav>
+
+<main id="main" class="column">
+  <header class="masthead">
+    <h1>Mathematical genealogy</h1>
+    <p class="role">My advisor graph</p>
+    <p class="affil">The other extras are <a href="more.html">on the extras page</a>.</p>
+
+    <p class="stamp">Last revised August 2026</p>
+  </header>
+
+  <section class="section" id="genealogy" aria-labelledby="h-genealogy">
+    <h2 id="h-genealogy">Genealogy</h2>
+    <p class="note">Data from the <a href="https://www.mathgenealogy.org/">Mathematics Genealogy Project</a>.</p>
+    <div class="gen-wrap">
+      <div id="gen-graph"></div>
+      <aside id="gen-panel" aria-live="polite"></aside>
+    </div>
+    <div class="linkrow">
+      <button type="button" class="tag" id="gen-sibs">hide siblings</button>
+      <button type="button" class="tag" id="gen-reset">back to me</button>
+      <button type="button" class="tag" id="gen-fit">fit all</button>
+      <button type="button" class="tag" id="gen-out">zoom out</button>
+      <button type="button" class="tag" id="gen-in">zoom in</button>
+    </div>
+  </section>
+
+  <footer class="colophon">
+    <p>This website is entirely unsanctioned by Virginia Commonwealth University. Although it is intended to further the educational mission of the university, the opinions expressed here are the author's, and are not endorsed by VCU in any way.</p>
+  </footer>
+</main>
+
+</div><!-- /.shell -->
+
+<div class="controls" role="group" aria-label="Background controls">
+  <button type="button" class="ctl" id="bg-toggle"><span class="ctl-ico" aria-hidden="true">&#9638;</span><span class="ctl-txt">Percolation</span></button>
+  <button type="button" class="ctl" id="speed-toggle"><span class="ctl-ico" aria-hidden="true">&#128034;</span><span class="ctl-txt">Slow</span></button>
+  <button type="button" class="ctl" id="tide-toggle" aria-pressed="false"><span class="ctl-ico" aria-hidden="true">&#9646;&#9646;</span><span class="ctl-txt">Pause</span></button>
+</div>
+
+<dialog id="abstract-dialog" aria-labelledby="dlg-title">
+  <div class="dlg-inner">
+    <p class="dlg-title" id="dlg-title"></p>
+    <p class="dlg-meta"></p>
+    <div class="dlg-body"></div>
+    <div class="dlg-foot">
+      <span class="dlg-src"></span>
+      <button type="button" class="tag" data-close>close</button>
+    </div>
+  </div>
+</dialog>
+
+<script src="assets/tidal-graph.js"></script>
+<script src="assets/abstracts.js"></script>
+<script src="assets/ui.js"></script>
+<script src="assets/genealogy-data.js"></script>
+<script src="assets/genealogy.js"></script>
+</body>
+</html>
