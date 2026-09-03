@@ -380,18 +380,6 @@
     if (p.website) {
       links.push(link(p.website, 'website'));
     }
-    if (p.most_cited) {
-      var paperUrl = p.most_cited.journal_url || p.most_cited.arxiv_url;
-      if (paperUrl) {
-        var paperLink = link(paperUrl, 'most-cited paper');
-        if (p.most_cited.title) {
-          paperLink.title = p.most_cited.title;
-          paperLink.setAttribute('aria-label', 'Most-cited paper: ' +
-                                 p.most_cited.title);
-        }
-        links.push(paperLink);
-      }
-    }
     if (p.wiki) {
       links.push(link('https://en.wikipedia.org/wiki/' +
         encodeURIComponent(p.wiki.replace(/ /g, '_')), 'wikipedia'));
@@ -430,6 +418,24 @@
     if (adv.length) { panel.appendChild(relation('advised by', adv)); }
     if (kids.length) { panel.appendChild(relation('advised', kids)); }
     if (p.note) { panel.appendChild(para('gen-pnote', p.note)); }
+    if (p.most_cited) {
+      var paperUrl = p.most_cited.journal_url || p.most_cited.arxiv_url ||
+                     p.most_cited.archive_url;
+      if (paperUrl && p.most_cited.title) {
+        var paper = document.createElement('p');
+        paper.className = 'gen-ppaper';
+        var paperLabel = document.createElement('span');
+        paperLabel.textContent = 'selected paper';
+        var paperLink = document.createElement('a');
+        paperLink.href = paperUrl;
+        paperLink.rel = 'noopener';
+        paperLink.textContent = p.most_cited.title;
+        paper.appendChild(paperLabel);
+        paper.appendChild(document.createTextNode(' '));
+        paper.appendChild(paperLink);
+        panel.appendChild(paper);
+      }
+    }
     if (p.photo && p.photo_credit) {
       links.push(link(p.photo_credit, 'portrait credit'));
     }

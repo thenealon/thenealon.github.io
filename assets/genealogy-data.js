@@ -12,7 +12,16 @@ window.GENEALOGY = [
    "balister"
   ],
   "mgp": 163297,
-  "me": true
+  "me": true,
+  "most_cited": {
+   "title": "Turán Numbers of Multiple Paths and Equibipartite Forests",
+   "year": 2011,
+   "cited_by": 54,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1017/s0963548311000460",
+   "doi": "10.1017/s0963548311000460"
+  }
  },
  {
   "id": "bollobas",
@@ -31,7 +40,16 @@ window.GENEALOGY = [
   "mgp": 22719,
   "mactutor": "Bollobas",
   "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/B%C3%A9la_Bollob%C3%A1s.jpg/330px-B%C3%A9la_Bollob%C3%A1s.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-  "photo_credit": "https://en.wikipedia.org/wiki/File:B%C3%A9la_Bollob%C3%A1s.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  "photo_credit": "https://en.wikipedia.org/wiki/File:B%C3%A9la_Bollob%C3%A1s.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+  "most_cited": {
+   "title": "A Probabilistic Proof of an Asymptotic Formula for the Number of Labelled Regular Graphs",
+   "year": 1980,
+   "cited_by": 746,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1016/s0195-6698(80)80030-8",
+   "doi": "10.1016/s0195-6698(80)80030-8"
+  }
  },
  {
   "id": "erdos",
@@ -45,7 +63,16 @@ window.GENEALOGY = [
   "wiki": "Paul Erdős",
   "mgp": 19470,
   "photo": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Erdos_budapest_fall_1992_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
-  "photo_credit": "https://en.wikipedia.org/wiki/File:Erdos_budapest_fall_1992_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Erdos_budapest_fall_1992_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+  "most_cited": {
+   "title": "Supersaturated graphs and hypergraphs",
+   "year": 1983,
+   "cited_by": 169,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1007/bf02579292",
+   "doi": "10.1007/bf02579292"
+  }
  },
  {
   "id": "fejestoth",
@@ -56,7 +83,16 @@ window.GENEALOGY = [
    "fejer"
   ],
   "wiki": "László Fejes Tóth",
-  "mgp": 153675
+  "mgp": 153675,
+  "most_cited": {
+   "title": "Inequalities concerning polygons and polyhedra",
+   "year": 1948,
+   "cited_by": 9,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1215/s0012-7094-48-01573-7",
+   "doi": "10.1215/s0012-7094-48-01573-7"
+  }
  },
  {
   "id": "adams",
@@ -69,7 +105,14 @@ window.GENEALOGY = [
   "wiki": "Frank Adams",
   "mgp": 24507,
   "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Frank_Adams_Aug_1988_%28cropped%29.png/330px-Frank_Adams_Aug_1988_%28cropped%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-  "photo_credit": "https://en.wikipedia.org/wiki/File:Frank_Adams_Aug_1988_%28cropped%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Frank_Adams_Aug_1988_%28cropped%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+  "most_cited": {
+   "title": "On the non-existence of elements of Hopf invariant one",
+   "year": 1960,
+   "journal_url": "https://doi.org/10.2307/1970147",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "wylie",
@@ -81,7 +124,16 @@ window.GENEALOGY = [
   ],
   "wiki": "Shaun Wylie",
   "photo": "https://upload.wikimedia.org/wikipedia/en/c/c1/Shaun_Wylie.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
-  "photo_credit": "https://en.wikipedia.org/wiki/File:Shaun_Wylie.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Shaun_Wylie.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+  "most_cited": {
+   "title": "P-regularity and a duality theorem of Čech",
+   "year": 1937,
+   "cited_by": 0,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.21136/cpmf.1937.122906",
+   "doi": "10.21136/cpmf.1937.122906"
+  }
  },
  {
   "id": "lefschetz",
@@ -94,7 +146,16 @@ window.GENEALOGY = [
   ],
   "wiki": "Solomon Lefschetz",
   "photo": "https://upload.wikimedia.org/wikipedia/en/0/0a/Solomon_Lefschetz.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
-  "photo_credit": "https://en.wikipedia.org/wiki/File:Solomon_Lefschetz.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Solomon_Lefschetz.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+  "most_cited": {
+   "title": "On certain numerical invariants of algebraic varieties with application to abelian varieties",
+   "year": 1921,
+   "cited_by": 67,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1090/s0002-9947-1921-1501178-3",
+   "doi": "10.1090/s0002-9947-1921-1501178-3"
+  }
  },
  {
   "id": "story",
@@ -103,7 +164,14 @@ window.GENEALOGY = [
   "inst": "Universität Leipzig",
   "wiki": "William Edward Story",
   "photo": "https://upload.wikimedia.org/wikipedia/commons/9/96/William_Edward_Story_%281850-1930%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
-  "photo_credit": "https://en.wikipedia.org/wiki/File:William_Edward_Story_%281850-1930%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+  "photo_credit": "https://en.wikipedia.org/wiki/File:William_Edward_Story_%281850-1930%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+  "most_cited": {
+   "title": "Notes on the ‘15’ Puzzle",
+   "year": 1879,
+   "journal_url": "https://doi.org/10.2307/2369492",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "fejer",
@@ -117,7 +185,14 @@ window.GENEALOGY = [
   "wiki": "Lipót Fejér",
   "mgp": 7488,
   "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Fej%C3%A9r_Lip%C3%B3t.jpg/330px-Fej%C3%A9r_Lip%C3%B3t.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-  "photo_credit": "https://en.wikipedia.org/wiki/File:Fej%C3%A9r_Lip%C3%B3t.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Fej%C3%A9r_Lip%C3%B3t.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+  "most_cited": {
+   "title": "Ueber die arithmetischen Mittel erster Ordnung der Fourierreihe",
+   "year": 1904,
+   "archive_url": "https://eudml.org/doc/59166",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "schwarz",
@@ -158,7 +233,14 @@ window.GENEALOGY = [
   "wiki": "Ernst Kummer",
   "mgp": 18331,
   "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Ernst_Eduard_Kummer_photo.jpg/330px-Ernst_Eduard_Kummer_photo.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-  "photo_credit": "https://en.wikipedia.org/wiki/File:Ernst_Eduard_Kummer_photo.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Ernst_Eduard_Kummer_photo.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+  "most_cited": {
+   "title": "Zur Theorie der complexen Zahlen",
+   "year": 1844,
+   "archive_url": "https://eudml.org/doc/147393",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "gudermann",
@@ -181,7 +263,14 @@ window.GENEALOGY = [
   ],
   "wiki": "Carl Friedrich Gauss",
   "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Carl_Friedrich_Gauss_1840_by_Jensen.jpg/330px-Carl_Friedrich_Gauss_1840_by_Jensen.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-  "photo_credit": "https://en.wikipedia.org/wiki/File:Carl_Friedrich_Gauss_1840_by_Jensen.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  "photo_credit": "https://en.wikipedia.org/wiki/File:Carl_Friedrich_Gauss_1840_by_Jensen.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+  "most_cited": {
+   "title": "Disquisitiones generales circa superficies curvas",
+   "year": 1827,
+   "archive_url": "https://quod.lib.umich.edu/u/umhistmath/ABR0732.0001.001?view=toc",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "pfaff",
@@ -254,7 +343,16 @@ window.GENEALOGY = [
   "advisors": [
    "bollobas"
   ],
-  "note": "My second advisor on the MGP record, and one of Bollobás's own students."
+  "note": "My second advisor on the MGP record, and one of Bollobás's own students.",
+  "most_cited": {
+   "title": "Phase transitions in the neuropercolation model of neural populations with mixed local and non-local interactions",
+   "year": 2005,
+   "cited_by": 141,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1007/s00422-005-0565-z",
+   "doi": "10.1007/s00422-005-0565-z"
+  }
  },
  {
   "id": "ball",
@@ -265,7 +363,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1987,
-  "descendants": 6
+  "descendants": 6,
+  "most_cited": {
+   "title": "Volume Ratios and a Reverse Isoperimetric Inequality",
+   "year": 1991,
+   "cited_by": 187,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1112/jlms/s2-44.2.351",
+   "doi": "10.1112/jlms/s2-44.2.351"
+  }
  },
  {
   "id": "balogh",
@@ -277,7 +384,16 @@ window.GENEALOGY = [
   "inst": "The University of Memphis",
   "year": 2001,
   "descendants": 20,
-  "coauthor": true
+  "coauthor": true,
+  "most_cited": {
+   "title": "k-Sets, Convex Quadrilaterals, and the Rectilinear Crossing Number of Kn",
+   "year": 2006,
+   "cited_by": 14,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1007/s00454-005-1227-6",
+   "doi": "10.1007/s00454-005-1227-6"
+  }
  },
  {
   "id": "benevides",
@@ -287,7 +403,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 2011
+  "year": 2011,
+  "most_cited": {
+   "title": "The 3-colored Ramsey number of even cycles",
+   "year": 2009,
+   "cited_by": 29,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1016/j.jctb.2008.12.002",
+   "doi": "10.1016/j.jctb.2008.12.002"
+  }
  },
  {
   "id": "brightwell",
@@ -298,7 +423,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1988,
-  "descendants": 11
+  "descendants": 11,
+  "most_cited": {
+   "title": "Graph Homomorphisms and Phase Transitions",
+   "year": 1999,
+   "cited_by": 87,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1006/jctb.1999.1899",
+   "doi": "10.1006/jctb.1999.1899"
+  }
  },
  {
   "id": "carne",
@@ -309,7 +443,14 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1979,
-  "descendants": 3
+  "descendants": 3,
+  "most_cited": {
+   "title": "A Uniform Algebra of Analytic Functions on a Banach Space",
+   "year": 1989,
+   "journal_url": "https://doi.org/10.2307/2001402",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "coker",
@@ -319,7 +460,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 2012
+  "year": 2012,
+  "most_cited": {
+   "title": "The adjacent vertex distinguishing total chromatic number",
+   "year": 2012,
+   "cited_by": 23,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1016/j.disc.2012.04.006",
+   "doi": "10.1016/j.disc.2012.04.006"
+  }
  },
  {
   "id": "cutler",
@@ -329,7 +479,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 2004
+  "year": 2004,
+  "most_cited": {
+   "title": "The maximum number of complete subgraphs in a graph with given maximum degree",
+   "year": 2014,
+   "cited_by": 24,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1016/j.jctb.2013.10.003",
+   "doi": "10.1016/j.jctb.2013.10.003"
+  }
  },
  {
   "id": "david",
@@ -350,7 +509,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1993,
-  "descendants": 1
+  "descendants": 1,
+  "most_cited": {
+   "title": "A Generalization of a Theorem of Dirac",
+   "year": 2001,
+   "cited_by": 8,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1006/jctb.2001.2041",
+   "doi": "10.1006/jctb.2001.2041"
+  }
  },
  {
   "id": "diestel",
@@ -361,7 +529,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1987,
-  "descendants": 42
+  "descendants": 42,
+  "most_cited": {
+   "title": "Highly Connected Sets and the Excluded Grid Theorem",
+   "year": 1999,
+   "cited_by": 83,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1006/jctb.1998.1862",
+   "doi": "10.1006/jctb.1998.1862"
+  }
  },
  {
   "id": "dobson",
@@ -372,7 +549,16 @@ window.GENEALOGY = [
   ],
   "inst": "Louisiana State University",
   "year": 1995,
-  "descendants": 2
+  "descendants": 2,
+  "most_cited": {
+   "title": "Transitive Permutation Groups of Prime-Squared Degree",
+   "year": 2002,
+   "cited_by": 45,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1023/a:1020882414534",
+   "doi": "10.1023/a:1020882414534"
+  }
  },
  {
   "id": "dvorak",
@@ -382,7 +568,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 2022
+  "year": 2022,
+  "most_cited": {
+   "title": "Probability Mass of Rademacher Sums Beyond One Standard Deviation",
+   "year": 2022,
+   "cited_by": 3,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1137/21m1428212",
+   "doi": "10.1137/21m1428212"
+  }
  },
  {
   "id": "eccles",
@@ -392,7 +587,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 2013
+  "year": 2013,
+  "most_cited": {
+   "title": "Graphs of Large Linear Size Are Antimagic",
+   "year": 2016,
+   "cited_by": 26,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1002/jgt.21872",
+   "doi": "10.1002/jgt.21872"
+  }
  },
  {
   "id": "eldridge",
@@ -402,7 +606,14 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 1977
+  "year": 1977,
+  "most_cited": {
+   "title": "Packings of graphs and applications to computational complexity",
+   "year": 1978,
+   "journal_url": "https://doi.org/10.1016/0095-8956(78)90030-8",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "gamblin",
@@ -412,7 +623,14 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 1996
+  "year": 1996,
+  "most_cited": {
+   "title": "The Spack package manager: bringing order to HPC software chaos",
+   "year": 2015,
+   "journal_url": "https://doi.org/10.1145/2807591.2807623",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "garrod",
@@ -422,7 +640,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 2011
+  "year": 2011,
+  "most_cited": {
+   "title": "The secretary problem on an unknown poset",
+   "year": 2013,
+   "cited_by": 13,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1002/rsa.20466",
+   "doi": "10.1002/rsa.20466"
+  }
  },
  {
   "id": "o",
@@ -432,7 +659,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 2019
+  "year": 2019,
+  "most_cited": {
+   "title": "Subdivisions of digraphs in tournaments",
+   "year": 2021,
+   "cited_by": 11,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1016/j.jctb.2020.09.006",
+   "doi": "10.1016/j.jctb.2020.09.006"
+  }
  },
  {
   "id": "gowers",
@@ -443,7 +679,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1990,
-  "descendants": 40
+  "descendants": 40,
+  "most_cited": {
+   "title": "Hypergraph regularity and the multidimensional Szemerédi theorem",
+   "year": 2007,
+   "cited_by": 182,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.4007/annals.2007.166.897",
+   "doi": "10.4007/annals.2007.166.897"
+  }
  },
  {
   "id": "harris",
@@ -453,7 +698,14 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 1985
+  "year": 1985,
+  "most_cited": {
+   "title": "List-colourings of graphs",
+   "year": 1985,
+   "journal_url": "https://doi.org/10.1007/BF02582936",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "haslegrave",
@@ -463,7 +715,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 2011
+  "year": 2011,
+  "most_cited": {
+   "title": "Extremal results on average subtree density of series-reduced trees",
+   "year": 2014,
+   "cited_by": 42,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1016/j.jctb.2014.02.003",
+   "doi": "10.1016/j.jctb.2014.02.003"
+  }
  },
  {
   "id": "haxell",
@@ -474,7 +735,14 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1993,
-  "descendants": 7
+  "descendants": 7,
+  "most_cited": {
+   "title": "A condition for matchability in hypergraphs",
+   "year": 1995,
+   "journal_url": "https://doi.org/10.1007/BF01793010",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "herrman",
@@ -485,7 +753,16 @@ window.GENEALOGY = [
   ],
   "inst": "The University of Memphis",
   "year": 2020,
-  "descendants": 1
+  "descendants": 1,
+  "most_cited": {
+   "title": "Multi-angle quantum approximate optimization algorithm",
+   "year": 2022,
+   "cited_by": 122,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1038/s41598-022-10555-8",
+   "doi": "10.1038/s41598-022-10555-8"
+  }
  },
  {
   "id": "hind",
@@ -495,7 +772,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 1988
+  "year": 1988,
+  "most_cited": {
+   "title": "Colouring a graph frugally",
+   "year": 1997,
+   "cited_by": 49,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1007/bf01195001",
+   "doi": "10.1007/bf01195001"
+  }
  },
  {
   "id": "holyer",
@@ -506,7 +792,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1981,
-  "descendants": 6
+  "descendants": 6,
+  "most_cited": {
+   "title": "The NP-Completeness of Edge-Coloring",
+   "year": 1981,
+   "cited_by": 810,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1137/0210055",
+   "doi": "10.1137/0210055"
+  }
  },
  {
   "id": "hubenko",
@@ -516,7 +811,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 2004
+  "year": 2004,
+  "most_cited": {
+   "title": "Semistrong edge coloring of graphs",
+   "year": 2005,
+   "cited_by": 13,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1002/jgt.20061",
+   "doi": "10.1002/jgt.20061"
+  }
  },
  {
   "id": "jin",
@@ -526,7 +830,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 1993
+  "year": 1993,
+  "most_cited": {
+   "title": "Triangle-free four-chromatic graphs",
+   "year": 1995,
+   "cited_by": 25,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1016/0012-365x(94)00063-o",
+   "doi": "10.1016/0012-365x(94)00063-o"
+  }
  },
  {
   "id": "johannson",
@@ -536,7 +849,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 2011
+  "year": 2011,
+  "most_cited": {
+   "title": "The adjacent vertex distinguishing total chromatic number",
+   "year": 2012,
+   "cited_by": 23,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1016/j.disc.2012.04.006",
+   "doi": "10.1016/j.disc.2012.04.006"
+  }
  },
  {
   "id": "johnson",
@@ -546,7 +868,14 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 2015
+  "year": 2015,
+  "most_cited": {
+   "title": "Locating a robber with multiple probes",
+   "year": 2018,
+   "journal_url": "https://doi.org/10.1016/j.disc.2017.08.028",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "juskevicius",
@@ -556,7 +885,14 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 2015
+  "year": 2015,
+  "most_cited": {
+   "title": "Optimal Probability Inequalities for Random Walks Related to Problems in Extremal Combinatorics",
+   "year": 2012,
+   "journal_url": "https://doi.org/10.1137/110834913",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "kettle",
@@ -567,7 +903,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 2013,
-  "coauthor": true
+  "coauthor": true,
+  "most_cited": {
+   "title": "Turán Numbers of Multiple Paths and Equibipartite Forests",
+   "year": 2011,
+   "cited_by": 54,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1017/s0963548311000460",
+   "doi": "10.1017/s0963548311000460"
+  }
  },
  {
   "id": "kittipassorn",
@@ -578,7 +923,16 @@ window.GENEALOGY = [
   ],
   "inst": "The University of Memphis",
   "year": 2015,
-  "descendants": 2
+  "descendants": 2,
+  "most_cited": {
+   "title": "Long cycles in Hamiltonian graphs",
+   "year": 2019,
+   "cited_by": 9,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1007/s11856-018-1798-6",
+   "doi": "10.1007/s11856-018-1798-6"
+  }
  },
  {
   "id": "koch",
@@ -588,7 +942,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 2015
+  "year": 2015,
+  "most_cited": {
+   "title": "About Supergraphs. Part I",
+   "year": 2018,
+   "cited_by": 6,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.2478/forma-2018-0009",
+   "doi": "10.2478/forma-2018-0009"
+  }
  },
  {
   "id": "kohayakawa",
@@ -599,7 +962,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1990,
-  "descendants": 4
+  "descendants": 4,
+  "most_cited": {
+   "title": "Limits of permutation sequences",
+   "year": 2013,
+   "cited_by": 76,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1016/j.jctb.2012.09.003",
+   "doi": "10.1016/j.jctb.2012.09.003"
+  }
  },
  {
   "id": "leader",
@@ -610,7 +982,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1989,
-  "descendants": 19
+  "descendants": 19,
+  "most_cited": {
+   "title": "Edge-isoperimetric inequalities in the grid",
+   "year": 1991,
+   "cited_by": 107,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1007/bf01275667",
+   "doi": "10.1007/bf01275667"
+  }
  },
  {
   "id": "lee",
@@ -620,7 +1001,14 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 2015
+  "year": 2015,
+  "most_cited": {
+   "title": "Line percolation",
+   "year": 2018,
+   "journal_url": "https://doi.org/10.1002/rsa.20755",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "letzter",
@@ -630,7 +1018,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 2015
+  "year": 2015,
+  "most_cited": {
+   "title": "Path Ramsey Number for Random Graphs",
+   "year": 2016,
+   "cited_by": 33,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1017/s0963548315000279",
+   "doi": "10.1017/s0963548315000279"
+  }
  },
  {
   "id": "liu",
@@ -640,7 +1037,14 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 2006
+  "year": 2006,
+  "most_cited": {
+   "title": "Highly connected subgraphs of graphs with given independence number",
+   "year": 2007,
+   "arxiv_url": "https://arxiv.org/abs/math/0702354",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "mond",
@@ -650,7 +1054,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 2024
+  "year": 2024,
+  "most_cited": {
+   "title": "Counting Hamilton Cycles in Dirac Hypergraphs",
+   "year": 2023,
+   "cited_by": 4,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1007/s00493-023-00029-4",
+   "doi": "10.1007/s00493-023-00029-4"
+  }
  },
  {
   "id": "montagh",
@@ -660,7 +1073,14 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 2005
+  "year": 2005,
+  "most_cited": {
+   "title": "Unavoidable Subgraphs of Colored Graphs",
+   "year": 2008,
+   "journal_url": "https://doi.org/10.1016/j.disc.2007.08.102",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "morris",
@@ -672,7 +1092,14 @@ window.GENEALOGY = [
   "inst": "The University of Memphis",
   "year": 2006,
   "descendants": 8,
-  "coauthor": true
+  "coauthor": true,
+  "most_cited": {
+   "title": "Independent sets in hypergraphs",
+   "year": 2015,
+   "arxiv_url": "https://arxiv.org/abs/1204.6530",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "narayanan",
@@ -683,7 +1110,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 2015,
-  "descendants": 1
+  "descendants": 1,
+  "most_cited": {
+   "title": "On the stability of the Erdős–Ko–Rado theorem",
+   "year": 2016,
+   "cited_by": 43,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1016/j.jcta.2015.08.002",
+   "doi": "10.1016/j.jcta.2015.08.002"
+  }
  },
  {
   "id": "papioannou",
@@ -704,7 +1140,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1980,
-  "descendants": 15
+  "descendants": 15,
+  "most_cited": {
+   "title": "The Weiss conjecture on admissibility of observation operators for contraction semigroups",
+   "year": 2001,
+   "cited_by": 37,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1007/bf01301467",
+   "doi": "10.1007/bf01301467"
+  }
  },
  {
   "id": "pebody",
@@ -714,7 +1159,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 2002
+  "year": 2002,
+  "most_cited": {
+   "title": "Contraction–Deletion Invariants for Graphs",
+   "year": 2000,
+   "cited_by": 24,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1006/jctb.2000.1988",
+   "doi": "10.1006/jctb.2000.1988"
+  }
  },
  {
   "id": "popielarz",
@@ -724,7 +1178,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 2018
+  "year": 2018,
+  "most_cited": {
+   "title": "Subdivisions of digraphs in tournaments",
+   "year": 2021,
+   "cited_by": 11,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1016/j.jctb.2020.09.006",
+   "doi": "10.1016/j.jctb.2020.09.006"
+  }
  },
  {
   "id": "portier",
@@ -733,7 +1196,16 @@ window.GENEALOGY = [
   "advisors": [
    "bollobas"
   ],
-  "year": 2024
+  "year": 2024,
+  "most_cited": {
+   "title": "The Odd Chromatic Number of a Planar Graph is at Most 8",
+   "year": 2023,
+   "cited_by": 23,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1007/s00373-023-02617-z",
+   "doi": "10.1007/s00373-023-02617-z"
+  }
  },
  {
   "id": "przykucki",
@@ -743,7 +1215,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 2013
+  "year": 2013,
+  "most_cited": {
+   "title": "Subcritical $\\mathcal {U}$-bootstrap percolation models have non-trivial phase transitions",
+   "year": 2016,
+   "cited_by": 40,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1090/tran/6586",
+   "doi": "10.1090/tran/6586"
+  }
  },
  {
   "id": "radcliffe",
@@ -754,7 +1235,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1989,
-  "descendants": 15
+  "descendants": 15,
+  "most_cited": {
+   "title": "Graphs with the fewest matchings",
+   "year": 2016,
+   "cited_by": 16,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1007/s00493-014-3188-y",
+   "doi": "10.1007/s00493-014-3188-y"
+  }
  },
  {
   "id": "read",
@@ -765,7 +1255,14 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1984,
-  "descendants": 5
+  "descendants": 5,
+  "most_cited": {
+   "title": "A Solution to the Invariant Subspace Problem",
+   "year": 1984,
+   "journal_url": "https://doi.org/10.1112/blms/16.4.337",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "riet",
@@ -777,7 +1274,16 @@ window.GENEALOGY = [
   "inst": "The University of Memphis",
   "year": 2012,
   "descendants": 1,
-  "coauthor": true
+  "coauthor": true,
+  "most_cited": {
+   "title": "F-saturation games",
+   "year": 2015,
+   "cited_by": 7,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1016/j.disc.2015.05.028",
+   "doi": "10.1016/j.disc.2015.05.028"
+  }
  },
  {
   "id": "riordan",
@@ -788,7 +1294,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1998,
-  "descendants": 7
+  "descendants": 7,
+  "most_cited": {
+   "title": "The degree sequence of a scale‐free random graph process",
+   "year": 2001,
+   "cited_by": 522,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1002/rsa.1009",
+   "doi": "10.1002/rsa.1009"
+  }
  },
  {
   "id": "sahasrabudhe",
@@ -798,7 +1313,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 2017
+  "year": 2017,
+  "most_cited": {
+   "title": "Flat Littlewood polynomials exist",
+   "year": 2020,
+   "cited_by": 15,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.4007/annals.2020.192.3.6",
+   "doi": "10.4007/annals.2020.192.3.6"
+  }
  },
  {
   "id": "sarkar",
@@ -808,7 +1332,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 1998
+  "year": 1998,
+  "most_cited": {
+   "title": "Connectivity of random k-nearest-neighbour graphs",
+   "year": 2005,
+   "cited_by": 71,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1239/aap/1113402397",
+   "doi": "10.1239/aap/1113402397"
+  }
  },
  {
   "id": "scott",
@@ -819,7 +1352,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1995,
-  "descendants": 14
+  "descendants": 14,
+  "most_cited": {
+   "title": "Szemerédi's Regularity Lemma for Matrices and Sparse Graphs",
+   "year": 2011,
+   "cited_by": 39,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1017/s0963548310000490",
+   "doi": "10.1017/s0963548310000490"
+  }
  },
  {
   "id": "shaw",
@@ -829,7 +1371,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 2017
+  "year": 2017,
+  "most_cited": {
+   "title": "Burning the Plane",
+   "year": 2020,
+   "cited_by": 10,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1007/s00373-020-02182-9",
+   "doi": "10.1007/s00373-020-02182-9"
+  }
  },
  {
   "id": "slivnik",
@@ -839,7 +1390,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 1996
+  "year": 1996,
+  "most_cited": {
+   "title": "Short Proof of Galvin's Theorem on the List-chromatic Index of a Bipartite Multigraph",
+   "year": 1996,
+   "cited_by": 10,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1017/s0963548300001851",
+   "doi": "10.1017/s0963548300001851"
+  }
  },
  {
   "id": "smith",
@@ -850,7 +1410,14 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 2012,
-  "coauthor": true
+  "coauthor": true,
+  "most_cited": {
+   "title": "Monotone Cellular Automata in a Random Environment",
+   "year": 2015,
+   "journal_url": "https://doi.org/10.1017/S0963548315000012",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "smith2",
@@ -860,7 +1427,14 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 2019
+  "year": 2019,
+  "most_cited": {
+   "title": "On a conjecture of Gentner and Rautenbach",
+   "year": 2018,
+   "arxiv_url": "https://arxiv.org/abs/1611.07513",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "snyder",
@@ -880,7 +1454,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "Harvard University",
-  "year": 2020
+  "year": 2020,
+  "most_cited": {
+   "title": "Tautological classes of matroids",
+   "year": 2023,
+   "cited_by": 19,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1007/s00222-023-01194-5",
+   "doi": "10.1007/s00222-023-01194-5"
+  }
  },
  {
   "id": "stacey",
@@ -890,7 +1473,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 1994
+  "year": 1994,
+  "most_cited": {
+   "title": "Percolation on finite graphs and isoperimetric inequalities",
+   "year": 2004,
+   "cited_by": 82,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1214/009117904000000414",
+   "doi": "10.1214/009117904000000414"
+  }
  },
  {
   "id": "szabo",
@@ -900,7 +1492,14 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 1998
+  "year": 1998,
+  "most_cited": {
+   "title": "The oriented cycle game",
+   "year": 1998,
+   "journal_url": "https://doi.org/10.1016/S0012-365X(97)00224-0",
+   "source": "hand-checked bibliography",
+   "checked": "2026-09-03"
+  }
  },
  {
   "id": "thomason",
@@ -911,7 +1510,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1980,
-  "descendants": 31
+  "descendants": 31,
+  "most_cited": {
+   "title": "Edge weights and vertex colours",
+   "year": 2004,
+   "cited_by": 216,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1016/j.jctb.2003.12.001",
+   "doi": "10.1016/j.jctb.2003.12.001"
+  }
  },
  {
   "id": "tiba",
@@ -921,7 +1529,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 2022
+  "year": 2022,
+  "most_cited": {
+   "title": "Flat Littlewood polynomials exist",
+   "year": 2020,
+   "cited_by": 15,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.4007/annals.2020.192.3.6",
+   "doi": "10.4007/annals.2020.192.3.6"
+  }
  },
  {
   "id": "tomon",
@@ -931,7 +1548,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 2016
+  "year": 2016,
+  "most_cited": {
+   "title": "The Extremal Number of Tight Cycles",
+   "year": 2022,
+   "cited_by": 15,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1093/imrn/rnaa396",
+   "doi": "10.1093/imrn/rnaa396"
+  }
  },
  {
   "id": "tyomkyn",
@@ -941,7 +1567,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 2010
+  "year": 2010,
+  "most_cited": {
+   "title": "Walks and paths in trees",
+   "year": 2012,
+   "cited_by": 23,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1002/jgt.20600",
+   "doi": "10.1002/jgt.20600"
+  }
  },
  {
   "id": "uzzell",
@@ -951,7 +1586,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 2012
+  "year": 2012,
+  "most_cited": {
+   "title": "Monotone Cellular Automata in a Random Environment",
+   "year": 2015,
+   "cited_by": 46,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1017/s0963548315000012",
+   "doi": "10.1017/s0963548315000012"
+  }
  },
  {
   "id": "hintum",
@@ -961,7 +1605,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 2022
+  "year": 2022,
+  "most_cited": {
+   "title": "The bunkbed conjecture on the complete graph",
+   "year": 2019,
+   "cited_by": 6,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1016/j.ejc.2018.10.002",
+   "doi": "10.1016/j.ejc.2018.10.002"
+  }
  },
  {
   "id": "vu",
@@ -972,7 +1625,16 @@ window.GENEALOGY = [
   ],
   "inst": "The University of Memphis",
   "year": 2014,
-  "coauthor": true
+  "coauthor": true,
+  "most_cited": {
+   "title": "Extremal properties of flood-filling games",
+   "year": 2019,
+   "cited_by": 0,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.23638/dmtcs-21-4-11",
+   "doi": "10.23638/dmtcs-21-4-11"
+  }
  },
  {
   "id": "weinreich",
@@ -982,7 +1644,16 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "The University of Memphis",
-  "year": 2000
+  "year": 2000,
+  "most_cited": {
+   "title": "The Speed of Hereditary Properties of Graphs",
+   "year": 2000,
+   "cited_by": 67,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1006/jctb.2000.1952",
+   "doi": "10.1006/jctb.2000.1952"
+  }
  },
  {
   "id": "wojciechowski",
@@ -993,7 +1664,16 @@ window.GENEALOGY = [
   ],
   "inst": "University of Cambridge",
   "year": 1990,
-  "descendants": 4
+  "descendants": 4,
+  "most_cited": {
+   "title": "Finite Automata on Transfinite Sequences and Regular Expressions",
+   "year": 1985,
+   "cited_by": 29,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.3233/fi-1985-83-407",
+   "doi": "10.3233/fi-1985-83-407"
+  }
  },
  {
   "id": "wright",
@@ -1003,6 +1683,15 @@ window.GENEALOGY = [
    "bollobas"
   ],
   "inst": "University of Cambridge",
-  "year": 1990
+  "year": 1990,
+  "most_cited": {
+   "title": "The 1/3–2/3 Conjecture for 5-Thin Posets",
+   "year": 1992,
+   "cited_by": 7,
+   "source": "Crossref",
+   "checked": "2026-09-03",
+   "journal_url": "https://doi.org/10.1137/0405037",
+   "doi": "10.1137/0405037"
+  }
  }
 ];
