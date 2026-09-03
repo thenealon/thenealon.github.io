@@ -530,14 +530,21 @@ def block_gallery(sec):
     files = [f for f in files
              if os.path.basename(f).lower() not in ("index.html",)
              and "apps/" + os.path.basename(f) not in demo_hrefs]
-    demo_list = ""
-    if demos:
-        demo_list = block_items({"kind": "demo"})
-    if not files:
+    cards = []
+    for demo in demos:
+        href = demo.get("href")
+        title = demo.get("name")
+        if not href or not title:
+            continue
+        cards.append(
+            '      <li><a class="app" href="%s">\n'
+            '        %s\n'
+            '        <span class="app-name">%s</span>\n'
+            '      </a></li>\n' % (href, _thumb(title), title))
+    if not files and not cards:
         return ('    <p class="note">Nothing here yet. Drop a self-contained '
                 '<code>.html</code> file into the <code>apps/</code> folder and '
-                'it will appear here automatically.</p>\n' + demo_list)
-    cards = []
+                'it will appear here automatically.</p>\n')
     for path in files:
         href = "apps/" + os.path.basename(path)
         title = _title_of(path)
@@ -546,7 +553,7 @@ def block_gallery(sec):
             '        %s\n'
             '        <span class="app-name">%s</span>\n'
             '      </a></li>\n' % (href, _thumb(title), title))
-    return (demo_list + '    <ul class="gallery">\n' + "".join(cards) +
+    return ('    <ul class="gallery">\n' + "".join(cards) +
             '    </ul>\n')
 
 
