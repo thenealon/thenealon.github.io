@@ -31,6 +31,7 @@ def load(name):
 
 
 SITE = load("site.json")
+SEMINAR_URL = "https://vcumath.github.io/Seminar/dms.html"
 
 # the running head in the margin always carries the full affiliation
 AFFIL_RAIL = next(p["masthead"]["affiliation"] for p in SITE["pages"]
@@ -73,7 +74,7 @@ HEAD = """<!DOCTYPE html>
     <h1>{m_h1}</h1>
     <p class="role">{m_role}</p>
 {m_affil}
-    <p class="stamp">{stamp}</p>
+{seminar_callout}    <p class="stamp">{stamp}</p>
   </header>
 
 """
@@ -234,7 +235,7 @@ def block_overview(sec):
             '<a href="bridges26.html">Cyclic Pianos</a> and '
             '<a href="seq.html">Cyclic Sequences</a>.</li>\n'
             '      <li><span class="when">Seminar</span>'
-            '<a href="http://www.people.vcu.edu/~dcranston/DM-seminar/">VCU '
+            f'<a href="{SEMINAR_URL}">VCU '
             'Discrete Math Seminar</a>.</li>\n'
             '      <li><span class="when">Email</span>'
             '<span class="email" data-user="nobushaw" data-domain="vcu.edu">'
@@ -587,6 +588,18 @@ def render(pg):
     secs = pg["sections"]
     contents = "\n".join(
         '      <li><a href="#%s">%s</a></li>' % (s["id"], s["rail"]) for s in secs)
+    seminar_callout = ""
+    if pg["file"] == "index.html":
+        contents = (
+            f'      <li><a class="seminar-nav" href="{SEMINAR_URL}">'
+            'Seminar <span aria-hidden="true">&nearr;</span></a></li>\n'
+            + contents)
+        seminar_callout = (
+            f'    <a class="seminar-link" href="{SEMINAR_URL}">\n'
+            '      <span><strong>VCU Discrete Math Seminar</strong>'
+            '<span class="seminar-detail">Schedule &amp; joining details</span></span>\n'
+            '      <span class="seminar-arrow" aria-hidden="true">&rarr;</span>\n'
+            '    </a>\n')
     body = "".join(wrap(s, BLOCKS[s["block"]](s)) for s in secs)
     extra = ('<script src="assets/genealogy-data.js"></script>\n'
              '<script src="assets/genealogy.js"></script>\n'
@@ -609,7 +622,8 @@ def render(pg):
                       contents=contents, jump_href=pg["jump"]["href"],
                       jump_label=pg["jump"]["label"], jump_gloss=pg["jump"]["gloss"],
                       m_h1=m["h1"], m_role=m["role"], m_affil=m_affil,
-                      railwhere=railwhere, stamp=SITE["stamp"])
+                      railwhere=railwhere, stamp=SITE["stamp"],
+                      seminar_callout=seminar_callout)
     out += body + FOOT.format(colophon=SITE["colophon"], extra=extra)
     with open(os.path.join(HERE, pg["file"]), "w", encoding="utf-8") as f:
         f.write(out)
