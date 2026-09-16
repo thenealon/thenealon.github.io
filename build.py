@@ -47,7 +47,7 @@ HEAD = """<!DOCTYPE html>
 <title>{title}</title>
 <meta name="description" content="{desc}">
 <meta name="color-scheme" content="light dark">
-<link rel="stylesheet" href="assets/paper.css">
+<link rel="stylesheet" href="assets/paper.css?v=20260916">
 <script>try{{var g=localStorage.getItem('nb-bg');if(g){{document.documentElement.setAttribute('data-bg',g);}}}}catch(e){{}}</script>
 <noscript><style>.controls{{display:none}}</style></noscript>
 </head>
@@ -596,7 +596,7 @@ def render(pg):
             + contents)
         seminar_callout = (
             f'    <a class="seminar-link" href="{SEMINAR_URL}">\n'
-            '      <span><strong>VCU Discrete Math Seminar</strong>'
+            '      <span><strong>VCU Discrete Math Seminar</strong> '
             '<span class="seminar-detail">Schedule &amp; joining details</span></span>\n'
             '      <span class="seminar-arrow" aria-hidden="true">&rarr;</span>\n'
             '    </a>\n')
