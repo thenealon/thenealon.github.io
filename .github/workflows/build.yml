@@ -58,7 +58,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html more.html genealogy.html assets/genealogy-data.js assets/demos
+          git add index.html more.html genealogy.html assets/genealogy-data.js assets/abstracts.js assets/demos
           if git diff --staged --quiet; then
             echo "Nothing changed."
           else

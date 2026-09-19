@@ -13,6 +13,8 @@
   function labelBg(m) {
     if (!bgBtn) { return; }
     var perc = m === 'perc';
+    var thresholdControl = document.getElementById('threshold-control');
+    if (thresholdControl) { thresholdControl.hidden = !perc; }
     bgBtn.querySelector('.ctl-ico').textContent = perc ? '\u25A6' : '\u25B3';
     bgBtn.querySelector('.ctl-txt').textContent = perc ? 'Percolation' : 'Graph';
     bgBtn.setAttribute('aria-label', perc
@@ -30,6 +32,28 @@
       window.tidalGraph.setMode(next);
       set('nb-bg', next);
       labelBg(next);
+    });
+  }
+
+  /* ---- bootstrap threshold: the grid has four orthogonal neighbours ---- */
+  var thresholdSlider = document.getElementById('threshold-slider');
+  var thresholdValue = document.getElementById('threshold-value');
+  if (thresholdSlider && window.tidalGraph) {
+    var savedThreshold = parseInt(get('nb-threshold'), 10);
+    if (savedThreshold >= 1 && savedThreshold <= 4) {
+      window.tidalGraph.setThreshold(savedThreshold);
+    }
+    function labelThreshold() {
+      var r = window.tidalGraph.getThreshold();
+      thresholdSlider.value = r;
+      if (thresholdValue) { thresholdValue.textContent = r; }
+      thresholdSlider.setAttribute('aria-valuetext', r + ' infected neighbor' + (r === 1 ? '' : 's'));
+    }
+    labelThreshold();
+    thresholdSlider.addEventListener('input', function () {
+      window.tidalGraph.setThreshold(Number(thresholdSlider.value));
+      set('nb-threshold', window.tidalGraph.getThreshold());
+      labelThreshold();
     });
   }
 
@@ -172,7 +196,7 @@
   }());
 
   /* ---- abstracts ---------------------------------------------------
-     Buttons ship hidden.  One is revealed only if fetch_abstracts.py has
+     Buttons ship hidden.  One is revealed only if the reviewed data file has
      actually retrieved that paper's abstract, so a paper with no abstract
      anywhere simply shows no button.                                    */
   var data = window.ABSTRACTS || {};
@@ -212,9 +236,21 @@
     dlg.querySelector('.dlg-meta').textContent = v ? v.textContent : '';
     var body = dlg.querySelector('.dlg-body');
     body.textContent = '';
-    body.appendChild(paragraphs(entry.text));
-    dlg.querySelector('.dlg-src').textContent =
-      (entry.source || '') + (meta.generated ? ' \u00b7 retrieved ' + meta.generated : '');
+    // html is generated offline from reviewed text, escaped before typesetting.
+    if (entry.html) { body.innerHTML = entry.html; }
+    else { body.appendChild(paragraphs(entry.text)); }
+    var source = dlg.querySelector('.dlg-src');
+    source.textContent = '';
+    if (entry.url && /^https:\/\//.test(entry.url)) {
+      var link = document.createElement('a');
+      link.href = entry.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = entry.source || 'Source';
+      link.title = entry.source_title || 'Read the original abstract';
+      source.appendChild(link);
+    } else { source.textContent = entry.source || ''; }
+    body.scrollTop = 0;
 
     opener = btn;
     if (dlg.showModal) { dlg.showModal(); } else { dlg.setAttribute('open', ''); }
@@ -224,6 +260,8 @@
     (function (btn) {
       if (!entryFor(btn)) { return; }   /* no abstract on file: stay hidden */
       btn.hidden = false;
+      btn.setAttribute('aria-haspopup', 'dialog');
+      btn.setAttribute('aria-controls', 'abstract-dialog');
       btn.addEventListener('click', function () { open(btn); });
     }(buttons[i]));
   }
@@ -231,6 +269,9 @@
   if (dlg) {
     var closeBtn = dlg.querySelector('[data-close]');
     if (closeBtn) { closeBtn.addEventListener('click', close); }
+    dlg.addEventListener('close', function () {
+      if (opener) { opener.focus(); opener = null; }
+    });
     /* click on the backdrop */
     dlg.addEventListener('click', function (e) { if (e.target === dlg) { close(); } });
     /* Escape, for the browsers that do not give it to us free */

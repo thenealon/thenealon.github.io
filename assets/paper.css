@@ -58,17 +58,16 @@
   --link: #8a5d00;
   --link-hover: #c07f00;
 
-  /* bootstrap percolation: the healthy state is the paper, the infected
-     state a visible parchment, and the frontier gold */
+  /* Shared panel defaults; both animated backgrounds use the dark theme. */
   --panel: rgba(255, 255, 255, 0.86);
   --node-fill: rgba(255, 255, 255, 0.92);
   --node-fill-hi: #fffaf0;
   --graph-bg: rgba(255, 255, 255, 0.72);
 
-  --perc-a: #ffffff;
-  --perc-b: #e4d5a2;
-  --perc-glow: #e8a200;
-  --perc-alpha: 0.60;
+  --perc-a: #000000;
+  --perc-b: #542b16;
+  --perc-glow: #a57956;
+  --perc-alpha: 1;
 
   /* random geometric graph: settled edges quiet, new edges gold */
   --graph-edge: #cec5b2;
@@ -88,6 +87,7 @@ html { background: var(--bg); -webkit-text-size-adjust: 100%; scroll-behavior: s
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
 body {
+  isolation: isolate;
   margin: 0;
   font-family: var(--serif);
   font-size: clamp(1.05rem, 1rem + 0.28vw, 1.18rem);
@@ -102,7 +102,7 @@ body {
 #tidal-graph {
   position: fixed; top: 0; left: 0; inset: 0;
   width: 100%; height: 100%;
-  display: block; z-index: -1; pointer-events: none;
+  display: block; z-index: 0; pointer-events: none;
 }
 
 a {
@@ -122,12 +122,9 @@ a:hover, a:focus { color: var(--link-hover); text-decoration-color: currentColor
 }
 .skip:focus { left: 0.75rem; top: 0.75rem; }
 
-/* One control switches both at once: bootstrap percolation on white, the
-   random geometric graph on black.  The percolation covers the whole field
-   and wants a little more body behind the text; the graph is sparse. */
-:root[data-bg="perc"] { --sheet: rgba(255, 255, 255, 0.68); }
-
-:root[data-bg="graph"] {
+/* Both backgrounds have readable light type on dark surfaces. */
+:root[data-bg="graph"],
+:root[data-bg="perc"] {
   --bg: #0d0d0f;
   --sheet: rgba(14, 14, 17, 0.62);
   --sheet-flat: #111114;
@@ -153,8 +150,18 @@ a:hover, a:focus { color: var(--link-hover); text-decoration-color: currentColor
   --graph-node-alpha: 1;
 }
 
+/* Coffee stays brown on black throughout each round. */
+:root[data-bg="perc"] {
+  --bg: #000000;
+  --sheet: rgba(8, 7, 6, 0.82);
+  --sheet-flat: #100d0b;
+  --ink-faint: #aaa096;
+  --panel: rgba(15, 12, 10, 0.94);
+}
+
 /* ---------- shell ---------- */
 .shell {
+  position: relative; z-index: 1;
   display: grid;
   grid-template-columns: var(--rail) minmax(0, 1fr);
   gap: 0 3rem;
@@ -338,6 +345,14 @@ details.fold > *:not(summary) { margin-top: 0.9rem; }
   .ctl { -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
 }
 .ctl:hover { color: var(--link-hover); border-color: var(--rule); }
+.threshold-control { display: flex; align-items: center; gap: 0.55rem; cursor: default; }
+.threshold-control[hidden] { display: none; }
+.threshold-control span { white-space: nowrap; }
+.threshold-control input { width: 4.5rem; margin: 0; accent-color: #a57956; cursor: pointer; }
+@media (pointer: coarse) {
+  .controls .ctl { min-height: 44px; }
+  .threshold-control input { min-height: 32px; }
+}
 .ctl-ico { font-size: 1.05rem; line-height: 1; }
 
 /* ---------- abstract dialog ---------- */
@@ -526,3 +541,14 @@ dialog#abstract-dialog::backdrop { background: rgba(20, 19, 15, 0.35); }
   .app { transition: none; }
   .app:hover, .app:focus-visible { transform: none; }
 }
+
+/* Keep long abstracts readable and the close control reachable on phones. */
+dialog#abstract-dialog { max-height: 88vh; max-height: 88dvh; }
+.dlg-inner { display: flex; flex-direction: column; max-height: inherit; box-sizing: border-box; }
+.dlg-body { overflow-y: auto; min-height: 0; overscroll-behavior: contain; }
+.dlg-body p { text-align: left; overflow-wrap: anywhere; }
+.dlg-body math { font-size: 1em; }
+.dlg-title, .dlg-meta, .dlg-foot { flex-shrink: 0; }
+.dlg-src { overflow-wrap: anywhere; }
+.dlg-foot button { flex-shrink: 0; }
+@media (max-width: 40rem) { .dlg-inner { padding: 1.1rem; } }

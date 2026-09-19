@@ -173,6 +173,10 @@
 </div><!-- /.shell -->
 
 <div class="controls" role="group" aria-label="Background controls">
+  <label class="ctl threshold-control" id="threshold-control" hidden>
+    <span aria-hidden="true">r = <output id="threshold-value">2</output></span>
+    <input type="range" id="threshold-slider" min="1" max="4" step="1" value="2" aria-label="Bootstrap threshold" aria-valuetext="2 infected neighbors" title="Infected neighbors needed to spread (out of 4)">
+  </label>
   <button type="button" class="ctl" id="bg-toggle"><span class="ctl-ico" aria-hidden="true">&#9638;</span><span class="ctl-txt">Percolation</span></button>
   <button type="button" class="ctl" id="speed-toggle"><span class="ctl-ico" aria-hidden="true">&#128034;</span><span class="ctl-txt">Slow</span></button>
   <button type="button" class="ctl" id="tide-toggle" aria-pressed="false"><span class="ctl-ico" aria-hidden="true">&#9646;&#9646;</span><span class="ctl-txt">Pause</span></button>
@@ -190,6 +194,7 @@
   </div>
 </dialog>
 
+<script src="assets/coffee-surface.js"></script>
 <script src="assets/tidal-graph.js"></script>
 <script src="assets/abstracts.js"></script>
 <script src="assets/ui.js"></script>

@@ -64,8 +64,10 @@ const anchor = '  lastW = canvas.clientWidth;\n  lastH = canvas.clientHeight;\n 
 if (src.indexOf(anchor) === -1) { throw new Error('anchor not found'); }
 const patched = src.replace(anchor,
   '  window.__peek = function () { return { n: n, r: r, xs: xs, ys: ys, deg: deg, segN: segN, live: segN, segs: segs }; };\n'
-  + '  window.__peekPerc = function () { return { cols: pCols, rows: pRows, count: pCount, total: pTotal, gen: pGen, phase: pPhase, base: pBase }; };\n'
-  + '  window.__newRound = newRound;\n' + anchor);
+  + '  window.__peekPerc = function () { return { cols: pCols, rows: pRows, count: pCount, total: pTotal, gen: pGen, phase: pPhase, grid: Array.from(pInf), seeds: pSeeds.length, landed: pSeedCursor, threshold: PERC_R }; };\n'
+  + '  window.__newRound = newRound;\n'
+  + '  window.__generation = percGeneration;\n'
+  + '  window.__setPerc = function (cells) { pInf.set(cells); pCount = cells.reduce(function(a,b){return a+b;},0); };\n' + anchor);
 eval(patched);
 
 function bruteForce(xs, ys, n, r) {
@@ -177,26 +179,71 @@ for (let i = 0; i < s1.n; i++) {
 console.log('mean drift over 10 s:', (mean / s1.n).toFixed(1), 'px; max', max.toFixed(1),
             'px; r =', s1.r.toFixed(1));
 
-/* ---- bootstrap percolation: one clean round, start to finish ---- */
-{
-  window.tidalGraph.setMode('perc');
-  window.__newRound(false);
-  let p = window.__peekPerc();
-  console.log(`\nlattice ${p.cols}x${p.rows} = ${p.total} sites, 2-neighbour rule`);
-  console.log(`seeded ${p.count} sites = ${(100*p.count/p.total).toFixed(2)}%`);
-
-  let filledAt = null, holdAt = null, reseedAt = null, last = p.count;
-  for (let sec = 1; sec <= 70; sec++) {
-    advance(1);
-    p = window.__peekPerc();
-    if (!filledAt && p.count >= p.total) filledAt = sec;
-    if (!holdAt && p.phase !== 'grow') holdAt = sec;
-    if (filledAt && !reseedAt && p.count < last) reseedAt = sec;
-    if (sec % 7 === 0)
-      console.log(`  t=${String(sec).padStart(2)}s  gen ${String(p.gen).padStart(4)}  ` +
-        `infected ${(100*p.count/p.total).toFixed(1).padStart(5)}%  ${p.phase}  base=${p.base}`);
-    last = p.count;
+/* ---- bootstrap: compare each threshold to an independent oracle ---- */
+const assert = require('node:assert/strict');
+window.tidalGraph.setMode('perc');
+let rng = 12345;
+function random() { rng = (Math.imul(rng, 1664525) + 1013904223) >>> 0; return rng / 4294967296; }
+for (let threshold = 1; threshold <= 4; threshold++) {
+  window.tidalGraph.setThreshold(threshold);
+  const state = window.__peekPerc();
+  let cells = Array.from({length: state.total}, () => random() < .23 ? 1 : 0);
+  window.__setPerc(cells);
+  for (let generation = 0; generation < 12; generation++) {
+    const expected = cells.map((infected, i) => {
+      if (infected) return 1;
+      const x = i % state.cols, y = Math.floor(i / state.cols);
+      let count = 0;
+      for (const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+        const nx = x+dx, ny = y+dy;
+        if (nx >= 0 && nx < state.cols && ny >= 0 && ny < state.rows)
+          count += cells[ny*state.cols+nx];
+      }
+      return count >= threshold ? 1 : 0;
+    });
+    window.__generation();
+    assert.deepEqual(window.__peekPerc().grid, expected, `threshold ${threshold}, generation ${generation}`);
+    cells = expected;
   }
-  console.log(`\nfully infected at t=${filledAt}s; held at t=${holdAt}s; next round began at t=${reseedAt}s`);
-  console.log('background state is now', window.__peekPerc().base, '(started at 0)');
+  console.log(`threshold ${threshold}: 12 synchronous generations match the independent oracle`);
 }
+
+/* No propagation until all poured seeds land; pause prevents all motion. */
+window.tidalGraph.setThreshold(2);
+window.__newRound();
+assert.equal(window.__peekPerc().count, 0);
+advance(2);
+let pouring = window.__peekPerc();
+assert.equal(pouring.phase, 'pour');
+assert.equal(pouring.gen, 0);
+assert.equal(pouring.count, pouring.landed);
+assert.ok(pouring.count > 0 && pouring.count < pouring.seeds);
+window.tidalGraph.setPaused(true);
+advance(2);
+assert.deepEqual(window.__peekPerc(), pouring);
+window.tidalGraph.setPaused(false);
+advance(5);
+assert.notEqual(window.__peekPerc().phase, 'pour');
+assert.equal(window.__peekPerc().landed, window.__peekPerc().seeds);
+console.log('pouring: only landed seeds infect; growth starts afterward; pause is stable');
+
+/* A stalled high-threshold round must end, never receive extra infections. */
+window.tidalGraph.setThreshold(4);
+advance(6);
+for (let wait = 0; wait < 20 && window.__peekPerc().phase !== 'hold'; wait++) advance(.25);
+let stalled = window.__peekPerc();
+assert.equal(stalled.phase, 'hold');
+const stoppedCount = stalled.count;
+advance(1);
+assert.equal(window.__peekPerc().count, stoppedCount);
+advance(5);
+assert.equal(window.__peekPerc().phase, 'pour');
+console.log('stalled round: holds its actual closure, fades, then starts a new pour');
+
+window.tidalGraph.setThreshold(99);
+assert.equal(window.tidalGraph.getThreshold(), 4);
+window.tidalGraph.setThreshold(-5);
+assert.equal(window.tidalGraph.getThreshold(), 1);
+window.tidalGraph.setThreshold(NaN);
+assert.equal(window.tidalGraph.getThreshold(), 1);
+console.log('threshold control: bounds and invalid inputs handled');

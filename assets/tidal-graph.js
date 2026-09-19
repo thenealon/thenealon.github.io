@@ -30,37 +30,28 @@
  * there is no boundary depletion and no visible teleporting.
  *
  * BOOTSTRAP PERCOLATION.  Underneath the graph, a large lattice runs
- * 2-neighbour bootstrap percolation: a site with at least two already
- * infected von Neumann neighbours becomes infected, and infection never
- * heals.  The dynamics are the ones you would expect on Z^2 -- infected
+ * r-neighbour bootstrap percolation (r = 2 by default): a site with at
+ * least r infected orthogonal neighbours becomes infected and never heals
+ * within a round. At r = 2, the dynamics are the usual ones on Z^2: infected
  * regions square themselves off and grow as rectangles, rectangles merge,
  * and once one of them spans the box the rest goes quickly.
  *
- * The seed density is well over critical.  A near-critical seeding takes
- * hundreds of generations to fill and spends most of them with one small
- * frontier crawling across an otherwise motionless screen; seeding harder
- * gives many rectangles growing at once, so there is movement everywhere
- * without speeding the generation clock up.  The threshold itself:  Holroyd's threshold for the
- * square [n]^2 is p_c ~ pi^2 / (18 log n), but the convergence to that
- * asymptotic is famously slow (Gravner, Holroyd & Morris), so the constant
- * here was fixed by simulation at the grid sizes a browser actually uses
- * rather than taken from the theorem.  If a round stalls short of full --
- * the final set under this rule is a union of rectangles, and it need not
- * be everything -- a few fresh sites are sprinkled in until it completes.
+ * Each round starts with small mugs flying across the screen. Their drops
+ * land on a randomly chosen seed set before the first synchronous update.
+ * After that, only the selected threshold rule can infect a site. A full or
+ * stalled configuration is held, fades to black, and starts a fresh round.
  *
- * Once the lattice is full, the two states trade places: what was infected
- * becomes the new healthy background, a fresh set is chosen, and the round
- * runs again in the other colour.  So the field never blanks out; it just
- * keeps turning over between the two states.
- *
- * The infected lattice is painted onto an offscreen canvas as it grows, so
- * each frame is one blit rather than tens of thousands of rectangles.
+ * The lattice drives a continuous coffee surface: interpolated infection
+ * levels, rounded contours, a rippling meniscus, and soft reflections.
+ * Displacement and ripples affect only rendering, never the infection rule.
+ * The surface uses WebGL when available, with a rounded Canvas 2D fallback.
  *
  * Only one of the two runs at a time; the control in the corner switches
  * between them and the choice is remembered.  The idle one is neither
  * stepped nor drawn.
  *
- * Dependencies: none.  Canvas 2D only.  Degrades to nothing without JS.
+ * Dependencies: coffee-surface.js; no third-party libraries. Optional WebGL.
+ * Degrades to a plain background without JS.
  */
 (function () {
   'use strict';
@@ -107,26 +98,14 @@
   var WAKE_S = 26;        /* px/s, strength of the pointer wake         */
 
   /* bootstrap percolation */
-  var PERC_CELL = 11;         /* px per lattice site                    */
-  var PERC_R = 2;             /* neighbours needed to become infected   */
-  var PERC_HZ = 5.5;          /* generations per second, at turtle speed */
-  var PERC_P = 0.36;          /* seed density is PERC_P / log(min side) */
+  var PERC_CELL = 14;          /* px per lattice site */
+  var PERC_R = 2;              /* orthogonal neighbours required */
+  var PERC_HZ = 5.5;           /* simulation generations per scaled second */
+  var PERC_P = 0.36;           /* seed density = PERC_P / log(min side) */
   var PERC_P_MIN = 0.06, PERC_P_MAX = 0.13;
-  var PERC_SPRINKLE = 0.004;  /* fraction of sites added on a stall     */
-  var PERC_HOLD = 2.6;        /* s, the full lattice is held before the
-                                 states trade places                     */
-  /* A newly infected site does not appear all at once.  It is painted over
-     several generations: faintly in the bright colour first, brightening,
-     then covered back down to the settled tone.  So the visible event is a
-     glow travelling along the infection frontier, and the settled field is
-     barely there.  Alphas are chosen so that after the last step under 3%
-     of the glow remains.                                                  */
-  var PERC_FADE = [
-    ['glow', 0.20], ['glow', 0.36], ['glow', 0.50], ['glow', 0.56],
-    ['glow', 0.56],
-    ['set', 0.16], ['set', 0.20], ['set', 0.26], ['set', 0.33],
-    ['set', 0.42], ['set', 0.53], ['set', 0.66], ['set', 0.80], ['set', 0.92]
-  ];
+  var PERC_HOLD = 3.2;         /* seconds before a fresh pot */
+  var PERC_CLEAR = 1.4;        /* gentle fade between independent rounds */
+  var PERC_POUR = 4.8;         /* seconds for the mugs to cross */
 
   /* ---- state ------------------------------------------------------- */
   var W = 0, H = 0, EW = 0, EH = 0, n = 0, r = 0, r2 = 0;
@@ -148,14 +127,12 @@
   var edgeCol = [206, 197, 178], glowCol = [217, 148, 0];
   var edgeBand = [];          /* per-band stroke style, built in readTheme */
   var mx = -1e9, my = -1e9, wake = false;
-  var off = null, offCtx = null;
-  var pInf = null, pCols = 0, pRows = 0, pCount = 0, pTotal = 0, pGen = 0;
-  var pPhase = 'grow', pTimer = 0, pAcc = 0, pAdd = null;
-  var percPal = [[16, 16, 19], [28, 28, 26]];   /* state 0, state 1 */
-  var percGlow = [255, 179, 0];
-  var fadeQ = [];
-  var pBase = 0;              /* which state is currently the background */
-  var percA = 0.3;
+  var coffee = null;
+  var pInf = null, pLevel = null, pCols = 0, pRows = 0;
+  var pCount = 0, pTotal = 0, pGen = 0, pAdd = null;
+  var pPhase = 'pour', pTimer = 0, pAcc = 0, pLiquidT = 0;
+  var pSeeds = [], pMugs = [], pSeedCursor = 0, pPourEnd = 0;
+  var pOpacity = 1;
   var fu = 0, fv = 0;   /* flow() writes here, to avoid allocating */
 
   /* ---- helpers ----------------------------------------------------- */
@@ -192,13 +169,6 @@
     var hi = hexToRgb(v('--graph-node-hi')) || [255, 179, 0];
     var na = parseFloat(v('--graph-node-alpha'));
     if (!(na > 0)) { na = 0.85; }
-    percPal = [hexToRgb(v('--perc-a')) || [16, 16, 19],
-               hexToRgb(v('--perc-b')) || [28, 28, 26]];
-    percGlow = hexToRgb(v('--perc-glow')) || [255, 179, 0];
-    percA = parseFloat(v('--perc-alpha'));
-    if (!(percA > 0)) { percA = 0.3; }
-    repaintPerc();
-
     /* band 0 is a pair just crossing the threshold, band 5 a close pair */
     edgeBand = [];
     for (var q = 0; q < EDGE_BUCKETS; q++) {
@@ -327,90 +297,90 @@
   /* ---- bootstrap percolation ---------------------------------------- */
 
   function initPerc() {
-    if (!off) {
-      off = document.createElement('canvas');
-      offCtx = off.getContext('2d');
-    }
-    off.width = canvas.width;
-    off.height = canvas.height;
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    offCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
     pCols = Math.max(4, Math.ceil(W / PERC_CELL));
     pRows = Math.max(4, Math.ceil(H / PERC_CELL));
     pTotal = pCols * pRows;
     pInf = new Uint8Array(pTotal);
+    pLevel = new Float32Array(pTotal);
     pAdd = new Int32Array(pTotal);
-    newRound(false);
+    if (!coffee && window.createCoffeeSurface) {
+      coffee = window.createCoffeeSurface();
+    }
+    if (coffee) { coffee.resize(W, H, pCols, pRows, PERC_CELL); }
+    newRound();
   }
 
   function seedDensity() {
-    var p = PERC_P / Math.log(Math.max(3, Math.min(pCols, pRows)));
-    if (p < PERC_P_MIN) { p = PERC_P_MIN; }
-    if (p > PERC_P_MAX) { p = PERC_P_MAX; }
-    return p;
+    return Math.max(PERC_P_MIN, Math.min(PERC_P_MAX,
+      PERC_P / Math.log(Math.max(3, Math.min(pCols, pRows)))));
   }
 
-  function rgb(c) { return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')'; }
+  function mugPosition(mug, t) {
+    var u = (t - mug.delay) / PERC_POUR;
+    return {
+      x: mug.reverse ? W + 52 - u * (W + 104) : -52 + u * (W + 104),
+      y: mug.y + Math.sin(u * TAU + mug.phase) * 11,
+      tilt: (mug.reverse ? -1 : 1) * (0.62 + 0.08 * Math.sin(u * 10)),
+      visible: u > -0.05 && u < 1.05
+    };
+  }
 
-  /* Whatever the last round infected becomes the healthy state of the next
-     one, so the field trades between the two colours instead of blanking. */
-  function newRound(swap) {
-    var i;
-    if (swap) { pBase = 1 - pBase; }
-
-    for (i = 0; i < pTotal; i++) { pInf[i] = 0; }
+  function newRound() {
+    pInf.fill(0);
+    pLevel.fill(0);
     pCount = 0;
     pGen = 0;
-    pPhase = 'grow';
+    pAcc = 0;
     pTimer = 0;
-
-    fadeQ = [];
-    offCtx.fillStyle = rgb(percPal[pBase]);
-    offCtx.fillRect(0, 0, W, H);
-
+    pOpacity = 1;
+    pPhase = 'pour';
+    pSeeds = [];
+    pMugs = [];
+    pSeedCursor = 0;
+    pPourEnd = 0;
+    var mugCount = W < 600 ? 2 : 3;
+    var band = H / mugCount;
+    for (var m = 0; m < mugCount; m++) {
+      pMugs.push({ y: Math.max(26, m * band + 5), delay: m * 0.32,
+        reverse: m % 2 === 1, phase: Math.random() * TAU });
+    }
     var p = seedDensity();
-    var m = 0;
-    for (i = 0; i < pTotal; i++) {
-      if (Math.random() < p) { pInf[i] = 1; pCount++; pAdd[m++] = i; }
+    for (var i = 0; i < pTotal; i++) {
+      if (Math.random() >= p) { continue; }
+      var x = ((i % pCols) + 0.5) * PERC_CELL;
+      var y = (((i / pCols) | 0) + 0.5) * PERC_CELL;
+      var which = Math.min(mugCount - 1, (y / band) | 0);
+      var mug = pMugs[which];
+      var across = mug.reverse ? W - x : x;
+      var release = mug.delay + (across + 44) / (W + 104) * PERC_POUR;
+      var pos = mugPosition(mug, release);
+      var duration = 0.3 + Math.sqrt(Math.abs(y - pos.y) / Math.max(1, H)) * 0.7;
+      pSeeds.push({ i: i, x: x, y: y, startX: pos.x + (mug.reverse ? -10 : 10),
+        startY: pos.y + 1, release: release, land: release + duration,
+        duration: duration });
+      pPourEnd = Math.max(pPourEnd, release + duration);
     }
-    paintCells(m);
-  }
-
-  /* Paint a list of sites in one colour at one alpha. */
-  function paintList(list, count, col, alpha) {
-    if (!count) { return; }
-    offCtx.fillStyle = 'rgba(' + col[0] + ',' + col[1] + ',' + col[2] + ',' +
-                       alpha + ')';
-    offCtx.beginPath();
-    var size = PERC_CELL - 1;
-    for (var k = 0; k < count; k++) {
-      var i = list[k];
-      offCtx.rect((i % pCols) * PERC_CELL, ((i / pCols) | 0) * PERC_CELL,
-                  size, size);
-    }
-    offCtx.fill();
-  }
-
-  /* Hand a freshly infected batch to the fade queue rather than stamping it
-     down at full strength, which is what made new infection jarring. */
-  function paintCells(m) {
-    if (!m) { return; }
-    fadeQ.push({ cells: pAdd.slice(0, m), n: m, step: 0 });
-  }
-
-  function advanceFades() {
-    for (var q = fadeQ.length; q--;) {
-      var b = fadeQ[q];
-      var f = PERC_FADE[b.step];
-      paintList(b.cells, b.n,
-                f[0] === 'glow' ? percGlow : percPal[1 - pBase], f[1]);
-      b.step++;
-      if (b.step >= PERC_FADE.length) { fadeQ.splice(q, 1); }
+    pSeeds.sort(function (a, b) { return a.land - b.land; });
+    pPourEnd = Math.max(pPourEnd, PERC_POUR + (mugCount - 1) * 0.32 + 0.35);
+    /* Reduced motion gets a still, genuinely reachable state, with no cups
+       frozen in midair. Explicit play can still animate subsequent rounds. */
+    if (paused || (mq && mq.matches && !override)) {
+      landSeeds(Infinity);
+      for (var g = 0; g < 14; g++) { if (!percGeneration()) { break; } }
+      for (var j = 0; j < pTotal; j++) { pLevel[j] = pInf[j]; }
+      pPhase = 'grow';
     }
   }
 
-  /* One synchronous update of the bootstrap rule. Returns sites added. */
+  function landSeeds(t) {
+    while (pSeedCursor < pSeeds.length && pSeeds[pSeedCursor].land <= t) {
+      var i = pSeeds[pSeedCursor++].i;
+      pInf[i] = 1;
+      pCount++;
+    }
+  }
+
+  /* One synchronous update. No sprinkling or spontaneous infection. */
   function percGeneration() {
     var m = 0, x, y, i, k;
     for (y = 0; y < pRows; y++) {
@@ -431,73 +401,56 @@
     return m;
   }
 
-  function sprinkle() {
-    var want = Math.max(1, Math.round(pTotal * PERC_SPRINKLE)), m = 0;
-    var guard = want * 40;
-    while (want > 0 && guard--) {
-      var j = (Math.random() * pTotal) | 0;
-      if (pInf[j]) { continue; }
-      pInf[j] = 1;
-      pCount++;
-      pAdd[m++] = j;
-      want--;
-    }
-    paintCells(m);
-  }
-
   function stepPerc(dt) {
     if (!pInf) { return; }
-
-    if (pPhase === 'hold') {
-      pTimer += dt;
-      if (fadeQ.length) {
-        pAcc += dt;
-        while (pAcc >= 1 / PERC_HZ && fadeQ.length) {
-          pAcc -= 1 / PERC_HZ;
-          advanceFades();
-        }
-      }
-      if (pTimer >= PERC_HOLD && !fadeQ.length) { newRound(true); }
+    var realDt = dt / speed;
+    pLiquidT += realDt;
+    var ease = 1 - Math.exp(-realDt * 7);
+    for (var i = 0; i < pTotal; i++) {
+      pLevel[i] += (pInf[i] - pLevel[i]) * ease;
+    }
+    if (pPhase === 'pour') {
+      pTimer += realDt;
+      landSeeds(pTimer);
+      if (pTimer >= pPourEnd) { pPhase = 'grow'; pTimer = 0; }
       return;
     }
-
+    if (pPhase === 'hold') {
+      pTimer += realDt;
+      if (pTimer >= PERC_HOLD) { pPhase = 'clear'; pTimer = 0; }
+      return;
+    }
+    if (pPhase === 'clear') {
+      pTimer += realDt;
+      var u = Math.min(1, pTimer / PERC_CLEAR);
+      pOpacity = 1 - u * u * (3 - 2 * u);
+      if (u >= 1) { newRound(); }
+      return;
+    }
     pAcc += dt;
-    var budget = 4;                    /* cap the catch-up after a tab switch */
+    var budget = 4;
     while (pAcc >= 1 / PERC_HZ && budget--) {
       pAcc -= 1 / PERC_HZ;
       pGen++;
-      advanceFades();
       var m = percGeneration();
-      if (m) {
-        paintCells(m);
-      } else if (pCount < pTotal) {
-        sprinkle();                    /* stalled short of full: nudge it */
-      }
-      if (pCount >= pTotal) {
-        pPhase = 'hold';
-        pTimer = 0;
-        break;
-      }
+      if (!m || pCount >= pTotal) { pPhase = 'hold'; pTimer = 0; break; }
     }
   }
 
   function drawPerc() {
-    if (!off || !pInf) { return; }
-    ctx.save();
-    ctx.globalAlpha = percA;
-    ctx.drawImage(off, 0, 0, W, H);
-    ctx.restore();
-  }
-
-  /* A theme change repaints the whole lattice in the new palette. */
-  function repaintPerc() {
-    if (!pInf || !offCtx) { return; }
-    offCtx.fillStyle = rgb(percPal[pBase]);
-    offCtx.fillRect(0, 0, W, H);
-    var m = 0;
-    for (var i = 0; i < pTotal; i++) { if (pInf[i]) { pAdd[m++] = i; } }
-    paintList(pAdd, m, percPal[1 - pBase], 1);
-    fadeQ = [];
+    if (!pInf) { return; }
+    if (coffee) { coffee.draw(ctx, pLevel, pLiquidT, pOpacity); }
+    if (pPhase !== 'pour' || !coffee) { return; }
+    for (var i = 0; i < pSeeds.length; i++) {
+      var s = pSeeds[i];
+      var u = (pTimer - s.release) / s.duration;
+      if (u < 0 || u > 1.65) { continue; }
+      coffee.drop(ctx, s, u, pLiquidT);
+    }
+    for (var m = 0; m < pMugs.length; m++) {
+      var pos = mugPosition(pMugs[m], pTimer);
+      if (pos.visible) { coffee.mug(ctx, pos.x, pos.y, pos.tilt); }
+    }
   }
 
   function push(x1, y1, x2, y2, band) {
@@ -613,6 +566,8 @@
   function frame(now) {
     raf = 0;
     var t = now / 1000;
+    /* Cap the liquid at 30 fps; leave the existing graph cadence alone. */
+    if (mode === 'perc' && lastT && t - lastT < 1 / 32) { schedule(); return; }
     var dt = lastT ? t - lastT : 0.016;
     lastT = t;
     if (dt > MAX_DT) { dt = MAX_DT; }
@@ -706,6 +661,17 @@
       document.documentElement.setAttribute('data-bg', mode);
       lastT = 0;
       readTheme();
+      still();
+      schedule();
+    },
+    getThreshold: function () { return PERC_R; },
+    setThreshold: function (value) {
+      var r = Math.round(Number(value));
+      if (!isFinite(r)) { return; }
+      r = Math.max(1, Math.min(4, r));
+      if (r === PERC_R) { return; }
+      PERC_R = r;
+      newRound();
       still();
       schedule();
     },
