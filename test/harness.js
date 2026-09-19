@@ -222,7 +222,7 @@ window.tidalGraph.setPaused(true);
 advance(2);
 assert.deepEqual(window.__peekPerc(), pouring);
 window.tidalGraph.setPaused(false);
-advance(5);
+advance(7);
 assert.notEqual(window.__peekPerc().phase, 'pour');
 assert.equal(window.__peekPerc().landed, window.__peekPerc().seeds);
 console.log('pouring: only landed seeds infect; growth starts afterward; pause is stable');
@@ -230,13 +230,13 @@ console.log('pouring: only landed seeds infect; growth starts afterward; pause i
 /* A stalled high-threshold round must end, never receive extra infections. */
 window.tidalGraph.setThreshold(4);
 advance(6);
-for (let wait = 0; wait < 20 && window.__peekPerc().phase !== 'hold'; wait++) advance(.25);
+for (let wait = 0; wait < 60 && window.__peekPerc().phase !== 'hold'; wait++) advance(.25);
 let stalled = window.__peekPerc();
 assert.equal(stalled.phase, 'hold');
 const stoppedCount = stalled.count;
 advance(1);
 assert.equal(window.__peekPerc().count, stoppedCount);
-advance(5);
+advance(8);
 assert.equal(window.__peekPerc().phase, 'pour');
 console.log('stalled round: holds its actual closure, fades, then starts a new pour');
 

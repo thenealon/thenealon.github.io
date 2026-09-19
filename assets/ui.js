@@ -8,6 +8,18 @@
   function get(k) { try { return store && store.getItem(k); } catch (e) { return null; } }
   function set(k, v) { try { if (store) { store.setItem(k, v); } } catch (e) {} }
 
+  function icon(name) {
+    var paths = {
+      coffee: '<path d="M4 5h10v7a5 5 0 0 1-10 0V5Z"/><path d="M14 6h1a3 3 0 0 1 0 6h-1M3 18h13"/>',
+      graph: '<path d="m5 5 10 2-5 9L5 5Z"/><circle cx="5" cy="5" r="2"/><circle cx="15" cy="7" r="2"/><circle cx="10" cy="16" r="2"/>',
+      slow: '<path d="m8 5 5 5-5 5"/>',
+      fast: '<path d="m4 5 5 5-5 5m7-10 5 5-5 5"/>',
+      pause: '<path d="M7 5v10M13 5v10"/>',
+      play: '<path d="m7 4 9 6-9 6V4Z"/>'
+    };
+    return '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">'+paths[name]+'</svg>';
+  }
+
   /* ---- which background -------------------------------------------- */
   var bgBtn = document.getElementById('bg-toggle');
   function labelBg(m) {
@@ -15,8 +27,9 @@
     var perc = m === 'perc';
     var thresholdControl = document.getElementById('threshold-control');
     if (thresholdControl) { thresholdControl.hidden = !perc; }
-    bgBtn.querySelector('.ctl-ico').textContent = perc ? '\u25A6' : '\u25B3';
-    bgBtn.querySelector('.ctl-txt').textContent = perc ? 'Percolation' : 'Graph';
+    bgBtn.querySelector('.ctl-ico').innerHTML = icon(perc ? 'coffee' : 'graph');
+    bgBtn.querySelector('.ctl-txt').textContent = perc ? 'Coffee' : 'Graph';
+    bgBtn.setAttribute('title', perc ? 'Switch to the graph background' : 'Switch to the coffee background');
     bgBtn.setAttribute('aria-label', perc
       ? 'Background: bootstrap percolation. Switch to the random geometric graph.'
       : 'Background: random geometric graph. Switch to bootstrap percolation.');
@@ -57,12 +70,13 @@
     });
   }
 
-  /* ---- pace: turtle or rabbit -------------------------------------- */
+  /* ---- pace: quiet or faster -------------------------------------- */
   var speedBtn = document.getElementById('speed-toggle');
   function labelSpeed(fast) {
     if (!speedBtn) { return; }
-    speedBtn.querySelector('.ctl-ico').textContent = fast ? '\uD83D\uDC07' : '\uD83D\uDC22';
+    speedBtn.querySelector('.ctl-ico').innerHTML = icon(fast ? 'fast' : 'slow');
     speedBtn.querySelector('.ctl-txt').textContent = fast ? 'Fast' : 'Slow';
+    speedBtn.setAttribute('title', fast ? 'Slow down' : 'Speed up');
     speedBtn.setAttribute('aria-label', fast
       ? 'Background running fast. Slow it down.'
       : 'Background running slowly. Speed it up.');
@@ -86,8 +100,9 @@
   var tideBtn = document.getElementById('tide-toggle');
   function labelTide(stopped) {
     if (!tideBtn) { return; }
-    tideBtn.querySelector('.ctl-ico').textContent = stopped ? '\u25B6' : '\u258C\u258C';
+    tideBtn.querySelector('.ctl-ico').innerHTML = icon(stopped ? 'play' : 'pause');
     tideBtn.querySelector('.ctl-txt').textContent = stopped ? 'Play' : 'Pause';
+    tideBtn.setAttribute('title', stopped ? 'Play background' : 'Pause background');
     tideBtn.setAttribute('aria-pressed', stopped ? 'true' : 'false');
     tideBtn.setAttribute('aria-label',
       stopped ? 'Background is still. Start it.' : 'Pause the background.');

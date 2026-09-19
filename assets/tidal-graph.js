@@ -29,12 +29,11 @@
  * The domain is a torus (positions wrap through an off-screen margin), so
  * there is no boundary depletion and no visible teleporting.
  *
- * BOOTSTRAP PERCOLATION.  Underneath the graph, a large lattice runs
- * r-neighbour bootstrap percolation (r = 2 by default): a site with at
- * least r infected orthogonal neighbours becomes infected and never heals
- * within a round. At r = 2, the dynamics are the usual ones on Z^2: infected
- * regions square themselves off and grow as rectangles, rectangles merge,
- * and once one of them spans the box the rest goes quickly.
+ * BOOTSTRAP PERCOLATION. Coffee mode runs synchronous r-neighbour bootstrap
+ * percolation on a finite rectangular subset of Z^2, without wraparound or
+ * an infected exterior. A site joins the infected set when at least r of
+ * its four orthogonal neighbours were infected in the previous generation.
+ * A site never heals within a round.
  *
  * Each round starts with small mugs flying across the screen. Their drops
  * land on a randomly chosen seed set before the first synchronous update.
@@ -44,7 +43,10 @@
  * The lattice drives a continuous coffee surface: interpolated infection
  * levels, rounded contours, a rippling meniscus, and soft reflections.
  * Displacement and ripples affect only rendering, never the infection rule.
- * The surface uses WebGL when available, with a rounded Canvas 2D fallback.
+ * An area-preserving display flow and a damped surface-wave equation make
+ * the liquid move independently of the synchronous infection rounds.
+ * Neither the flow, splashes nor mouse wake can change an infection.
+ * WebGL and software paths shade the same moving height field.
  *
  * Only one of the two runs at a time; the control in the corner switches
  * between them and the choice is remembered.  The idle one is neither
@@ -98,14 +100,14 @@
   var WAKE_S = 26;        /* px/s, strength of the pointer wake         */
 
   /* bootstrap percolation */
-  var PERC_CELL = 14;          /* px per lattice site */
+  var PERC_CELL = 18;          /* px per lattice site */
   var PERC_R = 2;              /* orthogonal neighbours required */
   var PERC_HZ = 5.5;           /* simulation generations per scaled second */
-  var PERC_P = 0.36;           /* seed density = PERC_P / log(min side) */
+  var PERC_P = 0.42;           /* seed density = PERC_P / log(min side) */
   var PERC_P_MIN = 0.06, PERC_P_MAX = 0.13;
-  var PERC_HOLD = 3.2;         /* seconds before a fresh pot */
-  var PERC_CLEAR = 1.4;        /* gentle fade between independent rounds */
-  var PERC_POUR = 4.8;         /* seconds for the mugs to cross */
+  var PERC_HOLD = 5.5;         /* seconds before a fresh pot */
+  var PERC_CLEAR = 2.0;        /* gentle fade between independent rounds */
+  var PERC_POUR = 6.6;         /* seconds for the mugs to cross */
 
   /* ---- state ------------------------------------------------------- */
   var W = 0, H = 0, EW = 0, EH = 0, n = 0, r = 0, r2 = 0;
@@ -320,8 +322,10 @@
     return {
       x: mug.reverse ? W + 52 - u * (W + 104) : -52 + u * (W + 104),
       y: mug.y + Math.sin(u * TAU + mug.phase) * 11,
-      tilt: (mug.reverse ? -1 : 1) * (0.62 + 0.08 * Math.sin(u * 10)),
-      visible: u > -0.05 && u < 1.05
+      tilt: .70 + .32 * Math.max(0, Math.min(1,u)),
+      amount: Math.max(.2, 1-u*.8),
+      opacity: Math.max(0, Math.min(1, u*8, (1-u)*8)),
+      visible: u > 0 && u < 1
     };
   }
 
@@ -338,6 +342,7 @@
     pMugs = [];
     pSeedCursor = 0;
     pPourEnd = 0;
+    if (coffee && coffee.reset) { coffee.reset(); }
     var mugCount = W < 600 ? 2 : 3;
     var band = H / mugCount;
     for (var m = 0; m < mugCount; m++) {
@@ -355,8 +360,11 @@
       var release = mug.delay + (across + 44) / (W + 104) * PERC_POUR;
       var pos = mugPosition(mug, release);
       var duration = 0.3 + Math.sqrt(Math.abs(y - pos.y) / Math.max(1, H)) * 0.7;
-      pSeeds.push({ i: i, x: x, y: y, startX: pos.x + (mug.reverse ? -10 : 10),
-        startY: pos.y + 1, release: release, land: release + duration,
+      var lip = coffee && coffee.lip ? coffee.lip(pos.x,pos.y,pos.tilt) : {x:pos.x+10,y:pos.y+1};
+      var landing = coffee && coffee.project ? coffee.project(x,y,pLiquidT+release+duration) : {x:x,y:y};
+      if (landing.y < lip.y + 16) { continue; }
+      pSeeds.push({ i: i, x: x, y: y, startX: lip.x,
+        startY: lip.y, release: release, land: release + duration,
         duration: duration });
       pPourEnd = Math.max(pPourEnd, release + duration);
     }
@@ -377,6 +385,7 @@
       var i = pSeeds[pSeedCursor++].i;
       pInf[i] = 1;
       pCount++;
+      if (coffee && coffee.splash) { coffee.splash((i%pCols+.5)*PERC_CELL, (Math.floor(i/pCols)+.5)*PERC_CELL, .65); }
     }
   }
 
@@ -405,6 +414,7 @@
     if (!pInf) { return; }
     var realDt = dt / speed;
     pLiquidT += realDt;
+    if (wake && coffee && coffee.stir) { coffee.stir(mx,my,pLiquidT); }
     var ease = 1 - Math.exp(-realDt * 7);
     for (var i = 0; i < pTotal; i++) {
       pLevel[i] += (pInf[i] - pLevel[i]) * ease;
@@ -449,7 +459,8 @@
     }
     for (var m = 0; m < pMugs.length; m++) {
       var pos = mugPosition(pMugs[m], pTimer);
-      if (pos.visible) { coffee.mug(ctx, pos.x, pos.y, pos.tilt); }
+      if (pos.visible) { coffee.pour(ctx, pos.x, pos.y, pos.tilt, pos.amount * pos.opacity, pLiquidT);
+        coffee.mug(ctx, pos.x, pos.y, pos.tilt, pos.opacity, pos.amount); }
     }
   }
 

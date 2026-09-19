@@ -20,6 +20,8 @@ prose printed under the heading, and is empty unless you write one.
 
 import json
 import os
+import hashlib
+import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "data")
@@ -91,9 +93,9 @@ FOOT = """  <footer class="colophon">
     <span aria-hidden="true">r = <output id="threshold-value">2</output></span>
     <input type="range" id="threshold-slider" min="1" max="4" step="1" value="2" aria-label="Bootstrap threshold" aria-valuetext="2 infected neighbors" title="Infected neighbors needed to spread (out of 4)">
   </label>
-  <button type="button" class="ctl" id="bg-toggle"><span class="ctl-ico" aria-hidden="true">&#9638;</span><span class="ctl-txt">Percolation</span></button>
-  <button type="button" class="ctl" id="speed-toggle"><span class="ctl-ico" aria-hidden="true">&#128034;</span><span class="ctl-txt">Slow</span></button>
-  <button type="button" class="ctl" id="tide-toggle" aria-pressed="false"><span class="ctl-ico" aria-hidden="true">&#9646;&#9646;</span><span class="ctl-txt">Pause</span></button>
+  <button type="button" class="ctl" id="bg-toggle"><span class="ctl-ico" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25"><path d="m5 5 10 2-5 9L5 5Z"/><circle cx="5" cy="5" r="2"/><circle cx="15" cy="7" r="2"/><circle cx="10" cy="16" r="2"/></svg></span><span class="ctl-txt">Graph</span></button>
+  <button type="button" class="ctl" id="speed-toggle"><span class="ctl-ico" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="m8 5 5 5-5 5"/></svg></span><span class="ctl-txt">Slow</span></button>
+  <button type="button" class="ctl" id="tide-toggle" aria-pressed="false"><span class="ctl-ico" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"><path d="M7 5v10M13 5v10"/></svg></span><span class="ctl-txt">Pause</span></button>
 </div>
 
 <dialog id="abstract-dialog" aria-labelledby="dlg-title">
@@ -627,6 +629,12 @@ def render(pg):
                       railwhere=railwhere, stamp=SITE["stamp"],
                       seminar_callout=seminar_callout)
     out += body + FOOT.format(colophon=SITE["colophon"], extra=extra)
+    # Content versions prevent a cached renderer from mixing with a new page.
+    for asset in ("paper.css", "coffee-surface.js", "tidal-graph.js", "ui.js"):
+        with open(os.path.join(HERE, "assets", asset), "rb") as source:
+            version = hashlib.sha256(source.read()).hexdigest()[:12]
+        out = re.sub(r'assets/' + re.escape(asset) + r'(?:\?[^"\s]*)?(?=")',
+                     f"assets/{asset}?v={version}", out)
     with open(os.path.join(HERE, pg["file"]), "w", encoding="utf-8") as f:
         f.write(out)
     print("wrote %s (%d sections)" % (pg["file"], len(secs)))
