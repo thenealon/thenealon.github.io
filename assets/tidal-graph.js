@@ -29,28 +29,29 @@
  * The domain is a torus (positions wrap through an off-screen margin), so
  * there is no boundary depletion and no visible teleporting.
  *
- * BOOTSTRAP PERCOLATION.  Underneath the graph, a large lattice runs
- * r-neighbour bootstrap percolation (r = 2 by default): a site with at
- * least r infected orthogonal neighbours becomes infected and never heals
- * within a round. At r = 2, the dynamics are the usual ones on Z^2: infected
- * regions square themselves off and grow as rectangles, rectangles merge,
- * and once one of them spans the box the rest goes quickly.
+ * BOOTSTRAP PERCOLATION. The coffee mode runs synchronous r-neighbour
+ * bootstrap percolation (r = 2 by default) on a finite rectangular subset
+ * of Z^2, with no wraparound or infected exterior. An uninfected site joins
+ * the infected set when at least r of its four orthogonal neighbours were
+ * infected in the previous generation. Sites never heal within a round.
  *
- * Each round starts with small mugs flying across the screen. Their drops
- * land on a randomly chosen seed set before the first synchronous update.
+ * Each round starts with two glass cups pouring localised initial sets.
+ * These sets are chosen for display, not sampled from an independent-site
+ * probability model. All seeds land before the first synchronous update.
  * After that, only the selected threshold rule can infect a site. A full or
  * stalled configuration is held, fades to black, and starts a fresh round.
  *
  * The lattice drives a continuous coffee surface: interpolated infection
  * levels, rounded contours, a rippling meniscus, and soft reflections.
  * Displacement and ripples affect only rendering, never the infection rule.
- * The surface uses WebGL when available, with a rounded Canvas 2D fallback.
+ * One Canvas 2D renderer gives the same translucent surface on every device.
+ * An optional lattice overlay displays the exact binary state.
  *
  * Only one of the two runs at a time; the control in the corner switches
  * between them and the choice is remembered.  The idle one is neither
  * stepped nor drawn.
  *
- * Dependencies: coffee-surface.js; no third-party libraries. Optional WebGL.
+ * Dependencies: coffee-surface.js; no third-party libraries or GPU requirement.
  * Degrades to a plain background without JS.
  */
 (function () {
@@ -98,14 +99,12 @@
   var WAKE_S = 26;        /* px/s, strength of the pointer wake         */
 
   /* bootstrap percolation */
-  var PERC_CELL = 14;          /* px per lattice site */
+  var PERC_CELL = 30;          /* px per lattice site */
   var PERC_R = 2;              /* orthogonal neighbours required */
-  var PERC_HZ = 5.5;           /* simulation generations per scaled second */
-  var PERC_P = 0.36;           /* seed density = PERC_P / log(min side) */
-  var PERC_P_MIN = 0.06, PERC_P_MAX = 0.13;
-  var PERC_HOLD = 3.2;         /* seconds before a fresh pot */
-  var PERC_CLEAR = 1.4;        /* gentle fade between independent rounds */
-  var PERC_POUR = 4.8;         /* seconds for the mugs to cross */
+  var PERC_HZ = 4;           /* simulation generations per scaled second */
+  var PERC_HOLD = 12;         /* seconds before a fresh pot */
+  var PERC_CLEAR = 3.5;        /* gentle fade between independent rounds */
+  var PERC_POUR = 7.2;         /* seconds for the mugs to cross */
 
   /* ---- state ------------------------------------------------------- */
   var W = 0, H = 0, EW = 0, EH = 0, n = 0, r = 0, r2 = 0;
@@ -132,7 +131,7 @@
   var pCount = 0, pTotal = 0, pGen = 0, pAdd = null;
   var pPhase = 'pour', pTimer = 0, pAcc = 0, pLiquidT = 0;
   var pSeeds = [], pMugs = [], pSeedCursor = 0, pPourEnd = 0;
-  var pOpacity = 1;
+  var pOpacity = 1, pLattice = false;
   var fu = 0, fv = 0;   /* flow() writes here, to avoid allocating */
 
   /* ---- helpers ----------------------------------------------------- */
@@ -310,19 +309,23 @@
     newRound();
   }
 
-  function seedDensity() {
-    return Math.max(PERC_P_MIN, Math.min(PERC_P_MAX,
-      PERC_P / Math.log(Math.max(3, Math.min(pCols, pRows)))));
-  }
+  function smoothUnit(t) { t = Math.max(0, Math.min(1, t)); return t*t*(3-2*t); }
 
   function mugPosition(mug, t) {
-    var u = (t - mug.delay) / PERC_POUR;
-    return {
-      x: mug.reverse ? W + 52 - u * (W + 104) : -52 + u * (W + 104),
-      y: mug.y + Math.sin(u * TAU + mug.phase) * 11,
-      tilt: (mug.reverse ? -1 : 1) * (0.62 + 0.08 * Math.sin(u * 10)),
-      visible: u > -0.05 && u < 1.05
-    };
+    var age = t - mug.delay;
+    var arrive = smoothUnit(age / 1.8);
+    var leave = smoothUnit((age - 5.1) / 2.1);
+    var side = mug.reverse ? 1 : -1;
+    var edge = mug.reverse ? W + 70 : -70;
+    var x = edge + (mug.x - edge) * arrive;
+    var y = mug.y - Math.sin(arrive * Math.PI) * 38;
+    x += (edge - mug.x) * leave;
+    y -= Math.sin(leave * Math.PI) * 20;
+    var pouring = smoothUnit((age - 1.7) / .65) * (1-smoothUnit((age-4.8)/.5));
+    var drained = smoothUnit((age-1.95)/2.9);
+    return {x:x, y:y, tilt:(.68+.40*drained)*pouring + side*.10*(1-arrive+leave),
+      opacity:smoothUnit(age/.6)*(1-smoothUnit((age-6.4)/.8)),
+      amount:1-.8*drained, visible:age > 0 && age < PERC_POUR};
   }
 
   function newRound() {
@@ -338,30 +341,48 @@
     pMugs = [];
     pSeedCursor = 0;
     pPourEnd = 0;
-    var mugCount = W < 600 ? 2 : 3;
-    var band = H / mugCount;
-    for (var m = 0; m < mugCount; m++) {
-      pMugs.push({ y: Math.max(26, m * band + 5), delay: m * 0.32,
-        reverse: m % 2 === 1, phase: Math.random() * TAU });
+    if (coffee && coffee.invalidate) { coffee.invalidate(); }
+    // Deliberately localised initial sets: two pours, not confetti over the
+    // whole page. These are NOT independent Bernoulli configurations.
+    // Randomness chooses A_0 only; every later infection is deterministic.
+    var pockets = [
+      {x:pCols*(.10+Math.random()*.04), y:pRows*(.25+Math.random()*.04),
+       rx:Math.min(9.5,pCols*.25), ry:Math.min(10,pRows*.27)},
+      {x:pCols*(.89+Math.random()*.03), y:pRows*(.73+Math.random()*.04),
+       rx:Math.min(10,pCols*.25), ry:Math.min(11,pRows*.27)}
+    ];
+    for (var m = 0; m < pockets.length; m++) {
+      var pocket = pockets[m];
+      pMugs.push({x:Math.max(45,Math.min(W-45,pocket.x*PERC_CELL-20)),
+        y:Math.max(52,(pocket.y-pocket.ry*.65)*PERC_CELL),
+        delay:m*.55, reverse:m===1});
     }
-    var p = seedDensity();
     for (var i = 0; i < pTotal; i++) {
-      if (Math.random() >= p) { continue; }
-      var x = ((i % pCols) + 0.5) * PERC_CELL;
-      var y = (((i / pCols) | 0) + 0.5) * PERC_CELL;
-      var which = Math.min(mugCount - 1, (y / band) | 0);
+      var gx = i % pCols, gy = (i / pCols) | 0;
+      var best = Infinity, which = 0;
+      for (var j = 0; j < pockets.length; j++) {
+        var pocket = pockets[j];
+        var dx = (gx+.5-pocket.x)/pocket.rx, dy = (gy+.5-pocket.y)/pocket.ry;
+        var q = dx*dx + dy*dy + .09*Math.sin(gx*.8+gy*.47);
+        if (q < best) { best = q; which = j; }
+      }
+      if (best > 1) { continue; }
+      var density = best < .20 ? 1 : (.38 + .11*PERC_R) * (1-.32*best);
+      if (Math.random() >= density) { continue; }
+      var x = (gx+.5)*PERC_CELL, y = (gy+.5)*PERC_CELL;
       var mug = pMugs[which];
-      var across = mug.reverse ? W - x : x;
-      var release = mug.delay + (across + 44) / (W + 104) * PERC_POUR;
+      var release = mug.delay + 1.95 + Math.max(0,best)*1.45 + Math.random()*.30;
       var pos = mugPosition(mug, release);
-      var duration = 0.3 + Math.sqrt(Math.abs(y - pos.y) / Math.max(1, H)) * 0.7;
-      pSeeds.push({ i: i, x: x, y: y, startX: pos.x + (mug.reverse ? -10 : 10),
-        startY: pos.y + 1, release: release, land: release + duration,
-        duration: duration });
-      pPourEnd = Math.max(pPourEnd, release + duration);
+      var origin = coffee && coffee.lip ? coffee.lip(pos.x,pos.y,pos.tilt) : {x:pos.x+20,y:pos.y};
+      var landing = coffee && coffee.project ? coffee.project(x,y) : {x:x,y:y};
+      if (landing.y < origin.y+24) { continue; }
+      var duration = .35 + Math.sqrt(Math.abs(y-origin.y)/Math.max(1,H))*.8;
+      pSeeds.push({i:i, x:x, y:y, startX:origin.x, startY:origin.y,
+        release:release, land:release+duration, duration:duration});
+      pPourEnd = Math.max(pPourEnd,release+duration);
     }
     pSeeds.sort(function (a, b) { return a.land - b.land; });
-    pPourEnd = Math.max(pPourEnd, PERC_POUR + (mugCount - 1) * 0.32 + 0.35);
+    pPourEnd = Math.max(pPourEnd, PERC_POUR + .55);
     /* Reduced motion gets a still, genuinely reachable state, with no cups
        frozen in midair. Explicit play can still animate subsequent rounds. */
     if (paused || (mq && mq.matches && !override)) {
@@ -440,6 +461,7 @@
   function drawPerc() {
     if (!pInf) { return; }
     if (coffee) { coffee.draw(ctx, pLevel, pLiquidT, pOpacity); }
+    if (coffee && pLattice) { coffee.lattice(ctx, pInf, pOpacity); }
     if (pPhase !== 'pour' || !coffee) { return; }
     for (var i = 0; i < pSeeds.length; i++) {
       var s = pSeeds[i];
@@ -449,7 +471,7 @@
     }
     for (var m = 0; m < pMugs.length; m++) {
       var pos = mugPosition(pMugs[m], pTimer);
-      if (pos.visible) { coffee.mug(ctx, pos.x, pos.y, pos.tilt); }
+      if (pos.visible) { coffee.mug(ctx, pos.x, pos.y, pos.tilt, pos.opacity, pos.amount); }
     }
   }
 
@@ -664,6 +686,8 @@
       still();
       schedule();
     },
+    getLattice: function () { return pLattice; },
+    setLattice: function (shown) { pLattice = !!shown; still(); },
     getThreshold: function () { return PERC_R; },
     setThreshold: function (value) {
       var r = Math.round(Number(value));

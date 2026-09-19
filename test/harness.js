@@ -212,7 +212,7 @@ for (let threshold = 1; threshold <= 4; threshold++) {
 window.tidalGraph.setThreshold(2);
 window.__newRound();
 assert.equal(window.__peekPerc().count, 0);
-advance(2);
+advance(3.2);
 let pouring = window.__peekPerc();
 assert.equal(pouring.phase, 'pour');
 assert.equal(pouring.gen, 0);
@@ -222,7 +222,7 @@ window.tidalGraph.setPaused(true);
 advance(2);
 assert.deepEqual(window.__peekPerc(), pouring);
 window.tidalGraph.setPaused(false);
-advance(5);
+advance(6);
 assert.notEqual(window.__peekPerc().phase, 'pour');
 assert.equal(window.__peekPerc().landed, window.__peekPerc().seeds);
 console.log('pouring: only landed seeds infect; growth starts afterward; pause is stable');
@@ -230,13 +230,13 @@ console.log('pouring: only landed seeds infect; growth starts afterward; pause i
 /* A stalled high-threshold round must end, never receive extra infections. */
 window.tidalGraph.setThreshold(4);
 advance(6);
-for (let wait = 0; wait < 20 && window.__peekPerc().phase !== 'hold'; wait++) advance(.25);
+for (let wait = 0; wait < 80 && window.__peekPerc().phase !== 'hold'; wait++) advance(.25);
 let stalled = window.__peekPerc();
 assert.equal(stalled.phase, 'hold');
 const stoppedCount = stalled.count;
 advance(1);
 assert.equal(window.__peekPerc().count, stoppedCount);
-advance(5);
+advance(15);
 assert.equal(window.__peekPerc().phase, 'pour');
 console.log('stalled round: holds its actual closure, fades, then starts a new pour');
 
@@ -247,3 +247,12 @@ assert.equal(window.tidalGraph.getThreshold(), 1);
 window.tidalGraph.setThreshold(NaN);
 assert.equal(window.tidalGraph.getThreshold(), 1);
 console.log('threshold control: bounds and invalid inputs handled');
+
+// Inspecting the exact lattice must never advance or alter the process.
+const beforeLattice = window.__peekPerc();
+window.tidalGraph.setLattice(true);
+assert.equal(window.tidalGraph.getLattice(), true);
+assert.deepEqual(window.__peekPerc(), beforeLattice);
+window.tidalGraph.setLattice(false);
+assert.deepEqual(window.__peekPerc(), beforeLattice);
+console.log('lattice overlay: view-only, infection state and generation unchanged');

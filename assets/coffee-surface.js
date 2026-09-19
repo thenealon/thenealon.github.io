@@ -1,289 +1,225 @@
-/* Coffee is a rendering of the bootstrap state, not a second simulation.
-   The density texture comes only from infected sites. Waves, lighting and
-   the sub-cell displacement never change which sites become infected. */
+/* Translucent espresso, rendered identically on every Canvas 2D browser.
+   The only geometric input is the bootstrap lattice's infection level.
+   Smoothed contours follow the state; illumination never infects a site.
+   The optional lattice overlay draws the exact binary state, without smoothing. */
 (function () {
   'use strict';
+  var PI = Math.PI, cos = Math.cos, floor = Math.floor, max = Math.max, min = Math.min, sin = Math.sin;
+  var TAU = PI * 2;
+  function clamp(x, a, b) { return max(a, min(b, x)); }
   window.createCoffeeSurface = function () {
-    var surface = document.createElement('canvas');
-    var gl = null, program = null, texture = null, uniforms = {};
-    var w = 1, h = 1, cols = 1, rows = 1, cell = 14, pixels = null;
-    var fallback = null, fallbackCtx = null;
-    var lost = false;
-
-    function compile(type, source) {
-      var shader = gl.createShader(type);
-      gl.shaderSource(shader, source);
-      gl.compileShader(shader);
-      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        var message = gl.getShaderInfoLog(shader);
-        gl.deleteShader(shader);
-        throw new Error(message);
-      }
-      return shader;
+    var w=1,h=1,cols=1,rows=1,cell=30,bendX=0,bendY=0,phase=0;
+    function horizontal(y) {
+      return bendX*(sin(y*.0061+.3)+.26*sin(y*.014-.7)) + 2.4*sin(y*.04+phase*.42);
     }
-
-    try {
-      gl = surface.getContext('webgl', {
-        alpha: false, antialias: false, depth: false, stencil: false,
-        preserveDrawingBuffer: false, powerPreference: 'low-power'
-      });
-      if (gl && gl.getExtension('OES_standard_derivatives')) {
-        var vertex = compile(gl.VERTEX_SHADER,
-          'attribute vec2 aPosition; varying vec2 vUV;' +
-          'void main(){vUV=vec2(aPosition.x*.5+.5,.5-aPosition.y*.5);' +
-          'gl_Position=vec4(aPosition,0.,1.);}');
-        var fragment = compile(gl.FRAGMENT_SHADER, [
-          '#extension GL_OES_standard_derivatives : enable',
-          'precision highp float;',
-          'varying vec2 vUV;',
-          'uniform sampler2D uState;',
-          'uniform vec2 uSize, uGrid;',
-          'uniform float uCell, uTime, uOpacity;',
-          'float noise(vec2 p) {',
-          '  vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);',
-          '  vec3 s=vec3(127.1,311.7,74.7);',
-          '  float a=fract(sin(dot(i,s.xy))*4375.85);',
-          '  float b=fract(sin(dot(i+vec2(1,0),s.xy))*4375.85);',
-          '  float c=fract(sin(dot(i+vec2(0,1),s.xy))*4375.85);',
-          '  float d=fract(sin(dot(i+vec2(1,1),s.xy))*4375.85);',
-          '  return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);',
-          '}',
-          // Cubic B-spline reconstruction: continuous slopes, four filtered
-          // texture reads. This avoids both square tiles and faceted glints.
-          'float density(vec2 q) {',
-          '  vec2 p=q-.5, i=floor(p), f=fract(p);',
-          '  vec2 w0=pow(1.-f,vec2(3.))/6.;',
-          '  vec2 w1=(3.*f*f*f-6.*f*f+4.)/6.;',
-          '  vec2 w2=(-3.*f*f*f+3.*f*f+3.*f+1.)/6.;',
-          '  vec2 w3=f*f*f/6.;',
-          '  vec2 g0=w0+w1, g1=w2+w3;',
-          '  vec2 h0=(i-.5+w1/g0)/uGrid;',
-          '  vec2 h1=(i+1.5+w3/g1)/uGrid;',
-          '  float a=texture2D(uState,h0).r;',
-          '  float b=texture2D(uState,vec2(h1.x,h0.y)).r;',
-          '  float c=texture2D(uState,vec2(h0.x,h1.y)).r;',
-          '  float d=texture2D(uState,h1).r;',
-          '  return mix(mix(a,b,g1.x),mix(c,d,g1.x),g1.y);',
-          '}',
-          'void main() {',
-          '  vec2 p=vUV*uSize;',
-          '  float t=uTime;',
-          '  vec2 bend=vec2(sin(p.y*.020+t*.45)+.38*sin(p.x*.048-p.y*.031-t*.5),',
-          '                 cos(p.x*.019-t*.4)+.35*sin(p.y*.044+p.x*.027+t*.5));',
-          '  float f=density((p+bend*11.)/uCell);',
-          '  float aa=max(.005,fwidth(f)*.85);',
-          '  float mask=smoothstep(.235-aa,.235+aa,f);',
-          '  float d1=length(p-uSize*vec2(.18,.34));',
-          '  float d2=length(p-uSize*vec2(.77,.73));',
-          '  float ripple=.55*sin(d1*.072-t*2.5)+.35*sin(d2*.089-t*2.1);',
-          '  ripple+=.28*sin(p.x*.022+p.y*.013-t*.85);',
-          '  float meniscus=exp(-abs(f-.27)*26.);',
-          '  vec2 slope=vec2(dFdx(f),dFdy(f))*13.;',
-          '  slope+=vec2(dFdx(ripple),dFdy(ripple))*1.8;',
-          '  vec3 normal=normalize(vec3(-slope,1.));',
-          '  vec3 light=normalize(vec3(-.18,.27,1.));',
-          '  float shine=pow(max(0.,dot(normal,light)),65.);',
-          '  float body=noise(p*.009+vec2(t*.013,-t*.007));',
-          '  vec3 brown=mix(vec3(.17,.070,.031),vec3(.32,.16,.078),body);',
-          '  brown*=.93+.07*ripple;',
-          '  brown+=meniscus*vec3(.20,.12,.067);',
-          '  brown+=shine*vec3(.29,.235,.17)*(.45+.55*meniscus);',
-          '  brown*=smoothstep(.23,.36,f)*.40+.60;',
-          '  gl_FragColor=vec4(brown*mask*uOpacity,1.);',
-          '}'
-        ].join('\n'));
-        program = gl.createProgram();
-        gl.attachShader(program, vertex);
-        gl.attachShader(program, fragment);
-        gl.linkProgram(program);
-        gl.deleteShader(vertex);
-        gl.deleteShader(fragment);
-        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-          throw new Error(gl.getProgramInfoLog(program));
+    function vertical(x) {
+      return bendY*(sin(x*.0049-1.1)+.23*sin(x*.011+.6)) + 1.7*sin(x*.043-phase*.31);
+    }
+    // A composition of shears is bijective and has Jacobian determinant 1.
+    // Both the liquid and the exact lattice use this same embedding.
+    function project(x,y) {x+=horizontal(y);return {x:x,y:y+vertical(x)};}
+    function resize(width,height,c,r,px) {
+      w=width;h=height;cols=c;rows=r;cell=px;phase=0;
+      bendX=min(65,w*.10);bendY=min(46,h*.065);
+    }
+    var cases=[[],[[3,0]],[[0,1]],[[3,1]],[[1,2]],[[3,0],[1,2]],
+      [[0,2]],[[3,2]],[[2,3]],[[0,2]],[[0,1],[2,3]],[[1,2]],
+      [[1,3]],[[0,1]],[[3,0]],[]];
+    function contours(levels) {
+      var nodes=Object.create(null),loops=[];
+      function value(x,y){return x<0||y<0||x>=cols||y>=rows ? 0 : levels[y*cols+x];}
+      function edge(x,y,e) {
+        var ax=x,ay=y,bx=x,by=y,key;
+        if(e===0){bx++;key='h'+x+','+y;}
+        if(e===1){ax++;bx++;by++;key='v'+(x+1)+','+y;}
+        if(e===2){ay++;by++;bx++;key='h'+x+','+(y+1);}
+        if(e===3){by++;key='v'+x+','+y;}
+        if(!nodes[key]){
+          var a=value(ax,ay),b=value(bx,by),t=clamp((.5-a)/(b-a),0,1);
+          var p=project((ax+.5+(bx-ax)*t)*cell,(ay+.5+(by-ay)*t)*cell);
+          nodes[key]={x:p.x,y:p.y,next:[],seen:false};
         }
-        gl.useProgram(program);
-        var buffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
-        var position = gl.getAttribLocation(program, 'aPosition');
-        gl.enableVertexAttribArray(position);
-        gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
-        ['uState','uSize','uGrid','uCell','uTime','uOpacity'].forEach(function (name) {
-          uniforms[name] = gl.getUniformLocation(program, name);
-        });
-        texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-        gl.uniform1i(uniforms.uState, 0);
-      } else {
-        gl = null;
+        return key;
       }
-    } catch (e) {
-      console.warn('Coffee surface: using the Canvas fallback.', e.message);
-      gl = null;
+      for(var y=-1;y<rows;y++)for(var x=-1;x<cols;x++){
+        var code=(value(x,y)>=.5?1:0)|(value(x+1,y)>=.5?2:0)|
+          (value(x+1,y+1)>=.5?4:0)|(value(x,y+1)>=.5?8:0);
+        var pairs=cases[code];
+        for(var j=0;j<pairs.length;j++){
+          var a=edge(x,y,pairs[j][0]),b=edge(x,y,pairs[j][1]);
+          nodes[a].next.push(b);nodes[b].next.push(a);
+        }
+      }
+      for(var key in nodes){
+        if(nodes[key].seen)continue;
+        var line=[],at=key,previous=null;
+        while(!nodes[at].seen){
+          var node=nodes[at];node.seen=true;line.push(node);
+          var next=node.next[0]===previous?node.next[1]:node.next[0];
+          previous=at;at=next;
+          if(!at)break;
+        }
+        if(line.length>=3)loops.push(line);
+      }
+      return loops;
     }
-
-    surface.addEventListener('webglcontextlost', function (event) {
-      event.preventDefault();
-      lost = true;
-    });
-
-    function resize(width, height, c, r, px) {
-      w = width; h = height; cols = c; rows = r; cell = px;
-      pixels = new Uint8Array(cols * rows);
-      // Limit GPU work independently of screen density.
-      var scale = Math.min(window.devicePixelRatio || 1, 1.25,
-        Math.sqrt(1000000 / Math.max(1, w * h)));
-      surface.width = Math.max(1, Math.round(w * scale));
-      surface.height = Math.max(1, Math.round(h * scale));
-      if (gl && !lost) {
-        gl.viewport(0, 0, surface.width, surface.height);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, cols, rows, 0,
-          gl.LUMINANCE, gl.UNSIGNED_BYTE, pixels);
-        gl.uniform2f(uniforms.uSize, w, h);
-        gl.uniform2f(uniforms.uGrid, cols, rows);
-        gl.uniform1f(uniforms.uCell, cell);
-      }
-      if (fallback) { fallback.width = Math.ceil(w); fallback.height = Math.ceil(h); }
-    }
-
-    function drawFallback(ctx, levels, time, opacity) {
-      if (!fallback) {
-        fallback = document.createElement('canvas');
-        fallback.width = Math.ceil(w); fallback.height = Math.ceil(h);
-        fallbackCtx = fallback.getContext('2d');
-      }
-      var fc = fallbackCtx;
-      fc.clearRect(0, 0, w, h);
-      var gradient = fc.createLinearGradient(0, 0, w, h);
-      gradient.addColorStop(0, '#653e25');
-      gradient.addColorStop(0.5, '#3c1c0d');
-      gradient.addColorStop(1, '#57321c');
-      fc.fillStyle = gradient;
-      fc.beginPath();
-      for (var i = 0; i < levels.length; i++) {
-        if (levels[i] < .02) { continue; }
-        var x = ((i % cols) + .5) * cell;
-        var y = (((i / cols) | 0) + .5) * cell;
-        var radius = cell * .8 * levels[i];
-        x += Math.sin(y * .031 + time * .65) * 2;
-        y += Math.cos(x * .025 - time * .55) * 2;
-        fc.moveTo(x + radius, y);
-        fc.arc(x, y, radius, 0, Math.PI * 2);
-      }
-      fc.fill();
-      // Shallow rings are clipped to the actual pooled surface.
-      fc.globalCompositeOperation = 'source-atop';
-      fc.strokeStyle = 'rgba(191,155,124,.10)';
-      fc.lineWidth = 1.4;
-      for (var ring = 0; ring < 14; ring++) {
-        fc.beginPath();
-        fc.ellipse(w * .2, h * .35, (ring * 35 + time * 10) % 500 + 2,
-          (ring * 25 + time * 7) % 357 + 2, -.3, 0, Math.PI * 2);
-        fc.stroke();
-      }
-      fc.globalCompositeOperation = 'source-over';
-      ctx.save();
-      ctx.globalAlpha = opacity;
-      ctx.filter = 'blur(2px)';
-      ctx.drawImage(fallback, 0, 0, w, h);
-      ctx.restore();
-    }
-
-    function draw(ctx, levels, time, opacity) {
-      if (!gl || lost) { drawFallback(ctx, levels, time, opacity); return; }
-      for (var i = 0; i < levels.length; i++) { pixels[i] = Math.round(levels[i] * 255); }
-      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, cols, rows,
-        gl.LUMINANCE, gl.UNSIGNED_BYTE, pixels);
-      gl.uniform1f(uniforms.uTime, time);
-      gl.uniform1f(uniforms.uOpacity, opacity);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      ctx.drawImage(surface, 0, 0, w, h);
-    }
-
-    function mug(ctx, x, y, tilt) {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(tilt);
-      ctx.shadowColor = 'rgba(0,0,0,.5)';
-      ctx.shadowBlur = 7;
-      ctx.shadowOffsetY = 3;
-      // Ceramic handle, then the little tapered cup.
-      ctx.strokeStyle = '#bcb1a1';
-      ctx.lineWidth = 4;
+    function trace(ctx,loops){
       ctx.beginPath();
-      ctx.ellipse(-15, 2, 7, 8, 0, 0, Math.PI * 2);
-      ctx.stroke();
-      var glaze = ctx.createLinearGradient(-12, 0, 13, 0);
-      glaze.addColorStop(0, '#aca396');
-      glaze.addColorStop(.42, '#f0e9dc');
-      glaze.addColorStop(1, '#ccc0ad');
-      ctx.fillStyle = glaze;
-      ctx.beginPath();
-      ctx.moveTo(-13, -9);
-      ctx.lineTo(-10, 11);
-      ctx.bezierCurveTo(-9, 17, 9, 17, 10, 11);
-      ctx.lineTo(13, -9);
-      ctx.closePath();
-      ctx.fill();
-      ctx.shadowColor = 'transparent';
-      ctx.fillStyle = '#e6dccc';
-      ctx.beginPath(); ctx.ellipse(0, -9, 13, 5, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#352013';
-      ctx.beginPath(); ctx.ellipse(0, -9, 10.5, 3.3, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = 'rgba(203,168,126,.6)'; ctx.lineWidth = .9;
-      ctx.beginPath(); ctx.ellipse(0, -9, 9, 2.7, 0, Math.PI, Math.PI * 1.9); ctx.stroke();
-      ctx.restore();
-    }
-
-    function poolPosition(x, y, time) {
-      if (!gl || lost) {
-        var fx = x + Math.sin(y * .031 + time * .65) * 2;
-        return { x: fx, y: y + Math.cos(fx * .025 - time * .55) * 2 };
+      for(var j=0;j<loops.length;j++){
+        var p=loops[j],n=p.length;
+        // Quadratic corner rounding stays within the local convex hull.
+        // Infected centres remain distinct from the uninfected lattice sites.
+        ctx.moveTo((p[n-1].x+p[0].x)/2,(p[n-1].y+p[0].y)/2);
+        for(var i=0;i<n;i++){
+          var a=p[i],b=p[(i+1)%n];
+          ctx.quadraticCurveTo(a.x,a.y,(a.x+b.x)/2,(a.y+b.y)/2);
+        }
+        ctx.closePath();
       }
-      // Invert the display-only displacement so drops land in their pools.
-      var px = x, py = y;
-      for (var pass = 0; pass < 5; pass++) {
-        var bx = Math.sin(py * .020 + time * .45) +
-          .38 * Math.sin(px * .048 - py * .031 - time * .5);
-        var by = Math.cos(px * .019 - time * .4) +
-          .35 * Math.sin(py * .044 + px * .027 + time * .5);
-        px = x - bx * 11;
-        py = y - by * 11;
-      }
-      return { x: px, y: py };
     }
-
-    function drop(ctx, seed, u, time) {
-      var target = poolPosition(seed.x, seed.y, time);
-      ctx.save();
-      if (u < 1) {
-        var x = seed.startX + (target.x - seed.startX) * u;
-        var y = seed.startY + (target.y - seed.startY) * u * u;
-        var prev = Math.max(0, u - .13);
-        ctx.strokeStyle = 'rgba(117,70,37,.8)';
-        ctx.lineWidth = 1.7; ctx.lineCap = 'round';
-        ctx.beginPath();
-        ctx.moveTo(seed.startX + (target.x - seed.startX) * prev,
-          seed.startY + (target.y - seed.startY) * prev * prev);
-        ctx.lineTo(x, y); ctx.stroke();
-        ctx.fillStyle = '#8a5330';
-        ctx.beginPath(); ctx.ellipse(x, y, 1.8, 2.6, 0, 0, Math.PI * 2); ctx.fill();
-      } else {
-        var age = (u - 1) / .65;
-        ctx.strokeStyle = 'rgba(169,119,79,' + ((1 - age) * .35) + ')';
-        ctx.lineWidth = .8;
-        ctx.beginPath();
-        ctx.ellipse(target.x, target.y, 2 + age * 9, 1.5 + age * 5, 0, 0, Math.PI * 2);
+    function draw(ctx,levels,time,opacity){
+      phase=time;
+      var loops=contours(levels);if(!loops.length||opacity<=0)return;
+      ctx.save();ctx.globalAlpha=opacity;
+      trace(ctx,loops);
+      var body=ctx.createLinearGradient(0,0,w,h);
+      body.addColorStop(0,'rgba(106,67,40,.32)');
+      body.addColorStop(.44,'rgba(63,35,21,.24)');
+      body.addColorStop(1,'rgba(104,64,37,.31)');
+      ctx.fillStyle=body;ctx.fill('evenodd');
+      ctx.save();ctx.clip('evenodd');
+      // Reflections drift slowly over the liquid, independently of the
+      // exact infection times. All reflected light is clipped to its pool.
+      var offset=sin(time*.055)*h*.08;
+      var reflection=ctx.createLinearGradient(0,-h*.3+offset,w*.7,h+offset);
+      reflection.addColorStop(0,'rgba(206,175,130,0)');
+      reflection.addColorStop(.29,'rgba(206,175,130,0)');
+      reflection.addColorStop(.37,'rgba(206,175,130,.018)');
+      reflection.addColorStop(.405,'rgba(226,201,162,.09)');
+      reflection.addColorStop(.44,'rgba(180,137,88,.025)');
+      reflection.addColorStop(.48,'rgba(206,175,130,0)');
+      reflection.addColorStop(.73,'rgba(206,175,130,0)');
+      reflection.addColorStop(.82,'rgba(210,181,143,.045)');
+      reflection.addColorStop(1,'rgba(206,175,130,0)');
+      ctx.fillStyle=reflection;ctx.fillRect(0,0,w,h);
+      var ring=ctx.createLinearGradient(0,0,w,h);
+      ring.addColorStop(0,'rgba(226,207,174,.06)');
+      ring.addColorStop(.5,'rgba(160,114,64,.018)');
+      ring.addColorStop(1,'rgba(216,185,134,.04)');
+      ctx.strokeStyle=ring;ctx.lineWidth=1.1;
+      for(var q=0;q<3;q++){
+        var y=h*(.25+q*.29)+sin(time*.22+q*1.9)*12;
+        ctx.beginPath();ctx.moveTo(-40,y);
+        ctx.bezierCurveTo(w*.28,y-100,w*.54,y+80,w+40,y-70);
         ctx.stroke();
       }
       ctx.restore();
+      // Two restrained meniscus strokes give the transparent film depth.
+      trace(ctx,loops);
+      var rim=ctx.createLinearGradient(0,0,w,h);
+      rim.addColorStop(0,'rgba(222,203,169,.31)');
+      rim.addColorStop(.34,'rgba(204,165,113,.13)');
+      rim.addColorStop(.61,'rgba(95,65,40,.04)');
+      rim.addColorStop(1,'rgba(212,187,149,.22)');
+      ctx.strokeStyle=rim;ctx.lineWidth=1.1;ctx.stroke();
+      ctx.save();ctx.translate(0,1.6);trace(ctx,loops);
+      ctx.strokeStyle='rgba(7,5,3,.42)';ctx.lineWidth=1.2;ctx.stroke();ctx.restore();
+      ctx.restore();
     }
 
-    return { resize: resize, draw: draw, mug: mug, drop: drop };
+    function cupPath(ctx) {
+      ctx.beginPath(); ctx.moveTo(-20, -17);
+      ctx.bezierCurveTo(-19, -5, -17, 13, -15, 20);
+      ctx.bezierCurveTo(-12, 27, 12, 27, 15, 20);
+      ctx.bezierCurveTo(17, 13, 19, -5, 20, -17);
+      ctx.bezierCurveTo(12, -11, -12, -11, -20, -17); ctx.closePath();
+    }
+    function mug(ctx, x, y, tilt, opacity, amount) {
+      ctx.save(); ctx.translate(x, y); ctx.rotate(tilt); ctx.scale(.85, .85);
+      ctx.globalAlpha = opacity === undefined ? 1 : opacity;
+      // A double-walled glass handle, continuous with the cup's silhouette.
+      ctx.beginPath(); ctx.moveTo(-19, -10);
+      ctx.bezierCurveTo(-44, -17, -44, 20, -16, 15);
+      ctx.strokeStyle = 'rgba(175,188,190,.22)'; ctx.lineWidth = 5.5; ctx.stroke();
+      ctx.strokeStyle = 'rgba(232,237,229,.48)'; ctx.lineWidth = .8; ctx.stroke();
+      cupPath(ctx);
+      var glass = ctx.createLinearGradient(-23, 0, 23, 0);
+      glass.addColorStop(0, 'rgba(214,225,217,.17)');
+      glass.addColorStop(.18, 'rgba(164,177,170,.035)');
+      glass.addColorStop(.73, 'rgba(164,177,170,.055)');
+      glass.addColorStop(1, 'rgba(214,225,217,.22)');
+      ctx.fillStyle = glass; ctx.fill();
+      ctx.strokeStyle = 'rgba(209,220,213,.35)'; ctx.lineWidth = .9; ctx.stroke();
+      ctx.save(); ctx.clip();
+      // The liquid surface stays level as the glass tips, and the level
+      // falls through the pour. Geometry is still the same vector cup.
+      ctx.rotate(-tilt);
+      var level = -5 + (1-(amount === undefined ? 1 : amount))*15;
+      var espresso = ctx.createLinearGradient(0,level,0,35);
+      espresso.addColorStop(0,'rgba(151,99,59,.73)');
+      espresso.addColorStop(.22,'rgba(90,47,24,.76)');
+      espresso.addColorStop(1,'rgba(34,20,12,.86)');
+      ctx.fillStyle = espresso; ctx.fillRect(-50,level,100,70);
+      ctx.strokeStyle = 'rgba(214,171,117,.50)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(-45,level); ctx.lineTo(45,level); ctx.stroke();
+      ctx.restore();
+      // Fine rim and a single soft-box reflection, not a white cartoon fill.
+      ctx.beginPath(); ctx.ellipse(0,-17,20,6.2,0,0,TAU);
+      ctx.strokeStyle = 'rgba(235,240,229,.6)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(0,-17,17.5,4.5,0,PI,TAU);
+      ctx.strokeStyle = 'rgba(235,240,229,.22)'; ctx.lineWidth = .7; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-15,-9); ctx.bezierCurveTo(-14,0,-13,10,-11,16);
+      ctx.strokeStyle = 'rgba(239,241,224,.35)'; ctx.lineWidth = 1.5; ctx.lineCap = 'round'; ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(0,21,12,2.4,0,0,PI);
+      ctx.strokeStyle = 'rgba(227,231,214,.24)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.restore();
+    }
+    function lip(x, y, tilt) {
+      return {x:x+.85*(19*cos(tilt)+17*sin(tilt)),
+        y:y+.85*(19*sin(tilt)-17*cos(tilt))};
+    }
+    function drop(ctx, seed, u) {
+      if (u < 0 || u > 1 || seed.i % 7 !== 0) return;
+      var target = project(seed.x,seed.y);
+      var a = clamp(u,0,1), b = max(0,a-.055);
+      var dx = target.x-seed.startX, dy = target.y-seed.startY;
+      ctx.save(); ctx.lineCap = 'round';
+      ctx.strokeStyle = 'rgba(192,146,92,.34)'; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(seed.startX+dx*b,seed.startY+dy*b*b);
+      ctx.quadraticCurveTo(seed.startX+dx*(a+b)/2,seed.startY+dy*a*b,
+        seed.startX+dx*a,seed.startY+dy*a*a); ctx.stroke();
+      ctx.restore();
+    }
+    function lattice(ctx, infected, opacity) {
+      ctx.save(); ctx.globalAlpha = opacity;
+      ctx.strokeStyle='rgba(198,180,149,.13)'; ctx.lineWidth=.6;
+      ctx.beginPath();
+      for (var x=0;x<cols;x++) {
+        for (var y=0;y<rows;y+=.25) {
+          var p=project((x+.5)*cell,(y+.5)*cell);
+          if (y===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y);
+        }
+      }
+      for (var y=0;y<rows;y++) {
+        for (var x=0;x<cols;x+=.25) {
+          var p=project((x+.5)*cell,(y+.5)*cell);
+          if (x===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y);
+        }
+      }
+      ctx.stroke();
+      for (var kind=0;kind<2;kind++) {
+        ctx.beginPath();
+        for (var i=0;i<infected.length;i++) {
+          if (infected[i]!==kind) continue;
+          var p=project((i%cols+.5)*cell,(floor(i/cols)+.5)*cell);
+          ctx.moveTo(p.x+1.8,p.y); ctx.arc(p.x,p.y,1.8,0,TAU);
+        }
+        if (kind) {ctx.fillStyle='rgba(235,199,150,.85)';ctx.fill();}
+        else {ctx.strokeStyle='rgba(185,181,167,.35)';ctx.lineWidth=.65;ctx.stroke();}
+      }
+      ctx.restore();
+    }
+    return {resize:resize, draw:draw, mug:mug, lip:lip, drop:drop, lattice:lattice, project:project,
+      invalidate:function () {}};
   };
 }());
