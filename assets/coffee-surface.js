@@ -77,7 +77,7 @@
     var surface=document.createElement('canvas'),gl=null,program=null,texture=null,uniforms={},floatTexture=false;
     var w=1,h=1,cols=1,rows=1,cell=14,scale=1,phase=0,lastTime=-1;
     var pixels,heights,velocities,previous,dye,dyeNext;
-    var fallback=null,fc=null,fw=1,fh=1,frame,ff,fz,fd;
+    var fallback=null,fc=null,fw=1,fh=1,frame,ff,fz,fd,filtered,blurPass;
     function compile(type,src){
       var shader=gl.createShader(type);gl.shaderSource(shader,src);gl.compileShader(shader);
       if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(shader));
@@ -120,6 +120,7 @@
     function resize(width,height,c,r,px){
       w=width;h=height;cols=c;rows=r;cell=px;
       var n=c*r;pixels=floatTexture?new Float32Array(n*4):new Uint8Array(n*4);heights=new Float32Array(n);velocities=new Float32Array(n);
+      filtered=new Float32Array(n);blurPass=new Float32Array(n);
       previous=new Float32Array(n);dye=new Float32Array(n);dyeNext=new Float32Array(n);
       scale=min(window.devicePixelRatio||1,1.2,sqrt(850000/max(1,w*h)));
       surface.width=max(1,Math.round(w*scale));surface.height=max(1,Math.round(h*scale));allocateTexture();
@@ -152,6 +153,19 @@
       var ix=floor(x),iy=floor(y),fx=x-ix,fy=y-iy,j=iy*cols+ix;
       var r=ix<cols-1?1:0,b=iy<rows-1?cols:0;
       return (a[j]*(1-fx)+a[j+r]*fx)*(1-fy)+(a[j+b]*(1-fx)+a[j+b+r]*fx)*fy;
+    }
+    function cubic(a,x,y){
+      var ix=floor(x),iy=floor(y),fx=x-ix,fy=y-iy;
+      var wx0=pow(1-fx,3)/6,wx1=(3*fx*fx*fx-6*fx*fx+4)/6,
+          wx2=(-3*fx*fx*fx+3*fx*fx+3*fx+1)/6,wx3=fx*fx*fx/6;
+      var x0=clamp(ix-1,0,cols-1),x1=clamp(ix,0,cols-1),x2=clamp(ix+1,0,cols-1),x3=clamp(ix+2,0,cols-1);
+      var value=0;
+      for(var k=0;k<4;k++){
+        var row=clamp(iy+k-1,0,rows-1)*cols;
+        var wy=k===0?pow(1-fy,3)/6:k===1?(3*fy*fy*fy-6*fy*fy+4)/6:k===2?(-3*fy*fy*fy+3*fy*fy+3*fy+1)/6:fy*fy*fy/6;
+        value+=(a[row+x0]*wx0+a[row+x1]*wx1+a[row+x2]*wx2+a[row+x3]*wx3)*wy;
+      }
+      return value;
     }
     function evolve(levels,time){
       var dt=lastTime<0?0:clamp(time-lastTime,0,.06);lastTime=time;
@@ -194,14 +208,80 @@
         if(xx>=0&&yy>=0&&xx<cols&&yy<rows)velocities[yy*cols+xx]+=strength*exp(-(dx*dx+dy*dy)*.7)*12;
       }
     }
+    var cases=[[],[[3,0]],[[0,1]],[[3,1]],[[1,2]],[[3,0],[1,2]],
+      [[0,2]],[[3,2]],[[2,3]],[[0,2]],[[0,1],[2,3]],[[1,2]],
+      [[1,3]],[[0,1]],[[3,0]],[]];
+    function contours(levels) {
+      var nodes=Object.create(null),loops=[];
+      function value(x,y){return x<0||y<0||x>=cols||y>=rows ? 0 : levels[y*cols+x];}
+      function edge(x,y,e) {
+        var ax=x,ay=y,bx=x,by=y,key;
+        if(e===0){bx++;key='h'+x+','+y;}
+        if(e===1){ax++;bx++;by++;key='v'+(x+1)+','+y;}
+        if(e===2){ay++;by++;bx++;key='h'+x+','+(y+1);}
+        if(e===3){by++;key='v'+x+','+y;}
+        if(!nodes[key]){
+          var a=value(ax,ay),b=value(bx,by),t=clamp((.235-a)/(b-a),0,1);
+          var p=project((ax+.5+(bx-ax)*t)*cell,(ay+.5+(by-ay)*t)*cell);
+          nodes[key]={x:p.x,y:p.y,next:[],seen:false};
+        }
+        return key;
+      }
+      for(var y=-1;y<rows;y++)for(var x=-1;x<cols;x++){
+        var code=(value(x,y)>=.235?1:0)|(value(x+1,y)>=.235?2:0)|
+          (value(x+1,y+1)>=.235?4:0)|(value(x,y+1)>=.235?8:0);
+        var pairs=cases[code];
+        for(var j=0;j<pairs.length;j++){
+          var a=edge(x,y,pairs[j][0]),b=edge(x,y,pairs[j][1]);
+          nodes[a].next.push(b);nodes[b].next.push(a);
+        }
+      }
+      for(var key in nodes){
+        if(nodes[key].seen)continue;
+        var line=[],at=key,previous=null;
+        while(!nodes[at].seen){
+          var node=nodes[at];node.seen=true;line.push(node);
+          var next=node.next[0]===previous?node.next[1]:node.next[0];
+          previous=at;at=next;
+          if(!at)break;
+        }
+        if(line.length>=3)loops.push(line);
+      }
+      return loops;
+    }
+    function trace(ctx,loops){
+      ctx.beginPath();
+      for(var j=0;j<loops.length;j++){
+        var p=loops[j],n=p.length;
+        // Quadratic corner rounding stays within the local convex hull.
+        // This only rounds the displayed density contour.
+        ctx.moveTo((p[n-1].x+p[0].x)/2,(p[n-1].y+p[0].y)/2);
+        for(var i=0;i<n;i++){
+          var a=p[i],b=p[(i+1)%n];
+          ctx.quadraticCurveTo(a.x,a.y,(a.x+b.x)/2,(a.y+b.y)/2);
+        }
+        ctx.closePath();
+      }
+    }
     // Same moving surface and reflected lighting when WebGL is unavailable.
     // A small software framebuffer bounds CPU work on older devices.
     function drawFallback(ctx,levels,time,opacity){
       if(!fallback){fallback=document.createElement('canvas');fallback.width=fw;fallback.height=fh;fc=fallback.getContext('2d');frame=fc.createImageData(fw,fh);}
+      // Reconstruct the density before shading. Filtering in material space
+      // gives small drops the same round, merging silhouette as the GPU path.
+      for(var y=0;y<rows;y++)for(var x=0;x<cols;x++){
+        var i=y*cols+x;
+        blurPass[i]=(levels[i-(x>0?1:0)]+4*levels[i]+levels[i+(x<cols-1?1:0)])/6;
+      }
+      for(var y=0;y<rows;y++)for(var x=0;x<cols;x++){
+        var i=y*cols+x;
+        filtered[i]=(blurPass[i-(y>0?cols:0)]+4*blurPass[i]+blurPass[i+(y<rows-1?cols:0)])/6;
+      }
+      var loops=contours(filtered);
       var sx=w/fw,sy=h/fh;
       for(var y=0;y<fh;y++)for(var x=0;x<fw;x++){
         var i=y*fw+x,q=material((x+.5)*sx,(y+.5)*sy,time),gx=q.x/cell-.5,gy=q.y/cell-.5;
-        var f=sample(levels,gx,gy),depth=smooth(.23,.88,f);
+        var f=cubic(levels,gx,gy),depth=smooth(.23,.88,f);
         ff[i]=f;fd[i]=sample(dye,gx,gy);
         var wave=sample(heights,gx,gy)+1.3*sin(q.x*.035+q.y*.015-time*1.6)+.72*sin(q.y*.055-q.x*.012+time*1.9)+.35*sin(q.x*.086+q.y*.069-time*2.7);
         fz[i]=5.2*depth+wave*(.4+.6*depth);
@@ -211,15 +291,19 @@
         var i=y*fw+x,j=i*4,f=ff[i],depth=smooth(.23,.88,f);
         var l=i-(x>0?1:0),r=i+(x<fw-1?1:0),u=i-(y>0?fw:0),d=i+(y<fh-1?fw:0);
         var nx=-(fz[r]-fz[l])/(2*sx),ny=-(fz[d]-fz[u])/(2*sy);
-        var a=exp(-pow((nx+.075)/.21,4)-pow((ny+.080)/.027,2));
+        var a=exp(-pow((nx+.075)/.21,4)-pow((ny+.080)/.040,2))*.72;
         var b=exp(-pow((nx-.12)/.045,2)-pow((ny-.01)/.32,4));
         var broad=exp(-((nx+.1)*(nx+.1)+(ny+.07)*(ny+.07))*8),tint=.85+fd[i]*.4;
         out[j]=255*((.30+(.066-.30)*depth)*tint+.62*a*.62+.49*b*.14+.055*broad);
         out[j+1]=255*((.145+(.028-.145)*depth)*tint+.56*a*.62+.56*b*.14+.036*broad);
         out[j+2]=255*((.059+(.012-.059)*depth)*tint+.44*a*.62+.57*b*.14+.020*broad);
-        out[j+3]=255*smooth(.18,.30,f)*(.62+.26*depth)*opacity;
+        out[j+3]=255*(.62+.26*depth)*opacity;
       }
-      fc.putImageData(frame,0,0);ctx.save();ctx.imageSmoothingEnabled=true;ctx.drawImage(fallback,0,0,w,h);ctx.restore();
+      // The moving silhouette is clipped at native display resolution;
+      // only the smooth interior reflections use the small framebuffer.
+      fc.putImageData(frame,0,0);ctx.save();trace(ctx,loops);ctx.clip('evenodd');
+      ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+      ctx.drawImage(fallback,0,0,w,h);ctx.restore();
     }
     var pointerX=null,pointerY=null;
     function stir(x,y,time){
@@ -231,6 +315,10 @@
     }
     function draw(ctx,levels,time,opacity){
       phase=time;evolve(levels,time);
+      if(ctx.canvas&&ctx.canvas.setAttribute){
+        var renderer=gl?'webgl':'software';
+        if(ctx.canvas.getAttribute('data-liquid-renderer')!==renderer)ctx.canvas.setAttribute('data-liquid-renderer',renderer);
+      }
       if(!gl){drawFallback(ctx,levels,time,opacity);return;}
       gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,cols,rows,gl.RGBA,floatTexture?gl.FLOAT:gl.UNSIGNED_BYTE,pixels);
       gl.uniform1f(uniforms.uTime,time);gl.uniform1f(uniforms.uOpacity,opacity);
