@@ -114,20 +114,36 @@
       return result;
     }
 
-    function trace(ctx) {
+    function drainTime(y, progress) {
+      var distance = 1 - Math.max(0, Math.min(1, y / h));
+      return Math.max(0, Math.min(1, (progress - .1 - .2 * distance) / (.45 + .25 * distance)));
+    }
+
+    function transport(point, drain) {
+      if (!drain) { return point; }
+      var t = drainTime(point.y, drain.progress);
+      var fall = t * t * (3 - 2 * t);
+      /* Lower rows gather first; the flow narrows as it enters the mug.
+         Only pigment moves. Vertices and the exact infection set stay put. */
+      return {x: drain.x + (point.x - drain.x) * (1 - fall) * (1 - fall),
+        y: point.y + (drain.y - point.y) * fall};
+    }
+
+    function trace(ctx, drain) {
       ctx.beginPath();
       for (var j = 0; j < loops.length; j++) {
         var p = loops[j], n = p.length;
-        ctx.moveTo((p[n - 1].x + p[0].x) / 2, (p[n - 1].y + p[0].y) / 2);
+        var first = transport(p[0], drain), last = transport(p[n - 1], drain);
+        ctx.moveTo((last.x + first.x) / 2, (last.y + first.y) / 2);
         for (var i = 0; i < n; i++) {
-          var a = p[i], b = p[(i + 1) % n];
+          var a = transport(p[i], drain), b = transport(p[(i + 1) % n], drain);
           ctx.quadraticCurveTo(a.x, a.y, (a.x + b.x) / 2, (a.y + b.y) / 2);
         }
         ctx.closePath();
       }
     }
 
-    function draw(ctx, levels, infected, opacity) {
+    function draw(ctx, levels, infected, opacity, drain) {
       var changed = false;
       for (var i = 0; i < levels.length; i++) {
         if (Math.abs(levels[i] - cached[i]) > .0005) { changed = true; break; }
@@ -136,9 +152,9 @@
 
       ctx.save();
       ctx.globalAlpha = opacity;
-      if (loops.length) {
+      if (loops.length && (!drain || drain.progress < 1)) {
         /* A thin pigment edge, without raised highlights or glossy bevels. */
-        trace(ctx);
+        trace(ctx, drain);
         ctx.strokeStyle = 'rgba(126,83,49,.10)'; ctx.lineWidth = 3; ctx.stroke();
         ctx.save(); ctx.clip('evenodd');
         ctx.globalAlpha = opacity * .68;
@@ -148,8 +164,7 @@
       }
       ctx.restore();
 
-      /* Graph paper stays visible above the translucent stain and remains
-         in place when one experiment fades into the next. */
+      /* Graph paper and infection markers remain fixed during drainage. */
       ctx.drawImage(paper, 0, 0, w, h);
       ctx.save(); ctx.globalAlpha = opacity;
       for (var fresh = 0; fresh < 2; fresh++) {
@@ -167,6 +182,13 @@
           ctx.canvas.getAttribute('data-liquid-renderer') !== 'graph-paper') {
         ctx.canvas.setAttribute('data-liquid-renderer', 'graph-paper');
       }
+      var collected = 0, total = 0;
+      if (drain) for (var i = 0; i < infected.length; i++) if (infected[i]) {
+        var t = drainTime((Math.floor(i / cols) + .5) * cell, drain.progress);
+        var arriving = Math.max(0, Math.min(1, (t - .92) / .08));
+        collected += arriving * arriving * (3 - 2 * arriving); total++;
+      }
+      return total ? collected / total : 0;
     }
 
     return {resize: resize, reset: reset, draw: draw};

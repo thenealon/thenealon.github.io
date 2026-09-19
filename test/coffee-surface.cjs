@@ -41,6 +41,21 @@ for (const [cols, rows] of [[13, 28], [60, 37], [160, 90]]) {
   surface.draw(paused, levels, infected, 1);
   assert.deepEqual(paused.calls, ctx.calls, 'A redraw has no independent animation');
 
+  let lastFill = 0;
+  for (const progress of [0, .3, .6, .8, 1]) {
+    const draining = context();
+    const fill = surface.draw(draining, levels, infected, 1, {progress, x:48, y:rows * cell - 68});
+    assert.deepEqual(sort(draining.calls.filter(c => c[0] === 'arc').map(c => c.slice(1, 3))), sort(expected), 'Draining pigment does not move or erase infected vertices');
+    assert.ok(fill >= lastFill && fill <= 1, 'The collector only fills');
+    assert.ok(draining.calls.flat().filter(v => typeof v === 'number').every(Number.isFinite));
+    assert.deepEqual(Array.from(infected), original, 'Drainage cannot alter the process');
+    if (progress === 1) {
+      assert.equal(fill, 1);
+      assert.equal(draining.calls.filter(c => c[0] === 'clip').length, 0, 'All coffee has reached the mug');
+    }
+    lastFill = fill;
+  }
+
   surface.reset();
   const empty = context();
   surface.draw(empty, new Float32Array(infected.length), new Uint8Array(infected.length), 1);

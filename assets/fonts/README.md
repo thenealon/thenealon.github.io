@@ -1,41 +1,31 @@
-# Fonts
+# Site text fonts
 
-The stylesheet asks for **Latin Modern Roman** first — GUST's redrawing of
-Knuth's Computer Modern, which is what most mathematics is set in — and it asks
-for it via `local()` before `url()`. So:
+The site ships Latin Modern Roman 2.005, based on Computer Modern, in regular,
+italic, bold, and bold italic. Every face retains its full upstream character
+set. Text, navigation, labels, and buttons use this one family at three sizes:
+16, 19, and 28 CSS pixels with the default browser root size. The rem units
+respect a reader's preferred text size.
 
-* If a TeX distribution has installed Latin Modern or CMU Serif as system
-  fonts on the reader's machine (common among mathematicians, rare among
-  everyone else), the browser uses those and downloads nothing.
-* Otherwise it looks for the woff2 files listed below in this directory.
-* Failing both, it falls back to Palatino / Iowan Old Style / Georgia. That is
-  the `mathpazo` look, which is a perfectly respectable way to set a paper.
+The WOFF2 files are the normal web format; WOFF is the legacy alternative.
+These are lossless format conversions of the upstream OpenType files, made
+with fontTools. No glyph outlines, metrics, names, or character maps changed.
 
-To serve Latin Modern yourself, drop these three files here:
+Source: https://ctan.org/pkg/lm
+Upstream: https://www.gust.org.pl/projects/e-foundry/latin-modern/
+Copyright 2003–2021 B. Jackowski and J. M. Nowacki, on behalf of TeX user groups.
+License: GUST Font License; see GUST-FONT-LICENSE.txt in this directory.
 
-    lmroman10-regular.woff2
-    lmroman10-italic.woff2
-    lmroman10-bold.woff2
+Loading uses font-display: swap, a same-origin preload of the regular face,
+and system-serif fallbacks. No font CDN, JavaScript font loader, or hidden-text
+loading gate is involved. Content is ordinary HTML and remains readable if
+fonts or scripts are unavailable. Print styles use the same text family and
+remove the animated background and controls.
 
-Sources, both open licences, no account needed:
+Regenerate a face with fontTools and Brotli installed:
 
-* **GUST e-foundry**, the upstream project — the Latin Modern family under the
-  GUST Font License (a LaTeX Project Public License variant). Ships OpenType;
-  convert with `fonttools`:
-
-      pip install fonttools brotli
-      fonttools ttLib.woff2 compress lmroman10-regular.otf
-
-* **CTAN**, package `lm` — the same fonts as part of TeX Live. If you have
-  TeX Live installed you already have them; `kpsewhich lmroman10-regular.otf`
-  will find the file.
-
-An alternative with a lower stroke contrast, which holds up better at small
-sizes on a screen (and in the dark theme, where Computer Modern's hairlines
-can get thin): **STIX Two Text**, SIL Open Font License, from the STIX
-project. If you go that way, change the `font-family` names in the
-`@font-face` blocks at the top of `assets/paper.css` and add STIX to the
-`--serif` stack.
-
-Nothing here is required for the site to work — it ships with no font files
-and no CDN, so there are no third-party requests on any page.
+```python
+from fontTools.ttLib import TTFont
+font = TTFont("lmroman10-regular.otf")
+font.flavor = "woff2"  # use "woff" for the legacy alternative
+font.save("lmroman10-regular.woff2")
+```

@@ -38,7 +38,8 @@
  * Each experiment begins with an independent Bernoulli seed set A_0. It is
  * held for four seconds before propagation. Subsequent generations take
  * three seconds at the default pace. Only the threshold rule adds sites;
- * the actual closure is held before fading into a fresh experiment.
+ * the actual closure is held before the coffee drains into a small mug.
+ * Drainage is a separate transition: A_t stays fixed until the next A_0.
  *
  * Graph-paper lines and vertices are fixed. Brown dots show A_t exactly;
  * a softly spreading coffee stain interpolates each discrete update.
@@ -104,7 +105,8 @@
   var PERC_P = 0.42;           /* seed density = PERC_P / log(min side) */
   var PERC_P_MIN = 0.06, PERC_P_MAX = 0.13;
   var PERC_HOLD = 14;          /* time to inspect the actual closure */
-  var PERC_CLEAR = 3;          /* gentle fade between independent experiments */
+  var PERC_DRAIN = 8;          /* coffee flows into the collector after closure */
+  var PERC_COLLECTED = 1.8;    /* hold the filled mug before a new experiment */
   var PERC_SEED_HOLD = 4;      /* time to inspect A_0 */
 
   /* ---- state ------------------------------------------------------- */
@@ -131,7 +133,10 @@
   var pInf = null, pLevel = null, pCols = 0, pRows = 0;
   var pCount = 0, pTotal = 0, pGen = 0, pAdd = null;
   var pPhase = 'seed', pTimer = 0, pAcc = 0;
-  var pOpacity = 1;
+  var pDrain = 0;
+  var collector = document.getElementById('coffee-collector');
+  var collectorLiquid = document.getElementById('collector-liquid');
+  var collectorTarget = null;
   var fu = 0, fv = 0;   /* flow() writes here, to avoid allocating */
 
   /* ---- helpers ----------------------------------------------------- */
@@ -310,6 +315,12 @@
   }
 
   function seedDensity() {
+    /* Independent Bernoulli seeds, tuned to make each rule observable.
+       At r=4 an adjacent healthy pair is permanently stable, so only
+       isolated interior holes can fill, regardless of the density. */
+    if (PERC_R === 1) { return .012; }
+    if (PERC_R === 3) { return .55; }
+    if (PERC_R === 4) { return .80; }
     return Math.max(PERC_P_MIN, Math.min(PERC_P_MAX,
       PERC_P / Math.log(Math.max(3, Math.min(pCols, pRows)))));
   }
@@ -318,7 +329,22 @@
     var output = document.getElementById('perc-generation');
     if (output) { output.textContent = pGen; }
     var status = document.getElementById('perc-status');
-    if (status) { status.setAttribute('data-phase', pPhase); }
+    if (status) {
+      status.setAttribute('data-phase', pPhase);
+      status.setAttribute('title', 'Initial density: ' + (seedDensity() * 100).toFixed(1) +
+        '%. Each update uses the previous generation and the four orthogonal neighbors.');
+    }
+    var stage = document.getElementById('perc-stage');
+    if (stage) { stage.textContent = pPhase === 'drain' ? 'Draining' : pPhase === 'hold' ? 'Complete' : ''; }
+    if (collector) {
+      var visible = mode === 'perc' && (pPhase === 'hold' || pPhase === 'drain');
+      if (visible) { collector.removeAttribute('hidden'); }
+      else { collector.setAttribute('hidden', ''); }
+      if (visible) {
+        var box = collector.getBoundingClientRect();
+        collectorTarget = {x: box.left + box.width * .4, y: box.top + box.height * .1875};
+      }
+    }
   }
 
   function newRound() {
@@ -328,7 +354,7 @@
     pGen = 0;
     pAcc = 0;
     pTimer = 0;
-    pOpacity = 1;
+    pDrain = 0;
     pPhase = 'seed';
     if (coffee && coffee.reset) { coffee.reset(); }
     var p = seedDensity();
@@ -379,14 +405,13 @@
     }
     if (pPhase === 'hold') {
       pTimer += realDt;
-      if (pTimer >= PERC_HOLD) { pPhase = 'clear'; pTimer = 0; labelGeneration(); }
+      if (pTimer >= PERC_HOLD) { pPhase = 'drain'; pTimer = 0; labelGeneration(); }
       return;
     }
-    if (pPhase === 'clear') {
+    if (pPhase === 'drain') {
       pTimer += realDt;
-      var u = Math.min(1, pTimer / PERC_CLEAR);
-      pOpacity = 1 - u * u * (3 - 2 * u);
-      if (u >= 1) { newRound(); }
+      pDrain = Math.min(1, pTimer / PERC_DRAIN);
+      if (pTimer >= PERC_DRAIN + PERC_COLLECTED) { newRound(); }
       return;
     }
     pAcc += realDt;
@@ -401,7 +426,13 @@
 
   function drawPerc() {
     if (!pInf) { return; }
-    if (coffee) { coffee.draw(ctx, pLevel, pInf, pOpacity); }
+    var target = collectorTarget || {x: 48, y: H - 84};
+    var drain = pPhase === 'drain' ? {progress: pDrain, x: target.x, y: target.y} : null;
+    var fill = coffee ? coffee.draw(ctx, pLevel, pInf, 1, drain) : 0;
+    if (collectorLiquid) {
+      collectorLiquid.setAttribute('y', 48 - 33 * fill);
+      collectorLiquid.setAttribute('height', 33 * fill);
+    }
   }
 
   function push(x1, y1, x2, y2, band) {
@@ -610,6 +641,7 @@
     setMode: function (m) {
       mode = (m === 'graph') ? 'graph' : 'perc';
       document.documentElement.setAttribute('data-bg', mode);
+      labelGeneration();
       lastT = 0;
       readTheme();
       still();

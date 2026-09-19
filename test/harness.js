@@ -64,7 +64,7 @@ const anchor = '  lastW = canvas.clientWidth;\n  lastH = canvas.clientHeight;\n 
 if (src.indexOf(anchor) === -1) { throw new Error('anchor not found'); }
 const patched = src.replace(anchor,
   '  window.__peek = function () { return { n: n, r: r, xs: xs, ys: ys, deg: deg, segN: segN, live: segN, segs: segs }; };\n'
-  + '  window.__peekPerc = function () { return { cols: pCols, rows: pRows, count: pCount, total: pTotal, gen: pGen, phase: pPhase, grid: Array.from(pInf), levels: Array.from(pLevel), threshold: PERC_R }; };\n'
+  + '  window.__peekPerc = function () { return { cols: pCols, rows: pRows, count: pCount, total: pTotal, gen: pGen, phase: pPhase, grid: Array.from(pInf), levels: Array.from(pLevel), threshold: PERC_R, density: seedDensity(), drain: pDrain }; };\n'
   + '  window.__newRound = newRound;\n'
   + '  window.__generation = percGeneration;\n'
   + '  window.__setPerc = function (cells) { pInf.set(cells); pCount = cells.reduce(function(a,b){return a+b;},0); };\n' + anchor);
@@ -240,7 +240,18 @@ assert.equal(window.__peekPerc().gen, 3);
 window.tidalGraph.setSpeed(false);
 console.log('pace: initial state held; updates are 3 seconds apart (1.25 seconds when faster); pause freezes both layers');
 
-/* A stalled high-threshold round must end, never receive extra infections. */
+/* Higher thresholds begin denser, but never receive extra infections. */
+const densities = [];
+for (let r = 1; r <= 4; r++) {
+  window.tidalGraph.setThreshold(r);
+  densities.push(window.__peekPerc().density);
+}
+assert.ok(densities.every((p, i) => i === 0 || p > densities[i - 1]));
+assert.equal(densities[0], .012);
+assert.equal(densities[2], .55);
+assert.equal(densities[3], .8);
+console.log('seed densities increase with the threshold:', densities.map(p => (100 * p).toFixed(1) + '%').join(', '));
+
 window.tidalGraph.setThreshold(4);
 for (let wait = 0; wait < 60 && window.__peekPerc().phase !== 'hold'; wait++) advance(.25);
 let stalled = window.__peekPerc();
@@ -251,10 +262,18 @@ assert.equal(window.__peekPerc().count, stoppedCount);
 advance(12);
 assert.equal(window.__peekPerc().phase, 'hold');
 assert.deepEqual(window.__peekPerc().grid, stalled.grid);
-advance(4.5);
+advance(2);
+assert.equal(window.__peekPerc().phase, 'drain');
+assert.deepEqual(window.__peekPerc().grid, stalled.grid, 'Drainage does not heal or infect sites');
+window.tidalGraph.setPaused(true);
+const draining = window.__peekPerc();
+advance(5);
+assert.deepEqual(window.__peekPerc(), draining, 'Pause also freezes the drain');
+window.tidalGraph.setPaused(false);
+advance(9.5);
 assert.equal(window.__peekPerc().phase, 'seed');
 assert.equal(window.__peekPerc().gen, 0);
-console.log('stalled round: holds its actual closure for 14 seconds, fades, then starts a new experiment');
+console.log('completed round: holds its closure, drains without changing A_t, then starts a new experiment');
 
 window.tidalGraph.setPaused(true);
 window.tidalGraph.reseed();

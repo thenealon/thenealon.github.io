@@ -19,8 +19,8 @@
   if (!people || !root) { return; }
 
   var SVGNS = 'http://www.w3.org/2000/svg';
-  var NODE_W = 168, NODE_H = 40, GAP_X = 16, GAP_Y = 58, PAD = 26;
-  var DOT_R = 11, DOT_GAP = 7, DOT_PER_ROW = 14;  /* the sibling block */
+  var NODE_W = 248, NODE_H = 54, GAP_X = 16, GAP_Y = 58, PAD = 26;
+  var DOT_R = 14, DOT_GAP = 7, DOT_PER_ROW = 14;  /* the sibling block */
   var showSibs = true;
 
   var byId = {}, i, j, d;
@@ -239,13 +239,13 @@
           g.appendChild(ini);
 
           var sub = p.life || (p.year ? String(p.year) : '');
-          var nm = el('text', { x: 40, y: sub ? 18 : NODE_H / 2 + 1,
+          var nm = el('text', { x: 40, y: sub ? 22 : NODE_H / 2 + 5,
                                 'class': 'gen-name' });
           nm.textContent = p.name.length > 24 ? p.name.slice(0, 23) + '\u2026'
                                               : p.name;
           g.appendChild(nm);
           if (sub) {
-            var yr = el('text', { x: 40, y: 30, 'class': 'gen-years' });
+            var yr = el('text', { x: 40, y: 43, 'class': 'gen-years' });
             yr.textContent = sub;
             g.appendChild(yr);
           }

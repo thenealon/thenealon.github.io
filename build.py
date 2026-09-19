@@ -49,6 +49,7 @@ HEAD = """<!DOCTYPE html>
 <title>{title}</title>
 <meta name="description" content="{desc}">
 <meta name="color-scheme" content="light dark">
+<link rel="preload" href="assets/fonts/lmroman10-regular.woff2?v=2.005" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/paper.css?v=20260916">
 <script>try{{var g=localStorage.getItem('nb-bg');if(g){{document.documentElement.setAttribute('data-bg',g);}}}}catch(e){{}}</script>
 <noscript><style>.controls{{display:none}}</style></noscript>
@@ -88,9 +89,18 @@ FOOT = """  <footer class="colophon">
 
 </div><!-- /.shell -->
 
+<svg id="coffee-collector" viewBox="0 0 80 64" hidden aria-hidden="true">
+  <defs><clipPath id="collector-clip"><path d="M12 12H52L49 42Q48 50 32 50Q16 50 15 42Z"/></clipPath></defs>
+  <path d="M52 19H58C71 19 71 38 55 38H51" fill="none" stroke="#bdb4a5" stroke-width="2"/>
+  <path d="M12 12H52L49 42Q48 50 32 50Q16 50 15 42Z" fill="#171410" stroke="#bdb4a5" stroke-width="1.5"/>
+  <rect id="collector-liquid" x="12" y="48" width="40" height="0" fill="#70472b" clip-path="url(#collector-clip)"/>
+  <ellipse cx="32" cy="12" rx="20" ry="4" fill="#21170f" stroke="#bdb4a5" stroke-width="1.5"/>
+  <path d="M8 56Q32 61 59 56" fill="none" stroke="#9c9385" stroke-width="1.2" stroke-linecap="round"/>
+</svg>
+
 <div class="controls" role="group" aria-label="Background controls">
   <div class="perc-status" id="perc-status" hidden title="A site becomes infected when at least r of its four orthogonal neighbors were infected in the previous generation. Infected sites remain infected.">
-    <span>Bootstrap percolation</span><span><span aria-hidden="true">t = </span><span class="ctl-txt">Generation </span><span id="perc-generation">0</span></span>
+    <span>Bootstrap percolation</span><span><span aria-hidden="true">t = </span><span class="ctl-txt">Generation </span><span id="perc-generation">0</span></span><span id="perc-stage"></span>
   </div>
   <label class="ctl threshold-control" id="threshold-control" hidden>
     <span aria-hidden="true">r = <output id="threshold-value">2</output></span>
@@ -633,7 +643,7 @@ def render(pg):
                       seminar_callout=seminar_callout)
     out += body + FOOT.format(colophon=SITE["colophon"], extra=extra)
     # Content versions prevent a cached renderer from mixing with a new page.
-    for asset in ("paper.css", "coffee-surface.js", "tidal-graph.js", "ui.js"):
+    for asset in ("paper.css", "coffee-surface.js", "tidal-graph.js", "ui.js", "genealogy.js"):
         with open(os.path.join(HERE, "assets", asset), "rb") as source:
             version = hashlib.sha256(source.read()).hexdigest()[:12]
         out = re.sub(r'assets/' + re.escape(asset) + r'(?:\?[^"\s]*)?(?=")',
