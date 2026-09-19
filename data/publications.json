@@ -1,7 +1,7 @@
 [
  {
   "key": "bushaw-clifton-3nbr",
-  "topics": ["bootstrap-percolation", "probability-processes"],
+  "topics": ["bootstrap-percolation"],
   "status": "preprint",
   "year": 2026,
   "authors": "N. Bushaw and A. Clifton",
@@ -127,7 +127,7 @@
  },
  {
   "key": "bushaw-etal-bootstrap-conjecturing",
-  "topics": ["bootstrap-percolation", "automated-conjecturing", "probability-processes"],
+  "topics": ["bootstrap-percolation", "automated-conjecturing"],
   "status": "published",
   "year": 2023,
   "authors": "N. Bushaw, B. Conka, V. Gupta, A. Kierans, H. LaFayette, C. E. Larson, K. McCall, A. Mulyar, C. Sullivan, S. Taylor, E. Wainright, E. Wilson, G. Wu and S. Loeb",
