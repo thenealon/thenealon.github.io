@@ -89,9 +89,12 @@ FOOT = """  <footer class="colophon">
 </div><!-- /.shell -->
 
 <div class="controls" role="group" aria-label="Background controls">
+  <div class="perc-status" id="perc-status" hidden title="A site becomes infected when at least r of its four orthogonal neighbors were infected in the previous generation. Infected sites remain infected.">
+    <span>Bootstrap percolation</span><span><span aria-hidden="true">t = </span><span class="ctl-txt">Generation </span><span id="perc-generation">0</span></span>
+  </div>
   <label class="ctl threshold-control" id="threshold-control" hidden>
     <span aria-hidden="true">r = <output id="threshold-value">2</output></span>
-    <input type="range" id="threshold-slider" min="1" max="4" step="1" value="2" aria-label="Bootstrap threshold" aria-valuetext="2 infected neighbors" title="Infected neighbors needed to spread (out of 4)">
+    <input type="range" id="threshold-slider" min="1" max="4" step="1" value="2" aria-label="Bootstrap threshold" aria-valuetext="2 infected neighbors" title="Required infected neighbors from the previous generation (up, down, left, right). Changing r starts a new experiment.">
   </label>
   <button type="button" class="ctl" id="bg-toggle"><span class="ctl-ico" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25"><path d="m5 5 10 2-5 9L5 5Z"/><circle cx="5" cy="5" r="2"/><circle cx="15" cy="7" r="2"/><circle cx="10" cy="16" r="2"/></svg></span><span class="ctl-txt">Graph</span></button>
   <button type="button" class="ctl" id="speed-toggle"><span class="ctl-ico" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="m8 5 5 5-5 5"/></svg></span><span class="ctl-txt">Slow</span></button>

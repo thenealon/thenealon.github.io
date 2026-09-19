@@ -64,7 +64,7 @@ const anchor = '  lastW = canvas.clientWidth;\n  lastH = canvas.clientHeight;\n 
 if (src.indexOf(anchor) === -1) { throw new Error('anchor not found'); }
 const patched = src.replace(anchor,
   '  window.__peek = function () { return { n: n, r: r, xs: xs, ys: ys, deg: deg, segN: segN, live: segN, segs: segs }; };\n'
-  + '  window.__peekPerc = function () { return { cols: pCols, rows: pRows, count: pCount, total: pTotal, gen: pGen, phase: pPhase, grid: Array.from(pInf), seeds: pSeeds.length, landed: pSeedCursor, threshold: PERC_R }; };\n'
+  + '  window.__peekPerc = function () { return { cols: pCols, rows: pRows, count: pCount, total: pTotal, gen: pGen, phase: pPhase, grid: Array.from(pInf), levels: Array.from(pLevel), threshold: PERC_R }; };\n'
   + '  window.__newRound = newRound;\n'
   + '  window.__generation = percGeneration;\n'
   + '  window.__setPerc = function (cells) { pInf.set(cells); pCount = cells.reduce(function(a,b){return a+b;},0); };\n' + anchor);
@@ -208,37 +208,62 @@ for (let threshold = 1; threshold <= 4; threshold++) {
   console.log(`threshold ${threshold}: 12 synchronous generations match the independent oracle`);
 }
 
-/* No propagation until all poured seeds land; pause prevents all motion. */
+/* A_0 is visible without animation. Four seconds to inspect it, then one
+   synchronous generation every three seconds; pause freezes both layers. */
 window.tidalGraph.setThreshold(2);
 window.__newRound();
-assert.equal(window.__peekPerc().count, 0);
+const initial = window.__peekPerc();
+assert.ok(initial.count > 0);
+assert.deepEqual(initial.levels, initial.grid);
 advance(2);
-let pouring = window.__peekPerc();
-assert.equal(pouring.phase, 'pour');
-assert.equal(pouring.gen, 0);
-assert.equal(pouring.count, pouring.landed);
-assert.ok(pouring.count > 0 && pouring.count < pouring.seeds);
+assert.deepEqual(window.__peekPerc(), initial);
 window.tidalGraph.setPaused(true);
-advance(2);
-assert.deepEqual(window.__peekPerc(), pouring);
+advance(10);
+assert.deepEqual(window.__peekPerc(), initial);
 window.tidalGraph.setPaused(false);
-advance(7);
-assert.notEqual(window.__peekPerc().phase, 'pour');
-assert.equal(window.__peekPerc().landed, window.__peekPerc().seeds);
-console.log('pouring: only landed seeds infect; growth starts afterward; pause is stable');
+advance(2.15);
+assert.equal(window.__peekPerc().gen, 1);
+const first = window.__peekPerc().grid;
+advance(2.65);
+assert.equal(window.__peekPerc().gen, 1);
+assert.deepEqual(window.__peekPerc().grid, first);
+advance(.4);
+assert.equal(window.__peekPerc().gen, 2);
+window.tidalGraph.setPaused(true);
+const spreading = window.__peekPerc();
+advance(2);
+assert.deepEqual(window.__peekPerc(), spreading, 'Pause freezes the exact state and its visual interpolation');
+window.tidalGraph.setPaused(false);
+window.tidalGraph.setSpeed(true);
+advance(1.3);
+assert.equal(window.__peekPerc().gen, 3);
+window.tidalGraph.setSpeed(false);
+console.log('pace: initial state held; updates are 3 seconds apart (1.25 seconds when faster); pause freezes both layers');
 
 /* A stalled high-threshold round must end, never receive extra infections. */
 window.tidalGraph.setThreshold(4);
-advance(6);
 for (let wait = 0; wait < 60 && window.__peekPerc().phase !== 'hold'; wait++) advance(.25);
 let stalled = window.__peekPerc();
 assert.equal(stalled.phase, 'hold');
 const stoppedCount = stalled.count;
 advance(1);
 assert.equal(window.__peekPerc().count, stoppedCount);
-advance(8);
-assert.equal(window.__peekPerc().phase, 'pour');
-console.log('stalled round: holds its actual closure, fades, then starts a new pour');
+advance(12);
+assert.equal(window.__peekPerc().phase, 'hold');
+assert.deepEqual(window.__peekPerc().grid, stalled.grid);
+advance(4.5);
+assert.equal(window.__peekPerc().phase, 'seed');
+assert.equal(window.__peekPerc().gen, 0);
+console.log('stalled round: holds its actual closure for 14 seconds, fades, then starts a new experiment');
+
+window.tidalGraph.setPaused(true);
+window.tidalGraph.reseed();
+const pausedSeed = window.__peekPerc();
+assert.equal(pausedSeed.gen, 0);
+assert.deepEqual(pausedSeed.levels, pausedSeed.grid, 'Paused resets show A_0 without skipped generations');
+advance(5);
+assert.deepEqual(window.__peekPerc(), pausedSeed);
+window.tidalGraph.setPaused(false);
 
 window.tidalGraph.setThreshold(99);
 assert.equal(window.tidalGraph.getThreshold(), 4);

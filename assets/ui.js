@@ -27,12 +27,15 @@
     var perc = m === 'perc';
     var thresholdControl = document.getElementById('threshold-control');
     if (thresholdControl) { thresholdControl.hidden = !perc; }
+    var percStatus = document.getElementById('perc-status');
+    if (percStatus) { percStatus.hidden = !perc; }
     bgBtn.querySelector('.ctl-ico').innerHTML = icon(perc ? 'coffee' : 'graph');
     bgBtn.querySelector('.ctl-txt').textContent = perc ? 'Coffee' : 'Graph';
     bgBtn.setAttribute('title', perc ? 'Switch to the graph background' : 'Switch to the coffee background');
     bgBtn.setAttribute('aria-label', perc
       ? 'Background: bootstrap percolation. Switch to the random geometric graph.'
       : 'Background: random geometric graph. Switch to bootstrap percolation.');
+    if (window.tidalGraph) { labelSpeed(window.tidalGraph.isFast()); }
   }
   if (bgBtn) {
     var bg0 = get('nb-bg') === 'perc' ? 'perc' : 'graph';
@@ -76,7 +79,10 @@
     if (!speedBtn) { return; }
     speedBtn.querySelector('.ctl-ico').innerHTML = icon(fast ? 'fast' : 'slow');
     speedBtn.querySelector('.ctl-txt').textContent = fast ? 'Fast' : 'Slow';
-    speedBtn.setAttribute('title', fast ? 'Slow down' : 'Speed up');
+    var perc = window.tidalGraph && window.tidalGraph.getMode() === 'perc';
+    speedBtn.setAttribute('title', perc
+      ? (fast ? 'One generation every 1.25 seconds. Slow down.' : 'One generation every 3 seconds. Speed up.')
+      : (fast ? 'Slow down' : 'Speed up'));
     speedBtn.setAttribute('aria-label', fast
       ? 'Background running fast. Slow it down.'
       : 'Background running slowly. Speed it up.');

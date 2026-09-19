@@ -1,43 +1,57 @@
-/* Renderer checks are independent of the bootstrap state oracle in harness.js.
-   No browser or graphics package is needed to check the wave state and flow. */
+/* Check the visible mathematical contract without browser/GPU dependencies. */
 const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
-let uploaded, time;
-const gl = new Proxy({
-  getExtension: () => ({}), getShaderParameter: () => true,
-  getProgramParameter: () => true, getUniformLocation: (_, name) => name,
-  getAttribLocation: () => 0,
-  uniform1f: (name, value) => { if (name === 'uTime') time = value; },
-  texSubImage2D: (...args) => { uploaded = Float32Array.from(args.at(-1)); }
-}, {get: (o, k) => k in o ? o[k] : /^[A-Z_]+$/.test(k) ? 1 : () => ({})});
+
+function context() {
+  const calls = [];
+  return new Proxy({calls, createImageData: (w, h) => ({data: new Uint8ClampedArray(w * h * 4)})}, {
+    get(o, key) {
+      if (key in o) return o[key];
+      return (...args) => calls.push([key, ...args]);
+    },
+    set(o, key, value) { o[key] = value; return true; }
+  });
+}
 const scope = {
-  document: {createElement: () => ({getContext: () => gl, addEventListener() {}})},
-  window: {devicePixelRatio: 1}, console, Math, Uint8Array, Float32Array
+  document: {createElement: () => ({getContext: () => context()})},
+  window: {devicePixelRatio: 2}, console, Math, Float32Array
 };
 vm.runInNewContext(fs.readFileSync(__dirname + '/../assets/coffee-surface.js', 'utf8'), scope);
 const surface = scope.window.createCoffeeSurface();
-surface.resize(720, 540, 40, 30, 18);
-const levels = Float32Array.from({length: 1200}, (_, i) => (i % 40 < 23 && i > 240) ? 1 : 0);
-const original = Array.from(levels), ctx = {drawImage() {}};
-surface.draw(ctx, levels, 0, 1);
-surface.splash(180, 270, 1);
-surface.stir(180, 270, 0);
-surface.stir(210, 275, .03);
-for (let frame = 1; frame <= 600; frame++) surface.draw(ctx, levels, frame / 30, 1);
-assert.deepEqual(Array.from(levels), original, 'Surface effects cannot infect or heal a site');
-assert.ok(uploaded.every(Number.isFinite), 'Wave and colour fields remain finite');
-assert.ok(uploaded.every((v, i) => i % 4 !== 1 || (v >= 0 && v <= 1)), 'Surface height stays bounded');
-const paused = Array.from(uploaded);
-surface.draw(ctx, levels, 20, 1);
-assert.deepEqual(Array.from(uploaded), paused, 'Redrawing at the same time does not advance the waves');
-assert.equal(time, 20);
-surface.reset();
-surface.draw(ctx, new Float32Array(1200), 20, 1);
-assert.ok(uploaded.every((v, i) => i % 4 !== 0 || v === 0), 'An empty infection set has no coffee');
-for (const t of [0, 1, 5, 20]) for (const [x, y] of [[80, 100], [300, 400], [690, 250]]) {
-  const e = .0001, p = surface.project(x, y, t), a = surface.project(x + e, y, t), b = surface.project(x, y + e, t);
-  const determinant = ((a.x - p.x) * (b.y - p.y) - (b.x - p.x) * (a.y - p.y)) / (e * e);
-  assert.ok(Math.abs(determinant - 1) < .0001, 'Display flow preserves area and orientation');
+
+for (const [cols, rows] of [[13, 28], [60, 37], [160, 90]]) {
+  const cell = 24;
+  surface.resize(cols * cell, rows * cell, cols, rows, cell);
+  const infected = Uint8Array.from({length: cols * rows}, (_, i) => (i % 7 === 0 || i % 31 === 0) ? 1 : 0);
+  const levels = Float32Array.from(infected, (v, i) => v * (i % 2 ? .35 : 1));
+  const original = Array.from(infected), originalLevels = Array.from(levels);
+  const ctx = context();
+  surface.draw(ctx, levels, infected, 1);
+  const vertices = ctx.calls.filter(c => c[0] === 'arc').map(c => c.slice(1, 3));
+  const expected = [];
+  for (let i = 0; i < infected.length; i++) if (infected[i])
+    expected.push([(i % cols + .5) * cell, (Math.floor(i / cols) + .5) * cell]);
+  const sort = a => a.sort((a, b) => a[1] - b[1] || a[0] - b[0]);
+  assert.deepEqual(sort(vertices), sort(expected), 'Every infected site is marked at its exact fixed lattice position, including new sites');
+  assert.deepEqual(Array.from(infected), original, 'Rendering cannot change the binary process');
+  assert.deepEqual(Array.from(levels), originalLevels, 'Rendering cannot advance the interpolation');
+  assert.ok(ctx.calls.flat().filter(v => typeof v === 'number').every(Number.isFinite));
+  const paused = context();
+  surface.draw(paused, levels, infected, 1);
+  assert.deepEqual(paused.calls, ctx.calls, 'A redraw has no independent animation');
+
+  surface.reset();
+  const empty = context();
+  surface.draw(empty, new Float32Array(infected.length), new Uint8Array(infected.length), 1);
+  assert.equal(empty.calls.filter(c => c[0] === 'arc').length, 0);
+  assert.equal(empty.calls.filter(c => c[0] === 'clip').length, 0, 'No coffee without infection');
+  assert.equal(empty.calls.filter(c => c[0] === 'drawImage').length, 1, 'The graph paper remains visible');
+
+  const diagonal = new Uint8Array(infected.length);
+  diagonal[cols + 1] = 1; diagonal[2 * cols + 2] = 1;
+  const separate = context();
+  surface.draw(separate, Float32Array.from(diagonal), diagonal, 1);
+  assert.equal(separate.calls.filter(c => c[0] === 'closePath').length, 2, 'Diagonal sites do not merge');
 }
-console.log('PASS: liquid never changes infection state; waves stay bounded, pause and reset work, and flow preserves area.');
+console.log('PASS: exact fixed vertices on phone, desktop and 4K grids; no mutation, phantom sites, diagonal bridges, or independent motion.');

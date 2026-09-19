@@ -6,7 +6,7 @@
 <title>Mathematical genealogy &mdash; Neal Bushaw</title>
 <meta name="description" content="The mathematical advisor graph of Neal Bushaw, with portraits, biographies, and selected papers.">
 <meta name="color-scheme" content="light dark">
-<link rel="stylesheet" href="assets/paper.css?v=0642d2d83d6e">
+<link rel="stylesheet" href="assets/paper.css?v=818e3216376c">
 <script>try{var g=localStorage.getItem('nb-bg');if(g){document.documentElement.setAttribute('data-bg',g);}}catch(e){}</script>
 <noscript><style>.controls{display:none}</style></noscript>
 </head>
@@ -63,9 +63,12 @@
 </div><!-- /.shell -->
 
 <div class="controls" role="group" aria-label="Background controls">
+  <div class="perc-status" id="perc-status" hidden title="A site becomes infected when at least r of its four orthogonal neighbors were infected in the previous generation. Infected sites remain infected.">
+    <span>Bootstrap percolation</span><span><span aria-hidden="true">t = </span><span class="ctl-txt">Generation </span><span id="perc-generation">0</span></span>
+  </div>
   <label class="ctl threshold-control" id="threshold-control" hidden>
     <span aria-hidden="true">r = <output id="threshold-value">2</output></span>
-    <input type="range" id="threshold-slider" min="1" max="4" step="1" value="2" aria-label="Bootstrap threshold" aria-valuetext="2 infected neighbors" title="Infected neighbors needed to spread (out of 4)">
+    <input type="range" id="threshold-slider" min="1" max="4" step="1" value="2" aria-label="Bootstrap threshold" aria-valuetext="2 infected neighbors" title="Required infected neighbors from the previous generation (up, down, left, right). Changing r starts a new experiment.">
   </label>
   <button type="button" class="ctl" id="bg-toggle"><span class="ctl-ico" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25"><path d="m5 5 10 2-5 9L5 5Z"/><circle cx="5" cy="5" r="2"/><circle cx="15" cy="7" r="2"/><circle cx="10" cy="16" r="2"/></svg></span><span class="ctl-txt">Graph</span></button>
   <button type="button" class="ctl" id="speed-toggle"><span class="ctl-ico" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="m8 5 5 5-5 5"/></svg></span><span class="ctl-txt">Slow</span></button>
@@ -84,10 +87,10 @@
   </div>
 </dialog>
 
-<script src="assets/coffee-surface.js?v=3dc92e249f79"></script>
-<script src="assets/tidal-graph.js?v=430d53a02c15"></script>
+<script src="assets/coffee-surface.js?v=4535183c4f85"></script>
+<script src="assets/tidal-graph.js?v=11669bbcc216"></script>
 <script src="assets/abstracts.js"></script>
-<script src="assets/ui.js?v=b9d39f3d28ca"></script>
+<script src="assets/ui.js?v=c20d0b2e614e"></script>
 <script src="assets/genealogy-data.js"></script>
 <script src="assets/genealogy.js"></script>
 </body>

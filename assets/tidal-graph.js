@@ -35,24 +35,21 @@
  * its four orthogonal neighbours were infected in the previous generation.
  * A site never heals within a round.
  *
- * Each round starts with small mugs flying across the screen. Their drops
- * land on a randomly chosen seed set before the first synchronous update.
- * After that, only the selected threshold rule can infect a site. A full or
- * stalled configuration is held, fades to black, and starts a fresh round.
+ * Each experiment begins with an independent Bernoulli seed set A_0. It is
+ * held for four seconds before propagation. Subsequent generations take
+ * three seconds at the default pace. Only the threshold rule adds sites;
+ * the actual closure is held before fading into a fresh experiment.
  *
- * The lattice drives a continuous coffee surface: interpolated infection
- * levels, rounded contours, a rippling meniscus, and soft reflections.
- * Displacement and ripples affect only rendering, never the infection rule.
- * An area-preserving display flow and a damped surface-wave equation make
- * the liquid move independently of the synchronous infection rounds.
- * Neither the flow, splashes nor mouse wake can change an infection.
- * WebGL and software paths shade the same moving height field.
+ * Graph-paper lines and vertices are fixed. Brown dots show A_t exactly;
+ * a softly spreading coffee stain interpolates each discrete update.
+ * The pigment settles between updates, without moving the lattice or
+ * suggesting propagation unrelated to the bootstrap rule.
  *
  * Only one of the two runs at a time; the control in the corner switches
  * between them and the choice is remembered.  The idle one is neither
  * stepped nor drawn.
  *
- * Dependencies: coffee-surface.js; no third-party libraries. Optional WebGL.
+ * Dependencies: coffee-surface.js; no third-party libraries or WebGL.
  * Degrades to a plain background without JS.
  */
 (function () {
@@ -100,14 +97,15 @@
   var WAKE_S = 26;        /* px/s, strength of the pointer wake         */
 
   /* bootstrap percolation */
-  var PERC_CELL = 18;          /* px per lattice site */
+  var PERC_CELL = 24;          /* px per lattice site; keep neighbours legible */
   var PERC_R = 2;              /* orthogonal neighbours required */
-  var PERC_HZ = 5.5;           /* simulation generations per scaled second */
+  var PERC_STEP = 3;           /* seconds per synchronous generation */
+  var PERC_FAST_STEP = 1.25;   /* optional faster observation */
   var PERC_P = 0.42;           /* seed density = PERC_P / log(min side) */
   var PERC_P_MIN = 0.06, PERC_P_MAX = 0.13;
-  var PERC_HOLD = 5.5;         /* seconds before a fresh pot */
-  var PERC_CLEAR = 2.0;        /* gentle fade between independent rounds */
-  var PERC_POUR = 6.6;         /* seconds for the mugs to cross */
+  var PERC_HOLD = 14;          /* time to inspect the actual closure */
+  var PERC_CLEAR = 3;          /* gentle fade between independent experiments */
+  var PERC_SEED_HOLD = 4;      /* time to inspect A_0 */
 
   /* ---- state ------------------------------------------------------- */
   var W = 0, H = 0, EW = 0, EH = 0, n = 0, r = 0, r2 = 0;
@@ -132,8 +130,7 @@
   var coffee = null;
   var pInf = null, pLevel = null, pCols = 0, pRows = 0;
   var pCount = 0, pTotal = 0, pGen = 0, pAdd = null;
-  var pPhase = 'pour', pTimer = 0, pAcc = 0, pLiquidT = 0;
-  var pSeeds = [], pMugs = [], pSeedCursor = 0, pPourEnd = 0;
+  var pPhase = 'seed', pTimer = 0, pAcc = 0;
   var pOpacity = 1;
   var fu = 0, fv = 0;   /* flow() writes here, to avoid allocating */
 
@@ -299,8 +296,8 @@
   /* ---- bootstrap percolation ---------------------------------------- */
 
   function initPerc() {
-    pCols = Math.max(4, Math.ceil(W / PERC_CELL));
-    pRows = Math.max(4, Math.ceil(H / PERC_CELL));
+    pCols = Math.max(4, Math.floor(W / PERC_CELL));
+    pRows = Math.max(4, Math.floor(H / PERC_CELL));
     pTotal = pCols * pRows;
     pInf = new Uint8Array(pTotal);
     pLevel = new Float32Array(pTotal);
@@ -317,16 +314,11 @@
       PERC_P / Math.log(Math.max(3, Math.min(pCols, pRows)))));
   }
 
-  function mugPosition(mug, t) {
-    var u = (t - mug.delay) / PERC_POUR;
-    return {
-      x: mug.reverse ? W + 52 - u * (W + 104) : -52 + u * (W + 104),
-      y: mug.y + Math.sin(u * TAU + mug.phase) * 11,
-      tilt: .70 + .32 * Math.max(0, Math.min(1,u)),
-      amount: Math.max(.2, 1-u*.8),
-      opacity: Math.max(0, Math.min(1, u*8, (1-u)*8)),
-      visible: u > 0 && u < 1
-    };
+  function labelGeneration() {
+    var output = document.getElementById('perc-generation');
+    if (output) { output.textContent = pGen; }
+    var status = document.getElementById('perc-status');
+    if (status) { status.setAttribute('data-phase', pPhase); }
   }
 
   function newRound() {
@@ -337,56 +329,17 @@
     pAcc = 0;
     pTimer = 0;
     pOpacity = 1;
-    pPhase = 'pour';
-    pSeeds = [];
-    pMugs = [];
-    pSeedCursor = 0;
-    pPourEnd = 0;
+    pPhase = 'seed';
     if (coffee && coffee.reset) { coffee.reset(); }
-    var mugCount = W < 600 ? 2 : 3;
-    var band = H / mugCount;
-    for (var m = 0; m < mugCount; m++) {
-      pMugs.push({ y: Math.max(26, m * band + 5), delay: m * 0.32,
-        reverse: m % 2 === 1, phase: Math.random() * TAU });
-    }
     var p = seedDensity();
     for (var i = 0; i < pTotal; i++) {
       if (Math.random() >= p) { continue; }
-      var x = ((i % pCols) + 0.5) * PERC_CELL;
-      var y = (((i / pCols) | 0) + 0.5) * PERC_CELL;
-      var which = Math.min(mugCount - 1, (y / band) | 0);
-      var mug = pMugs[which];
-      var across = mug.reverse ? W - x : x;
-      var release = mug.delay + (across + 44) / (W + 104) * PERC_POUR;
-      var pos = mugPosition(mug, release);
-      var duration = 0.3 + Math.sqrt(Math.abs(y - pos.y) / Math.max(1, H)) * 0.7;
-      var lip = coffee && coffee.lip ? coffee.lip(pos.x,pos.y,pos.tilt) : {x:pos.x+10,y:pos.y+1};
-      var landing = coffee && coffee.project ? coffee.project(x,y,pLiquidT+release+duration) : {x:x,y:y};
-      if (landing.y < lip.y + 16) { continue; }
-      pSeeds.push({ i: i, x: x, y: y, startX: lip.x,
-        startY: lip.y, release: release, land: release + duration,
-        duration: duration });
-      pPourEnd = Math.max(pPourEnd, release + duration);
-    }
-    pSeeds.sort(function (a, b) { return a.land - b.land; });
-    pPourEnd = Math.max(pPourEnd, PERC_POUR + (mugCount - 1) * 0.32 + 0.35);
-    /* Reduced motion gets a still, genuinely reachable state, with no cups
-       frozen in midair. Explicit play can still animate subsequent rounds. */
-    if (paused || (mq && mq.matches && !override)) {
-      landSeeds(Infinity);
-      for (var g = 0; g < 14; g++) { if (!percGeneration()) { break; } }
-      for (var j = 0; j < pTotal; j++) { pLevel[j] = pInf[j]; }
-      pPhase = 'grow';
-    }
-  }
-
-  function landSeeds(t) {
-    while (pSeedCursor < pSeeds.length && pSeeds[pSeedCursor].land <= t) {
-      var i = pSeeds[pSeedCursor++].i;
       pInf[i] = 1;
+      pLevel[i] = 1;
       pCount++;
-      if (coffee && coffee.splash) { coffee.splash((i%pCols+.5)*PERC_CELL, (Math.floor(i/pCols)+.5)*PERC_CELL, .65); }
     }
+    /* A_0 is visible immediately, including with reduced motion or pause. */
+    labelGeneration();
   }
 
   /* One synchronous update. No sprinkling or spontaneous infection. */
@@ -413,21 +366,20 @@
   function stepPerc(dt) {
     if (!pInf) { return; }
     var realDt = dt / speed;
-    pLiquidT += realDt;
-    if (wake && coffee && coffee.stir) { coffee.stir(mx,my,pLiquidT); }
-    var ease = 1 - Math.exp(-realDt * 7);
+    var period = speed === RABBIT ? PERC_FAST_STEP : PERC_STEP;
+    var ease = 1 - Math.exp(-realDt * 3.5);
     for (var i = 0; i < pTotal; i++) {
       pLevel[i] += (pInf[i] - pLevel[i]) * ease;
+      if (pInf[i] - pLevel[i] < .001) { pLevel[i] = pInf[i]; }
     }
-    if (pPhase === 'pour') {
+    if (pPhase === 'seed') {
       pTimer += realDt;
-      landSeeds(pTimer);
-      if (pTimer >= pPourEnd) { pPhase = 'grow'; pTimer = 0; }
-      return;
+      if (pTimer < PERC_SEED_HOLD) { return; }
+      pPhase = 'grow'; pTimer = 0; pAcc = period;
     }
     if (pPhase === 'hold') {
       pTimer += realDt;
-      if (pTimer >= PERC_HOLD) { pPhase = 'clear'; pTimer = 0; }
+      if (pTimer >= PERC_HOLD) { pPhase = 'clear'; pTimer = 0; labelGeneration(); }
       return;
     }
     if (pPhase === 'clear') {
@@ -437,31 +389,19 @@
       if (u >= 1) { newRound(); }
       return;
     }
-    pAcc += dt;
-    var budget = 4;
-    while (pAcc >= 1 / PERC_HZ && budget--) {
-      pAcc -= 1 / PERC_HZ;
+    pAcc += realDt;
+    if (pAcc >= period) {
+      pAcc -= period;
       pGen++;
       var m = percGeneration();
-      if (!m || pCount >= pTotal) { pPhase = 'hold'; pTimer = 0; break; }
+      if (!m || pCount >= pTotal) { pPhase = 'hold'; pTimer = 0; }
+      labelGeneration();
     }
   }
 
   function drawPerc() {
     if (!pInf) { return; }
-    if (coffee) { coffee.draw(ctx, pLevel, pLiquidT, pOpacity); }
-    if (pPhase !== 'pour' || !coffee) { return; }
-    for (var i = 0; i < pSeeds.length; i++) {
-      var s = pSeeds[i];
-      var u = (pTimer - s.release) / s.duration;
-      if (u < 0 || u > 1.65) { continue; }
-      coffee.drop(ctx, s, u, pLiquidT);
-    }
-    for (var m = 0; m < pMugs.length; m++) {
-      var pos = mugPosition(pMugs[m], pTimer);
-      if (pos.visible) { coffee.pour(ctx, pos.x, pos.y, pos.tilt, pos.amount * pos.opacity, pLiquidT);
-        coffee.mug(ctx, pos.x, pos.y, pos.tilt, pos.opacity, pos.amount); }
-    }
+    if (coffee) { coffee.draw(ctx, pLevel, pInf, pOpacity); }
   }
 
   function push(x1, y1, x2, y2, band) {
@@ -577,7 +517,7 @@
   function frame(now) {
     raf = 0;
     var t = now / 1000;
-    /* Cap the liquid at 30 fps; leave the existing graph cadence alone. */
+    /* Thirty frames per second is ample for the slowly spreading stain. */
     if (mode === 'perc' && lastT && t - lastT < 1 / 32) { schedule(); return; }
     var dt = lastT ? t - lastT : 0.016;
     lastT = t;
@@ -687,7 +627,9 @@
       schedule();
     },
     setSpeed: function (fast) {
+      var previous = speed === RABBIT ? PERC_FAST_STEP : PERC_STEP;
       speed = fast ? RABBIT : TURTLE;
+      pAcc *= (speed === RABBIT ? PERC_FAST_STEP : PERC_STEP) / previous;
     },
     isFast: function () { return speed === RABBIT; },
     getMode: function () { return mode; },
