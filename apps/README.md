@@ -1,11 +1,11 @@
-# apps/
+# Standalone demos
 
-Drop a self-contained `.html` file in here and it shows up in **Demos / Slop**
-automatically. Its name comes from the file's `<title>`, and GitHub takes its
-screenshot during the next site build. Nothing else to do.
+1. Add a self-contained HTML file to this folder with a descriptive `<title>`.
+2. Open `index.html` at the repository root and search for **EXTRAS**.
+3. Copy a list entry and change its link and name, for example:
 
-- One file per app. It can pull in its own CSS/JS, or be a single file.
-- The `<title>` is the label shown under the card.
-- Screenshots are recaptured when an app's HTML changes.
-- To override an automatic screenshot, replace its matching file in
-  `assets/demos/` and leave the HTML unchanged.
+   `<li><a href="apps/my-demo.html">My demo</a></li>`
+
+4. Commit both files to `main`.
+
+Links are added by hand. There is no automatic discovery, screenshot capture, or homepage generator. Keep each demo’s controls keyboard accessible, label its inputs, and provide text descriptions for meaningful graphics or audio.
